@@ -281,6 +281,7 @@
     /* Notification pulse */
     .pulse { animation:pulse 2s infinite; }
     @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.4)} 50%{box-shadow:0 0 0 12px rgba(249,115,22,0)} }
+    @keyframes alertPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.25)} }
 
     /* Toast */
     .toast {
@@ -645,12 +646,11 @@ async function manejarCambioRealtime(payload){
 
   if(eventType === 'INSERT'){
     const srv = mapServicio(newRow);
-    // Solo agregar si no existe ya
     if(!servicios.find(s=>s.id===srv.id)){
       servicios.unshift(srv);
-      // Notificar al conductor asignado
+      // Alerta sonora al conductor asignado
       if(currentRole === 'conductor' && srv.conductorId === currentUser.id){
-        mostrarNotifNuevoServicio(srv);
+        mostrarAlertaConductor(srv);
       } else if(currentRole !== 'conductor'){
         showToast('🚛 Nuevo servicio creado: '+srv.id,'info');
       }
@@ -661,43 +661,243 @@ async function manejarCambioRealtime(payload){
     if(idx >= 0){
       const estadoAnterior = servicios[idx].estado;
       servicios[idx] = mapServicio(newRow);
-      // Notificar cambios relevantes
-      if(currentRole === 'conductor' && newRow.conductor_id === currentUser.id){
-        // ya está manejado localmente
-      } else if(currentRole !== 'conductor'){
-        const labels = {aceptado:'✅ Aceptado',en_ruta:'🚛 En ruta',completado:'✔ Completado',rechazado:'✕ Rechazado'};
-        if(newRow.estado !== estadoAnterior && labels[newRow.estado]){
-          showToast(labels[newRow.estado]+' — '+newRow.id,'info');
+      // Aviso al admin cuando conductor acepta
+      if(currentRole !== 'conductor' && newRow.estado !== estadoAnterior){
+        if(newRow.estado === 'aceptado'){
+          const c = conductores.find(x=>x.id===newRow.conductor_id);
+          mostrarAlertaAdmin(servicios[idx], c, 'aceptado');
+        } else if(newRow.estado === 'en_ruta'){
+          const c = conductores.find(x=>x.id===newRow.conductor_id);
+          mostrarAlertaAdmin(servicios[idx], c, 'en_ruta');
+        } else if(newRow.estado === 'completado'){
+          const c = conductores.find(x=>x.id===newRow.conductor_id);
+          mostrarAlertaAdmin(servicios[idx], c, 'completado');
+        } else if(newRow.estado === 'rechazado'){
+          mostrarAlertaAdmin(servicios[idx], null, 'rechazado');
         }
+      }
+      // Conductor: si le reasignan o cambian algo
+      if(currentRole === 'conductor' && newRow.conductor_id === currentUser.id && newRow.estado === 'nuevo' && estadoAnterior !== 'nuevo'){
+        mostrarAlertaConductor(servicios[idx]);
       }
       render();
     }
   }
 }
 
-function mostrarNotifNuevoServicio(srv){
-  // Vibrar
-  if(navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
-  // Notificación del sistema si tiene permiso
+// ═══════════════════════════════════════════════════
+//  🔊 SISTEMA DE SONIDO
+// ═══════════════════════════════════════════════════
+
+let _audioCtx = null;
+let _alarmaInterval = null;
+let _alarmaActiva = false;
+
+function getAudioCtx(){
+  if(!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
+}
+
+function tocarTono(freq, duracion, tipo='sine', volumen=0.4){
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = tipo;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(volumen, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duracion);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duracion);
+  } catch(e){}
+}
+
+function tocarAlarmaConductor(){
+  // Secuencia urgente: 3 tonos ascendentes
+  tocarTono(440, 0.15, 'square', 0.5);
+  setTimeout(()=> tocarTono(550, 0.15, 'square', 0.5), 200);
+  setTimeout(()=> tocarTono(660, 0.3,  'square', 0.6), 400);
+}
+
+function tocarAvisoAdmin(){
+  // Tono suave de notificación
+  tocarTono(520, 0.1, 'sine', 0.3);
+  setTimeout(()=> tocarTono(660, 0.2, 'sine', 0.3), 150);
+}
+
+function iniciarAlarmaRepetida(){
+  _alarmaActiva = true;
+  tocarAlarmaConductor();
+  _alarmaInterval = setInterval(()=>{
+    if(_alarmaActiva) tocarAlarmaConductor();
+  }, 4000);
+}
+
+function detenerAlarma(){
+  _alarmaActiva = false;
+  if(_alarmaInterval){ clearInterval(_alarmaInterval); _alarmaInterval = null; }
+}
+
+// ═══════════════════════════════════════════════════
+//  🚛 ALERTA CONDUCTOR — Nuevo servicio
+// ═══════════════════════════════════════════════════
+
+function mostrarAlertaConductor(srv){
+  detenerAlarma();
+  iniciarAlarmaRepetida();
+  if(navigator.vibrate) navigator.vibrate([400,200,400,200,400,200,400]);
+
+  // Notificación del sistema
   if(Notification.permission === 'granted'){
-    new Notification('🚛 Nuevo servicio — ALCON', {
+    new Notification('🚛 ¡Nuevo servicio asignado!', {
       body: srv.tipoCarga + '\n' + srv.cliente + ' → ' + srv.destino,
-      icon: ''
+      requireInteraction: true,
+      tag: srv.id
     });
   }
-  // Overlay en app
+
   document.getElementById('notifOverlay').innerHTML = `
-    <div class="notif-overlay" onclick="closeNotif(event)">
-      <div class="notif-card" onclick="event.stopPropagation()">
-        <div class="nc-icon" style="animation:pulse 1s 3">🚛</div>
-        <div class="nc-title">¡Nuevo servicio!</div>
-        <div class="nc-sub"><b>${esc(srv.tipoCarga)}</b><br/>${esc(srv.cliente)}<br/><br/>📍 ${esc(srv.destino)}</div>
-        <div class="nc-actions"><button class="btn-primary" onclick="closeNotif();activeTab='servicios';render()">Ver servicio</button></div>
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px">
+      <div style="background:var(--surface);border-radius:24px;padding:28px 20px;width:100%;max-width:380px;text-align:center;border:2px solid var(--orange);box-shadow:0 0 40px rgba(249,115,22,.3)">
+
+        <!-- Ícono pulsante -->
+        <div style="font-size:56px;animation:alertPulse 1s ease-in-out infinite">🚛</div>
+
+        <!-- Título -->
+        <div style="font-size:22px;font-weight:900;color:var(--orange);margin:12px 0 4px">¡NUEVO SERVICIO!</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--grayDark);margin-bottom:16px">${esc(srv.id)}</div>
+
+        <!-- Info del servicio -->
+        <div style="background:var(--bg);border-radius:14px;padding:14px;margin-bottom:20px;text-align:left">
+          <div style="font-weight:900;font-size:15px;margin-bottom:8px">📦 ${esc(srv.tipoCarga)}</div>
+          <div style="font-size:13px;color:var(--gray);margin-bottom:6px">👤 ${esc(srv.cliente)}</div>
+          <div style="font-size:12px;margin-bottom:4px"><span style="color:var(--grayDark)">Origen:</span> ${esc(srv.origen)}</div>
+          <div style="font-size:12px"><span style="color:var(--grayDark)">Destino:</span> ${esc(srv.destino)}</div>
+          ${srv.notas?`<div style="font-size:11px;color:var(--grayDark);margin-top:6px">📝 ${esc(srv.notas)}</div>`:''}
+        </div>
+
+        <!-- Botones -->
+        <button onclick="aceptarDesdeAlerta('${srv.id}')"
+          style="width:100%;background:var(--green);color:#fff;border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:900;cursor:pointer;font-family:var(--font);margin-bottom:10px">
+          ✅ Aceptar servicio
+        </button>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button onclick="posponerAlerta('${srv.id}')"
+            style="background:var(--surface2);color:var(--orange);border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">
+            ⏰ Posponer
+          </button>
+          <button onclick="silenciarAlerta('${srv.id}')"
+            style="background:var(--surface2);color:var(--gray);border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">
+            🔕 Silenciar
+          </button>
+        </div>
+
+        <div style="margin-top:10px;font-size:11px;color:var(--grayDark)">
+          También puedes verlo en la pestaña Servicios
+        </div>
       </div>
     </div>
   `;
   document.getElementById('notifOverlay').style.display = 'block';
 }
+
+async function aceptarDesdeAlerta(id){
+  detenerAlarma();
+  document.getElementById('notifOverlay').style.display = 'none';
+  const s = servicios.find(x=>x.id===id);
+  if(!s) return;
+  s.estado = 'aceptado';
+  s.aceptadoEn = new Date().toISOString();
+  await guardarServicio(s);
+  showToast('✅ Servicio aceptado','success');
+  if(navigator.vibrate) navigator.vibrate([100,50,100]);
+  activeTab = 'servicios';
+  render();
+}
+
+function posponerAlerta(id){
+  detenerAlarma();
+  document.getElementById('notifOverlay').style.display = 'none';
+  showToast('⏰ Pospuesto — revisa en Servicios','info');
+  // Volver a sonar en 2 minutos
+  setTimeout(()=>{
+    const s = servicios.find(x=>x.id===id);
+    if(s && s.estado==='nuevo' && currentRole==='conductor' && s.conductorId===currentUser.id){
+      mostrarAlertaConductor(s);
+    }
+  }, 120000);
+}
+
+function silenciarAlerta(id){
+  detenerAlarma();
+  document.getElementById('notifOverlay').style.display = 'none';
+  showToast('🔕 Silenciado — puedes verlo en Servicios','info');
+}
+
+// ═══════════════════════════════════════════════════
+//  📋 ALERTA ADMIN — Estado del conductor
+// ═══════════════════════════════════════════════════
+
+function mostrarAlertaAdmin(srv, conductor, estado){
+  tocarAvisoAdmin();
+  if(navigator.vibrate) navigator.vibrate([150,100,150]);
+
+  const configs = {
+    aceptado:   { icon:'✅', titulo:'Grúa en movimiento',      color:'var(--green)',  msg:`El conductor ha aceptado el servicio y está en camino.` },
+    en_ruta:    { icon:'🚛', titulo:'Conductor en ruta',        color:'var(--orange)', msg:`El conductor inició el recorrido hacia el destino.` },
+    completado: { icon:'✔️', titulo:'Servicio completado',      color:'#a78bfa',       msg:`El servicio fue entregado exitosamente.` },
+    rechazado:  { icon:'⚠️', titulo:'Servicio rechazado',       color:'var(--red)',    msg:`El conductor no pudo tomar el servicio.` },
+  };
+  const cfg = configs[estado] || configs.aceptado;
+
+  document.getElementById('notifOverlay').innerHTML = `
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99999;display:flex;align-items:flex-end;justify-content:center;padding:20px"
+         onclick="cerrarAlertaAdmin(event)">
+      <div style="background:var(--surface);border-radius:24px 24px 16px 16px;padding:24px 20px;width:100%;max-width:420px;text-align:center;border-top:3px solid ${cfg.color}"
+           onclick="event.stopPropagation()">
+
+        <div style="font-size:44px;margin-bottom:8px">${cfg.icon}</div>
+        <div style="font-size:19px;font-weight:900;color:${cfg.color};margin-bottom:4px">${cfg.titulo}</div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--grayDark);margin-bottom:12px">${esc(srv.id)}</div>
+
+        <div style="background:var(--bg);border-radius:12px;padding:12px;margin-bottom:16px;text-align:left;font-size:13px">
+          <div style="font-weight:700;margin-bottom:4px">📦 ${esc(srv.tipoCarga)}</div>
+          <div style="color:var(--gray)">👤 ${esc(srv.cliente)}</div>
+          ${conductor?`<div style="color:var(--orange);margin-top:4px">🚛 ${esc(conductor.nombre)} — ${esc(conductor.vehiculo)}</div>`:''}
+          <div style="color:var(--grayDark);font-size:12px;margin-top:4px">${cfg.msg}</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button onclick="cerrarAlertaAdmin()"
+            style="background:var(--surface2);color:var(--gray);border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">
+            Cerrar
+          </button>
+          <button onclick="cerrarAlertaAdmin();activeTab='activos';render()"
+            style="background:${cfg.color};color:#fff;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">
+            Ver servicio
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('notifOverlay').style.display = 'block';
+
+  // Auto-cerrar en 8 segundos si no interactúa
+  setTimeout(()=>{
+    const ov = document.getElementById('notifOverlay');
+    if(ov && ov.style.display==='block') cerrarAlertaAdmin();
+  }, 8000);
+}
+
+function cerrarAlertaAdmin(e){
+  if(e && e.target !== e.currentTarget) return;
+  document.getElementById('notifOverlay').style.display = 'none';
+}
+
+
 
 function pedirPermisoNotificaciones(){
   if('Notification' in window && Notification.permission === 'default'){
