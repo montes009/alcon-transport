@@ -282,6 +282,7 @@
     .pulse { animation:pulse 2s infinite; }
     @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.4)} 50%{box-shadow:0 0 0 12px rgba(249,115,22,0)} }
     @keyframes alertPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.25)} }
+    @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
     /* Toast */
     .toast {
@@ -621,6 +622,50 @@ window.addEventListener('beforeinstallprompt', (e) => {
 //  REALTIME — Supabase subscriptions
 // ═══════════════════════════════════════════════════
 let _realtimeChannel = null;
+
+// ═══ AUTO-REFRESH cada 30s como respaldo del Realtime ═══
+let _autoRefreshInterval = null;
+
+function iniciarAutoRefresh(){
+  if(_autoRefreshInterval) clearInterval(_autoRefreshInterval);
+  _autoRefreshInterval = setInterval(async ()=>{
+    if(!currentUser || !currentEmpresa) return;
+
+    // Indicador visual
+    const ind = document.getElementById('syncIndicator');
+    if(ind){ ind.style.display='block'; ind.style.animation='spin 1s linear infinite'; }
+
+    const idsAntes = servicios.map(s=>s.id).join(',');
+    if(currentRole === 'conductor'){
+      await cargarServicios();
+      const nuevos = servicios.filter(s=>
+        s.conductorId === currentUser.id &&
+        s.estado === 'nuevo' &&
+        !idsAntes.includes(s.id)
+      );
+      if(nuevos.length > 0) mostrarAlertaConductor(nuevos[0]);
+    } else if(currentRole !== 'super_admin'){
+      const estadosAntes = {};
+      servicios.forEach(s=>{ estadosAntes[s.id]=s.estado; });
+      await cargarServicios();
+      servicios.forEach(s=>{
+        if(estadosAntes[s.id] && estadosAntes[s.id] !== s.estado){
+          const c = conductores.find(x=>x.id===s.conductorId);
+          if(['aceptado','en_ruta','completado','rechazado'].includes(s.estado)){
+            mostrarAlertaAdmin(s, c, s.estado);
+          }
+        }
+      });
+    }
+
+    if(ind){ ind.style.animation='none'; setTimeout(()=>{ if(ind) ind.style.display='none'; }, 500); }
+    render();
+  }, 30000);
+}
+
+function detenerAutoRefresh(){
+  if(_autoRefreshInterval){ clearInterval(_autoRefreshInterval); _autoRefreshInterval = null; }
+}
 
 function iniciarRealtime(){
   if(!currentEmpresa) return;
@@ -1106,9 +1151,10 @@ async function doLogin(){
   // Guardar sesión en PWA
   guardarSesion();
 
-  // Activar realtime y notificaciones
+  // Activar realtime, auto-refresh y notificaciones
   if(rolUsuario !== 'super_admin'){
     iniciarRealtime();
+    iniciarAutoRefresh();
     pedirPermisoNotificaciones();
   }
 
@@ -1118,6 +1164,7 @@ async function doLogin(){
 function logout(){
   borrarSesion();
   detenerRealtime();
+  detenerAutoRefresh();
   detenerAlarma();
   document.getElementById('userMenu').classList.remove('show');
   document.getElementById('app').classList.remove('show');
@@ -2749,6 +2796,7 @@ doLogin = async function(){
   if(currentUser && currentEmpresa){
     setTimeout(()=>{
       iniciarRealtime();
+      iniciarAutoRefresh();
       pedirPermisoNotificaciones();
     }, 500);
   }
