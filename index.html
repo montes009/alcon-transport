@@ -687,8 +687,75 @@ let nextServicioId  = 1;
 let nextFacturaNum  = 1;
 
 // ═══════════════════════════════════════════════════
-//  LOGIN
+//  SESIÓN PERSISTENTE — Solo en modo app instalada
 // ═══════════════════════════════════════════════════
+
+const esPWA = window.matchMedia('(display-mode: standalone)').matches
+           || window.navigator.standalone === true;
+
+function guardarSesion(){
+  if(!esPWA) return;
+  localStorage.setItem('alcon_session', JSON.stringify({
+    userId:    currentUser.id,
+    email:     currentUser.email,
+    password:  currentUser.password_hash,
+    rol:       currentUser.rol,
+    empresaId: currentEmpresa?.id
+  }));
+}
+
+function borrarSesion(){
+  localStorage.removeItem('alcon_session');
+}
+
+async function restaurarSesion(){
+  if(!esPWA) return false;
+  const raw = localStorage.getItem('alcon_session');
+  if(!raw) return false;
+
+  try {
+    const s = JSON.parse(raw);
+    const { data, error } = await sb
+      .from('usuarios')
+      .select('*, empresas(*)')
+      .eq('id', s.userId)
+      .eq('email', s.email)
+      .eq('password_hash', s.password)
+      .eq('activo', true)
+      .single();
+
+    if(error || !data) { borrarSesion(); return false; }
+
+    currentUser    = data;
+    currentRole    = data.rol;
+    currentEmpresa = data.empresas;
+
+    if(currentRole === 'super_admin'){
+      await cargarTodasEmpresas();
+    } else {
+      await cargarConductores();
+      await cargarServicios();
+    }
+
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('show');
+    document.getElementById('topRole').textContent = currentEmpresa?.nombre?.split(' ')[0]?.toUpperCase() || 'ALCON';
+    document.getElementById('topName').textContent  = currentUser.nombre.split(' ')[0];
+    document.getElementById('topAvatar').textContent = currentUser.nombre[0].toUpperCase();
+
+    activeTab = currentRole === 'super_admin' ? 'empresas'
+              : currentRole === 'conductor'   ? 'servicios'
+              : 'activos';
+
+    setTimeout(()=>{ iniciarRealtime(); pedirPermisoNotificaciones(); }, 500);
+    render();
+    return true;
+  } catch(e){
+    borrarSesion(); return false;
+  }
+}
+
+
 
 // ═══ ACCESO SECRETO SUPER ADMIN — TOQUE LARGO ═══
 function initSecretAccess(){
@@ -799,6 +866,9 @@ async function doLogin(){
             : rolUsuario === 'conductor'   ? 'servicios'
             : 'activos';
 
+  // Guardar sesión en PWA
+  guardarSesion();
+
   // Activar realtime y notificaciones
   if(rolUsuario !== 'super_admin'){
     iniciarRealtime();
@@ -809,6 +879,7 @@ async function doLogin(){
 }
 
 function logout(){
+  borrarSesion();
   document.getElementById('userMenu').classList.remove('show');
   document.getElementById('app').classList.remove('show');
   document.getElementById('loginScreen').style.display = 'flex';
@@ -2534,7 +2605,8 @@ logout = function(){
 // ═══ INIT PWA al cargar ═══
 document.addEventListener('DOMContentLoaded',()=>{
   initSecretAccess();
-  initPWA();
+  // Intentar restaurar sesión si es PWA
+  restaurarSesion();
 });
 
 function initPWA(){
