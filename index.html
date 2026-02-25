@@ -636,9 +636,14 @@ function iniciarRealtime(){
       await manejarCambioRealtime(payload);
     })
     .subscribe((status) => {
+      console.log('Realtime status:', status);
       const dot = document.getElementById('rtDot');
       if(dot) dot.className = 'rt-dot' + (status === 'SUBSCRIBED' ? '' : ' off');
     });
+}
+
+function detenerRealtime(){
+  if(_realtimeChannel){ sb.removeChannel(_realtimeChannel); _realtimeChannel = null; }
 }
 
 async function manejarCambioRealtime(payload){
@@ -1112,6 +1117,8 @@ async function doLogin(){
 
 function logout(){
   borrarSesion();
+  detenerRealtime();
+  detenerAlarma();
   document.getElementById('userMenu').classList.remove('show');
   document.getElementById('app').classList.remove('show');
   document.getElementById('loginScreen').style.display = 'flex';
@@ -2421,86 +2428,6 @@ function showToast(msg,type='info'){const t=document.createElement('div');t.clas
 // ═══════════════════════════════════════════════════
 //  🔔 SUPABASE REALTIME — Notificaciones en tiempo real
 // ═══════════════════════════════════════════════════
-
-let realtimeChannel = null;
-
-function iniciarRealtime(){
-  if(!currentEmpresa || !currentUser) return;
-  // Limpiar canal anterior
-  if(realtimeChannel){ sb.removeChannel(realtimeChannel); realtimeChannel=null; }
-
-  realtimeChannel = sb.channel('servicios_'+currentEmpresa.id)
-    .on('postgres_changes',{
-      event: 'INSERT',
-      schema: 'public',
-      table: 'servicios',
-      filter: `empresa_id=eq.${currentEmpresa.id}`
-    }, (payload)=>{
-      const nuevo = mapServicio(payload.new);
-      // Evitar duplicado si lo creamos nosotros
-      if(!servicios.find(s=>s.id===nuevo.id)){
-        servicios.unshift(nuevo);
-        // Notificar solo al conductor asignado
-        if(currentRole==='conductor' && nuevo.conductorId===currentUser.id){
-          mostrarNotifRealtime(nuevo, '🔔 Nuevo servicio asignado');
-          render();
-        }
-        // Actualizar vista admin
-        if(currentRole==='admin'||currentRole==='empresa_super_admin'){
-          render();
-        }
-      }
-    })
-    .on('postgres_changes',{
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'servicios',
-      filter: `empresa_id=eq.${currentEmpresa.id}`
-    }, (payload)=>{
-      const idx = servicios.findIndex(s=>s.id===payload.new.id);
-      const actualizado = mapServicio(payload.new);
-      if(idx>=0) servicios[idx] = actualizado;
-      else servicios.unshift(actualizado);
-
-      // Notificar al admin cuando conductor cambia estado
-      if((currentRole==='admin'||currentRole==='empresa_super_admin') && payload.old.estado !== payload.new.estado){
-        const msgs = {
-          aceptado:  '✅ Servicio aceptado por conductor',
-          en_ruta:   '🚛 Conductor en ruta',
-          rechazado: '⚠️ Servicio rechazado',
-          completado:'✔️ Servicio completado'
-        };
-        const msg = msgs[payload.new.estado];
-        if(msg) mostrarNotifRealtime(actualizado, msg);
-      }
-      // Notificar al conductor si le actualizan algo
-      if(currentRole==='conductor' && actualizado.conductorId===currentUser.id && payload.old.estado!==payload.new.estado){
-        render();
-      }
-      render();
-    })
-    .subscribe();
-}
-
-function detenerRealtime(){
-  if(realtimeChannel){ sb.removeChannel(realtimeChannel); realtimeChannel=null; }
-}
-
-function mostrarNotifRealtime(srv, titulo){
-  // Notificación push del navegador
-  if(Notification.permission==='granted'){
-    new Notification(titulo, {
-      body: `${srv.tipoCarga} — ${srv.cliente}\n${srv.origen} → ${srv.destino}`,
-      icon: 'https://cdn.jsdelivr.net/npm/twemoji@14/assets/72x72/1f69a.png',
-      badge: 'https://cdn.jsdelivr.net/npm/twemoji@14/assets/72x72/1f69a.png',
-      tag: srv.id,
-      requireInteraction: false
-    });
-  }
-  // Toast en pantalla
-  showToast(titulo + ' — ' + srv.id, 'info');
-  if(navigator.vibrate) navigator.vibrate([200,100,200]);
-}
 
 async function pedirPermisoNotificaciones(){
   if(!('Notification' in window)) return;
