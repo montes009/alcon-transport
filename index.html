@@ -569,97 +569,20 @@ const SUPA_URL = 'https://gdwvvlclzgzrqchyhlud.supabase.co';
 const SUPA_KEY = 'sb_publishable_929KIKo7d3aLB9ooHWZngw_WRoQmrtD';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-// ═══════════════════════════════════════════════════
-//  PWA — MANIFEST DINÁMICO
-// ═══════════════════════════════════════════════════
-(function initPWA(){
-  const manifest = {
-    name: 'ALCON Transport',
-    short_name: 'ALCON',
-    description: 'Gestión de grúas y transporte',
-    start_url: './',
-    display: 'standalone',
-    background_color: '#0f172a',
-    theme_color: '#0f172a',
-    orientation: 'portrait',
-    icons: [
-      { src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%230f172a"/><text y=".9em" font-size="80" x="10">🏗️</text></svg>', sizes: '192x192', type: 'image/svg+xml' },
-      { src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%230f172a"/><text y=".9em" font-size="80" x="10">🏗️</text></svg>', sizes: '512x512', type: 'image/svg+xml' }
-    ]
-  };
-  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
-  const url  = URL.createObjectURL(blob);
-  const link = document.getElementById('pwaManifest');
-  if(link) link.href = url;
-
-  // Service Worker
-  if('serviceWorker' in navigator){
-    const swCode = `
-      const CACHE = 'alcon-transport-v1';
-      const ASSETS = ['./', './index.html'];
-      self.addEventListener('install', e => {
-        e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{})));
-      });
-      self.addEventListener('fetch', e => {
-        e.respondWith(
-          fetch(e.request).catch(() => caches.match(e.request))
-        );
-      });
-      self.addEventListener('push', e => {
-        const data = e.data ? e.data.json() : {};
-        e.waitUntil(self.registration.showNotification(data.title||'ALCON Transport', {
-          body: data.body||'Nuevo servicio asignado',
-          icon: '/icon-192.png',
-          badge: '/icon-192.png',
-          vibrate: [200,100,200],
-          data: data
-        }));
-      });
-    `;
-    const swBlob = new Blob([swCode], {type:'application/javascript'});
-    const swUrl  = URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swUrl).catch(()=>{});
-  }
-})();
+// ═══ PWA — Service Worker real ═══
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  });
+}
 
 // ═══ PWA INSTALL PROMPT ═══
 let _deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   _deferredPrompt = e;
-  showPWABanner();
+  mostrarBannerInstalar();
 });
-
-function showPWABanner(){
-  const banner = document.getElementById('pwaBanner');
-  if(!banner || localStorage.getItem('pwa_dismissed')) return;
-  banner.innerHTML = `
-    <div class="pwa-banner">
-      <div class="pb-icon">🏗️</div>
-      <div class="pb-text">
-        <div class="pb-title">Instalar ALCON Transport</div>
-        <div class="pb-sub">Accede rápido desde tu pantalla de inicio</div>
-      </div>
-      <button class="pb-btn" onclick="instalarPWA()">Instalar</button>
-      <button class="pb-close" onclick="cerrarPWABanner()">✕</button>
-    </div>
-  `;
-  banner.style.display = 'block';
-}
-
-async function instalarPWA(){
-  if(!_deferredPrompt) return;
-  _deferredPrompt.prompt();
-  const { outcome } = await _deferredPrompt.userChoice;
-  _deferredPrompt = null;
-  cerrarPWABanner();
-  if(outcome === 'accepted') showToast('✅ App instalada correctamente','success');
-}
-
-function cerrarPWABanner(){
-  document.getElementById('pwaBanner').style.display = 'none';
-  localStorage.setItem('pwa_dismissed','1');
-}
 
 // ═══════════════════════════════════════════════════
 //  REALTIME — Supabase subscriptions
@@ -2613,6 +2536,20 @@ document.addEventListener('DOMContentLoaded',()=>{
   initSecretAccess();
   initPWA();
 });
+
+function initPWA(){
+  // Capturar evento de instalación (Android Chrome)
+  window.addEventListener('beforeinstallprompt',(e)=>{
+    e.preventDefault();
+    pwaInstallEvent = e;
+    mostrarBannerInstalar();
+  });
+
+  // Registrar Service Worker real
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  }
+}
 
 document.addEventListener('click',(e)=>{const m=document.getElementById('userMenu');const a=document.getElementById('topAvatar');if(m&&!m.contains(e.target)&&e.target!==a)m.classList.remove('show');});
 document.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&document.getElementById('loginForm')?.classList.contains('show'))doLogin();});
