@@ -630,23 +630,22 @@ function iniciarAutoRefresh(){
   if(_autoRefreshInterval) clearInterval(_autoRefreshInterval);
   _autoRefreshInterval = setInterval(async ()=>{
     if(!currentUser || !currentEmpresa) return;
+    // NO refrescar si el usuario está llenando el formulario de crear
+    if(activeTab === 'crear') return;
 
-    // Indicador visual
-    const ind = document.getElementById('syncIndicator');
-    if(ind){ ind.style.display='block'; ind.style.animation='spin 1s linear infinite'; }
+    const idsAntes = new Set(servicios.map(s=>s.id));
+    const estadosAntes = {};
+    servicios.forEach(s=>{ estadosAntes[s.id] = s.estado; });
 
-    const idsAntes = servicios.map(s=>s.id).join(',');
     if(currentRole === 'conductor'){
       await cargarServicios();
       const nuevos = servicios.filter(s=>
         s.conductorId === currentUser.id &&
         s.estado === 'nuevo' &&
-        !idsAntes.includes(s.id)
+        !idsAntes.has(s.id)
       );
       if(nuevos.length > 0) mostrarAlertaConductor(nuevos[0]);
     } else if(currentRole !== 'super_admin'){
-      const estadosAntes = {};
-      servicios.forEach(s=>{ estadosAntes[s.id]=s.estado; });
       await cargarServicios();
       servicios.forEach(s=>{
         if(estadosAntes[s.id] && estadosAntes[s.id] !== s.estado){
@@ -657,8 +656,6 @@ function iniciarAutoRefresh(){
         }
       });
     }
-
-    if(ind){ ind.style.animation='none'; setTimeout(()=>{ if(ind) ind.style.display='none'; }, 500); }
     render();
   }, 30000);
 }
@@ -1029,7 +1026,7 @@ async function restaurarSesion(){
               : currentRole === 'conductor'   ? 'servicios'
               : 'activos';
 
-    setTimeout(()=>{ iniciarRealtime(); pedirPermisoNotificaciones(); }, 500);
+    setTimeout(()=>{ iniciarRealtime(); iniciarAutoRefresh(); pedirPermisoNotificaciones(); }, 500);
     render();
     return true;
   } catch(e){
@@ -1275,18 +1272,22 @@ function render(){
 
   } else if(currentRole === 'empresa_super_admin'){
     bottom.innerHTML = renderBottomEmpresaSuperAdmin();
-    main.innerHTML   = activeTab === 'activos'     ? renderAdminActivos()
-                     : activeTab === 'crear'        ? renderAdminCrear()
-                     : activeTab === 'usuarios'     ? renderEmpresaUsuarios()
-                     : activeTab === 'conductores'  ? renderAdminConductores()
-                     : renderAdminFacturas();
+    if     (activeTab === 'activos')     main.innerHTML = renderAdminActivos();
+    else if(activeTab === 'crear')       main.innerHTML = renderAdminCrear();
+    else if(activeTab === 'conductores') main.innerHTML = renderAdminConductores();
+    else if(activeTab === 'facturas')    main.innerHTML = renderAdminFacturas();
+    else if(activeTab === 'reportes')    main.innerHTML = renderReportes();
+    else if(activeTab === 'usuarios')    renderEmpresaUsuarios().then(h=>{ main.innerHTML=h; });
+    else main.innerHTML = renderAdminActivos();
 
   } else if(currentRole === 'admin'){
     bottom.innerHTML = renderBottomAdmin();
-    main.innerHTML   = activeTab === 'activos'    ? renderAdminActivos()
-                     : activeTab === 'crear'       ? renderAdminCrear()
-                     : activeTab === 'conductores' ? renderAdminConductores()
-                     : renderAdminFacturas();
+    main.innerHTML   = activeTab === 'activos'     ? renderAdminActivos()
+                     : activeTab === 'crear'        ? renderAdminCrear()
+                     : activeTab === 'conductores'  ? renderAdminConductores()
+                     : activeTab === 'facturas'     ? renderAdminFacturas()
+                     : activeTab === 'reportes'     ? renderReportes()
+                     : renderAdminActivos();
 
   } else {
     bottom.innerHTML = renderBottomConductor();
@@ -2701,134 +2702,17 @@ function cerrarBannerInstalar(){
   if(banner) banner.style.display = 'none';
 }
 
-// ═══════════════════════════════════════════════════
-//  PATCH — render() para incluir Reportes + Realtime
-// ═══════════════════════════════════════════════════
-
-// Parchar bottombar admin para agregar pestaña reportes
-const _renderBottomAdmin_orig = renderBottomAdmin;
-renderBottomAdmin = function(){
-  const pendFact = servicios.filter(s=>s.estado==='completado'&&!s.facturaNum).length;
-  return `
-    <button class="bottombar-item ${activeTab==='activos'?'active':''}" onclick="activeTab='activos';render()">
-      <span class="bb-icon">📋</span><span class="bb-label">Servicios</span>
-    </button>
-    <button class="bottombar-item ${activeTab==='crear'?'active':''}" onclick="activeTab='crear';render()">
-      <span class="bb-icon" style="font-size:26px;background:var(--orange);width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:-16px;box-shadow:0 4px 16px rgba(249,115,22,.4)">➕</span>
-      <span class="bb-label" style="margin-top:2px">Crear</span>
-    </button>
-    <button class="bottombar-item ${activeTab==='conductores'?'active':''}" onclick="activeTab='conductores';render()">
-      <span class="bb-icon">🚛</span><span class="bb-label">Flota</span>
-    </button>
-    <button class="bottombar-item ${activeTab==='facturas'?'active':''}" onclick="activeTab='facturas';render()">
-      <span class="bb-icon">🧾</span><span class="bb-label">Facturas</span>
-      ${pendFact>0?`<span class="bb-badge">${pendFact}</span>`:''}
-    </button>
-    <button class="bottombar-item ${activeTab==='reportes'?'active':''}" onclick="activeTab='reportes';render()">
-      <span class="bb-icon">📊</span><span class="bb-label">Reportes</span>
-    </button>
-  `;
-};
-
-const _renderBottomEmpresaSuperAdmin_orig = renderBottomEmpresaSuperAdmin;
-renderBottomEmpresaSuperAdmin = function(){
-  const pendFact = servicios.filter(s=>s.estado==='completado'&&!s.facturaNum).length;
-  return `
-    <button class="bottombar-item ${activeTab==='activos'?'active':''}" onclick="activeTab='activos';render()">
-      <span class="bb-icon">📋</span><span class="bb-label">Servicios</span>
-    </button>
-    <button class="bottombar-item ${activeTab==='crear'?'active':''}" onclick="activeTab='crear';render()">
-      <span class="bb-icon" style="font-size:26px;background:var(--orange);width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:-16px;box-shadow:0 4px 16px rgba(249,115,22,.4)">➕</span>
-      <span class="bb-label" style="margin-top:2px">Crear</span>
-    </button>
-    <button class="bottombar-item ${activeTab==='conductores'?'active':''}" onclick="activeTab='conductores';render()">
-      <span class="bb-icon">🚛</span><span class="bb-label">Flota</span>
-    </button>
-    <button class="bottombar-item ${activeTab==='usuarios'?'active':''}" onclick="activeTab='usuarios';render()">
-      <span class="bb-icon">👥</span><span class="bb-label">Usuarios</span>
-    </button>
-    <button class="bottombar-item ${activeTab==='reportes'?'active':''}" onclick="activeTab='reportes';render()">
-      <span class="bb-icon">📊</span><span class="bb-label">Reportes</span>
-    </button>
-  `;
-};
-
-// Parchar render() para manejar pestaña reportes
-const _render_orig = render;
-render = function(){
-  const main   = document.getElementById('mainContent');
-  const bottom = document.getElementById('bottomBar');
-  if(currentRole==='super_admin'){
-    bottom.innerHTML = renderBottomSuperAdmin();
-    main.innerHTML   = activeTab==='empresas' ? renderSuperAdminEmpresas()
-                     : activeTab==='nueva'    ? renderSuperAdminNuevaEmpresa()
-                     : renderSuperAdminPerfil();
-  } else if(currentRole==='empresa_super_admin'){
-    bottom.innerHTML = renderBottomEmpresaSuperAdmin();
-    if(activeTab==='activos')         main.innerHTML = renderAdminActivos();
-    else if(activeTab==='crear')      main.innerHTML = renderAdminCrear();
-    else if(activeTab==='usuarios')   renderEmpresaUsuarios().then(h=>{ main.innerHTML=h; });
-    else if(activeTab==='conductores')main.innerHTML = renderAdminConductores();
-    else if(activeTab==='facturas')   main.innerHTML = renderAdminFacturas();
-    else if(activeTab==='reportes')   main.innerHTML = renderReportes();
-    else main.innerHTML = renderAdminActivos();
-  } else if(currentRole==='admin'){
-    bottom.innerHTML = renderBottomAdmin();
-    main.innerHTML   = activeTab==='activos'    ? renderAdminActivos()
-                     : activeTab==='crear'       ? renderAdminCrear()
-                     : activeTab==='conductores' ? renderAdminConductores()
-                     : activeTab==='facturas'    ? renderAdminFacturas()
-                     : activeTab==='reportes'    ? renderReportes()
-                     : renderAdminActivos();
-  } else {
-    bottom.innerHTML = renderBottomConductor();
-    main.innerHTML   = activeTab==='servicios' ? renderConductorServicios()
-                     : activeTab==='historial'  ? renderConductorHistorial()
-                     : renderConductorPerfil();
-  }
-};
-
-// Parchar doLogin para iniciar realtime y pedir permisos notificaciones
-const _doLogin_orig = doLogin;
-doLogin = async function(){
-  await _doLogin_orig.call(this);
-  // Si ya está logueado, iniciar realtime
-  if(currentUser && currentEmpresa){
-    setTimeout(()=>{
-      iniciarRealtime();
-      iniciarAutoRefresh();
-      pedirPermisoNotificaciones();
-    }, 500);
-  }
-};
-
-// Parchar logout para detener realtime
-const _logout_orig = logout;
-logout = function(){
-  detenerRealtime();
-  _logout_orig.call(this);
-};
-
-// ═══ INIT PWA al cargar ═══
+// ═══ INIT ═══
 document.addEventListener('DOMContentLoaded',()=>{
   initSecretAccess();
-  // Intentar restaurar sesión si es PWA
   restaurarSesion();
 });
 
-function initPWA(){
-  // Capturar evento de instalación (Android Chrome)
-  window.addEventListener('beforeinstallprompt',(e)=>{
-    e.preventDefault();
-    pwaInstallEvent = e;
-    
-  });
-
-  // Registrar Service Worker real
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
-  }
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
 }
+
+window.addEventListener('beforeinstallprompt',(e)=>{ e.preventDefault(); });
 
 document.addEventListener('click',(e)=>{const m=document.getElementById('userMenu');const a=document.getElementById('topAvatar');if(m&&!m.contains(e.target)&&e.target!==a)m.classList.remove('show');});
 document.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&document.getElementById('loginForm')?.classList.contains('show'))doLogin();});
