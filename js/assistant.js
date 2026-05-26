@@ -170,7 +170,7 @@ const UPAssistant = (() => {
     const delay = 1000 + Math.random() * 1000;
 
     try {
-      // ============================================
+      /* ============================================
       // MODO SIMULADO (activo por defecto)
       // ============================================
       await new Promise(r => setTimeout(r, delay));
@@ -179,31 +179,32 @@ const UPAssistant = (() => {
       hideTyping();
       renderMessage(botResponse, 'bot');
       conversationHistory.push({ role: 'assistant', content: botResponse });
+      */
 
       // ============================================
-      // MODO API — descomenta esto para conectar con Claude
+      // MODO API — conectado con Claude via Supabase
       // ============================================
-      /*
-      const response = await fetch('TU_SUPABASE_EDGE_FUNCTION_URL/lian-chat', {
+      const SUPABASE_URL = 'https://oguxdohmutqgacahcwop.supabase.co/functions/v1/up-asesor';
+      const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndXhkb2htdXRxZ2FjYWhjd29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjc0NzcsImV4cCI6MjA4ODMwMzQ3N30.RRruTo8B7k4R97Igq7_KV1PV58FqrpIzEu0R_MXIwR8';
+
+      const response = await fetch(SUPABASE_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer TU_ANON_KEY'
+          'Authorization': `Bearer ${ANON_KEY}`
         },
         body: JSON.stringify({
           message: userText,
-          history: conversationHistory,
-          context: 'UP Equipos - Asesor comercial de equipos de elevación'
+          history: conversationHistory.slice(-6)
         })
       });
-      
-      if (!response.ok) throw new Error('Error en la API');
-      
+
+      if (!response.ok) throw new Error('Error conexión');
       const data = await response.json();
       hideTyping();
-      renderMessage(data.response, 'bot');
-      conversationHistory.push({ role: 'assistant', content: data.response });
-      */
+      const botResponse = data.response;
+      renderMessage(botResponse, 'bot');
+      conversationHistory.push({ role: 'assistant', content: botResponse });
 
     } catch (error) {
       hideTyping();
