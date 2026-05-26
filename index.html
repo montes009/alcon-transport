@@ -14,17 +14,82 @@
 <body>
 
   <!-- ==========================================
+       LOADER
+  =========================================== -->
+  <div id="up-loader" style="
+    position:fixed; inset:0; z-index:99999;
+    background:#000000;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  ">
+    <!-- Fondo FX -->
+    <div id="ul-glow" style="
+      position:absolute;
+      width:600px; height:600px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(192,0,31,0.25) 0%, transparent 70%);
+      animation: ulGlow 3s ease-in-out infinite;
+      pointer-events:none;
+    "></div>
+
+    <!-- Logo + progreso -->
+    <div style="position:relative; z-index:2; text-align:center;">
+      <img src="IMAGENES POR INCORPORAR/logo up.png"
+           alt="UP Equipos"
+           id="ul-logo"
+           style="height:140px; width:auto; opacity:0; display:block; margin:0 auto;
+                  filter: drop-shadow(0 0 20px rgba(255,255,255,0.15));
+                  animation: ulLogoIn 0.8s ease 0.3s forwards;">
+
+      <!-- Barra de progreso -->
+      <div style="
+        width:240px; height:2px;
+        background:rgba(255,255,255,0.08);
+        border-radius:2px;
+        margin:32px auto 12px;
+        overflow:hidden;
+      ">
+        <div id="ul-bar" style="
+          height:100%; width:0%;
+          background:linear-gradient(to right, #C0001F, #ff1a3a);
+          border-radius:2px;
+          transition:width 0.15s ease;
+          box-shadow: 0 0 8px rgba(192,0,31,0.8);
+        "></div>
+      </div>
+
+      <!-- Texto estado -->
+      <div id="ul-status" style="
+        font-family:'Open Sans',sans-serif;
+        font-size:11px;
+        font-weight:600;
+        letter-spacing:3px;
+        text-transform:uppercase;
+        color:rgba(255,255,255,0.35);
+      ">Iniciando...</div>
+    </div>
+
+    <!-- Línea inferior decorativa -->
+    <div style="
+      position:absolute; bottom:0; left:0; right:0;
+      height:2px;
+      background:linear-gradient(to right,
+        transparent, #C0001F 30%, #C0001F 70%, transparent);
+      animation: ulLine 2s ease-in-out infinite;
+    "></div>
+  </div>
+
+  <!-- ==========================================
        NAVBAR
   =========================================== -->
   <nav class="navbar" role="navigation" aria-label="Navegación principal">
     <div class="nav-inner">
       <a href="#inicio" class="nav-logo" aria-label="UP Equipos - Inicio">
-        <!-- Logo SVG inline - reemplazar por img src="imagenes/logo-up.png" cuando tengas el archivo -->
-        <svg class="nav-logo-svg" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <polygon points="4,8 20,8 20,42 4,56" fill="#C0001F"/>
-          <text x="26" y="46" font-family="'Open Sans', sans-serif" font-weight="800" font-size="44" fill="#FFFFFF" letter-spacing="-2">UP</text>
-          <text x="26" y="58" font-family="'Open Sans', sans-serif" font-weight="400" font-size="10" fill="#888888" letter-spacing="4">EQUIPMENT</text>
-        </svg>
+        <img src="IMAGENES POR INCORPORAR/logo up.png"
+             alt="UP Equipos"
+             class="nav-logo-svg"
+             style="height:72px; width:auto;">
       </a>
 
       <ul class="nav-links" role="list">
@@ -572,11 +637,10 @@
     <div class="footer-inner">
       <div class="footer-top">
         <div class="footer-brand">
-          <svg width="130" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" aria-label="UP Equipos logo">
-            <polygon points="4,8 20,8 20,42 4,56" fill="#C0001F"/>
-            <text x="26" y="46" font-family="'Open Sans', sans-serif" font-weight="800" font-size="44" fill="#FFFFFF" letter-spacing="-2">UP</text>
-            <text x="26" y="58" font-family="'Open Sans', sans-serif" font-weight="400" font-size="10" fill="#888888" letter-spacing="4">EQUIPMENT</text>
-          </svg>
+          <img src="IMAGENES POR INCORPORAR/logo up.png"
+               alt="UP Equipos"
+               class="nav-logo-svg"
+               style="height:48px; width:auto; margin-bottom:16px;">
           <p>Distribuidores autorizados GENIE en Colombia. Especialistas en alquiler, venta y certificación de equipos de trabajo en altura.</p>
           <div class="footer-socials">
             <a href="https://facebook.com" target="_blank" rel="noopener" class="social-link" aria-label="Facebook">f</a>
@@ -655,6 +719,59 @@
           card.style.display = (filtro === 'todos' || card.dataset.cat === filtro) ? '' : 'none';
         });
       });
+    });
+  })();
+  </script>
+
+  <!-- Loader: keyframes y lógica -->
+  <style>
+  @keyframes ulGlow {
+    0%,100% { opacity:0.6; transform:scale(1);    }
+    50%      { opacity:1;   transform:scale(1.15); }
+  }
+  @keyframes ulLogoIn {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0);    }
+  }
+  @keyframes ulLine {
+    0%,100% { opacity:0.4; }
+    50%      { opacity:1;   }
+  }
+  </style>
+
+  <script>
+  (function(){
+    var loader = document.getElementById('up-loader');
+    var bar    = document.getElementById('ul-bar');
+    var status = document.getElementById('ul-status');
+    var msgs   = ['Iniciando...','Cargando equipos...','Preparando catálogo...','Bienvenido.'];
+    var pct = 0, mi = 0;
+
+    document.body.style.overflow = 'hidden';
+
+    function tick(){
+      pct += Math.random() * 20 + 8;
+      if(pct > 100) pct = 100;
+      bar.style.width = pct + '%';
+
+      if(pct >= 25 && mi===0){ mi=1; status.textContent=msgs[1]; }
+      if(pct >= 55 && mi===1){ mi=2; status.textContent=msgs[2]; }
+      if(pct >= 85 && mi===2){ mi=3; status.textContent=msgs[3]; }
+
+      if(pct < 100){
+        setTimeout(tick, 100 + Math.random()*200);
+      } else {
+        setTimeout(function(){
+          loader.style.opacity    = '0';
+          loader.style.visibility = 'hidden';
+          document.body.style.overflow = '';
+          setTimeout(function(){ loader.remove(); }, 800);
+        }, 500);
+      }
+    }
+
+    window.addEventListener('load', function(){
+      setTimeout(tick, 300);
     });
   })();
   </script>
