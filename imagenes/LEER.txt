@@ -1,0 +1,7 @@
+README: Coloca aquí las imágenes con estos nombres exactos:
+- hero-equipo.jpg (imagen principal del hero, paisaje horizontal)
+- fondo-industrial.jpg (foto de obra para la sección statement)
+- equipo-1.jpg (brazo articulado o cualquier manlift)
+- equipo-2.jpg (tijera eléctrica)
+- equipo-3.jpg (telescópico o telehandler)
+- logo-up.png (logo blanco PNG con fondo transparente)
