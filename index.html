@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="UP Equipos — Alquiler, venta y certificación de plataformas elevadoras tipo manlift. Distribuidor autorizado GENIE en Colombia. Medellín, Bogotá y Barranquilla.">
+  <meta name="keywords" content="manlift, plataformas elevadoras, alquiler, tijera eléctrica, brazo articulado, GENIE, Colombia, IPAF">
+  <meta property="og:title" content="UP Equipos — Soluciones de elevación">
+  <meta property="og:description" content="Equipos certificados, soporte técnico y asesoría especializada para obras, industria e infraestructura.">
+  <meta property="og:type" content="website">
+  <title>UP Equipos — Plataformas Elevadoras | Distribuidor GENIE Colombia</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ==========================================
+       NAVBAR
+  =========================================== -->
+  <nav class="navbar" role="navigation" aria-label="Navegación principal">
+    <div class="nav-inner">
+      <a href="#inicio" class="nav-logo" aria-label="UP Equipos - Inicio">
+        <!-- Logo SVG inline - reemplazar por img src="imagenes/logo-up.png" cuando tengas el archivo -->
+        <svg class="nav-logo-svg" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <polygon points="4,8 20,8 20,42 4,56" fill="#C0001F"/>
+          <text x="26" y="46" font-family="'Open Sans', sans-serif" font-weight="800" font-size="44" fill="#FFFFFF" letter-spacing="-2">UP</text>
+          <text x="26" y="58" font-family="'Open Sans', sans-serif" font-weight="400" font-size="10" fill="#888888" letter-spacing="4">EQUIPMENT</text>
+        </svg>
+      </a>
+
+      <ul class="nav-links" role="list">
+        <li><a href="#asesor">Asesor IA</a></li>
+        <li><a href="#catalogo">Equipos</a></li>
+        <li><a href="#confianza">Servicios</a></li>
+        <li><a href="#sedes">Sedes</a></li>
+        <li><a href="#asesor" class="nav-cta">Cotizar ahora</a></li>
+      </ul>
+
+      <button class="nav-toggle" aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <nav class="nav-mobile" aria-label="Menú móvil">
+      <a href="#asesor">Asesor IA</a>
+      <a href="#catalogo">Equipos</a>
+      <a href="#confianza">Servicios</a>
+      <a href="#sedes">Sedes</a>
+      <a href="#asesor">Cotizar ahora</a>
+    </nav>
+  </nav>
+
+  <!-- ==========================================
+       HERO
+  =========================================== -->
+  <section class="hero" id="inicio" aria-label="Sección principal">
+    <div class="hero-bg">
+      <!-- Reemplazar por imagen real: hero-equipo.jpg -->
+      <img
+        src="imagenes/hero-equipo.jpg"
+        alt="Equipo de elevación en obra industrial"
+        onerror="this.style.display='none'"
+      >
+    </div>
+    <div class="hero-accent" aria-hidden="true"></div>
+    <div class="hero-fx" aria-hidden="true"></div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-line"></div>
+        <span>Distribuidor autorizado GENIE · Colombia</span>
+      </div>
+
+      <h1>
+        Soluciones de elevación<br>
+        para proyectos que<br>
+        <em>no se detienen</em>
+      </h1>
+
+      <p class="hero-sub">
+        Equipos certificados, soporte técnico y asesoría especializada
+        para obras, industria e infraestructura en todo el país.
+      </p>
+
+      <div class="hero-buttons">
+        <button class="btn btn-primary" id="hero-chat-btn">
+          ⚡ Hablar con asesor
+        </button>
+        <a href="#catalogo" class="btn btn-outline">
+          Ver equipos disponibles
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-scroll" aria-hidden="true">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       STATS BAR
+  =========================================== -->
+  <section class="stats-bar" aria-label="Cifras clave">
+    <div class="stats-inner">
+      <div class="stat-item reveal">
+        <div class="stat-number">
+          <span data-count="12" data-suffix="+">0+</span>
+        </div>
+        <div class="stat-label">Años de experiencia</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <div class="stat-number">
+          <span data-count="200" data-suffix="+">0+</span>
+        </div>
+        <div class="stat-label">Equipos en flota</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <div class="stat-number">
+          <span data-count="3" data-suffix="">0</span>
+        </div>
+        <div class="stat-label">Ciudades con sede</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <div class="stat-number">
+          <span data-count="500" data-suffix="+">0+</span>
+        </div>
+        <div class="stat-label">Clientes atendidos</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       ASESOR IA
+  =========================================== -->
+  <section class="assistant-section" id="asesor" aria-label="Asesor comercial virtual">
+    <div class="assistant-inner container">
+      <div class="assistant-info">
+        <span class="section-label">Asesor virtual</span>
+        <h2 class="reveal">
+          Tu asesor experto<br>
+          <em>disponible 24/7</em>
+        </h2>
+        <p class="reveal reveal-delay-1">
+          Responde tus preguntas sobre equipos, disponibilidad y cotizaciones
+          en segundos. Entrenado con el conocimiento técnico del equipo UP.
+        </p>
+
+        <div class="assistant-features">
+          <div class="assistant-feature reveal reveal-delay-2">
+            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C0001F" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+            <div class="feature-text">
+              <strong>Recomendación personalizada</strong>
+              <span>Encuentra el equipo exacto para tu proyecto</span>
+            </div>
+          </div>
+          <div class="assistant-feature reveal reveal-delay-3">
+            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C0001F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+            <div class="feature-text">
+              <strong>Respuesta inmediata</strong>
+              <span>Sin esperas, sin formularios interminables</span>
+            </div>
+          </div>
+          <div class="assistant-feature reveal reveal-delay-4">
+            <div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C0001F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+            <div class="feature-text">
+              <strong>Cotización directa</strong>
+              <span>Te conecta con el equipo comercial al instante</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat widget -->
+      <div class="chat-widget reveal reveal-delay-2" role="region" aria-label="Chat con asesor">
+        <div class="chat-header">
+          <div class="chat-avatar" aria-hidden="true">🔧</div>
+          <div class="chat-header-info">
+            <strong>Asesor UP Equipos</strong>
+            <span><span class="chat-status-dot" aria-hidden="true"></span>En línea ahora</span>
+          </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Mensajes del chat">
+          <!-- Los mensajes se insertan aquí vía JS -->
+        </div>
+
+        <div class="chat-input-area">
+          <textarea
+            class="chat-input"
+            id="chat-input"
+            placeholder="¿Qué tipo de proyecto tienes?..."
+            rows="1"
+            aria-label="Escribe tu mensaje"
+            maxlength="500"
+          ></textarea>
+          <button class="chat-send" id="chat-send" aria-label="Enviar mensaje">
+            ➤
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       CATÁLOGO
+  =========================================== -->
+  <section class="catalogo-section" id="catalogo" aria-label="Catálogo de equipos">
+    <div class="section-header reveal">
+      <span class="section-label">Catálogo</span>
+      <h2>Nuestros equipos</h2>
+      <p>Flota certificada marca GENIE y JLG. Disponibles para alquiler y venta en todo Colombia.</p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="catalogo-filters" role="group" aria-label="Filtrar equipos">
+      <button class="filter-btn active" data-filter="todos">Todos</button>
+      <button class="filter-btn" data-filter="brazo">Brazos</button>
+      <button class="filter-btn" data-filter="tijera">Tijeras</button>
+      <button class="filter-btn" data-filter="unipersonal">Unipersonal</button>
+      <button class="filter-btn" data-filter="telehandler">Telehandler</button>
+    </div>
+
+    <!-- Grid de tarjetas verticales -->
+    <div class="eq-grid" id="eq-grid" role="list">
+
+      <!-- 1. Brazo Z-45/25J -->
+      <div class="eq-card" data-cat="brazo" role="listitem">
+        <div class="eq-card-bg">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="position:absolute;right:-20px;bottom:-20px;width:160px;height:160px;opacity:0.45" aria-hidden="true">
+            <circle cx="100" cy="100" r="55"  fill="none" stroke="rgba(192,0,31,0.55)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="80"  fill="none" stroke="rgba(192,0,31,0.30)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="105" fill="none" stroke="rgba(192,0,31,0.15)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="eq-card-image">
+          <img src="IMAGENES POR INCORPORAR/BRAZO ARTICULADO Z45 25J.png" alt="Brazo Articulado Z-45/25J" loading="lazy" onerror="this.style.opacity='0'">
+        </div>
+        <div class="eq-card-body">
+          <div class="eq-card-cat">Brazo Articulado</div>
+          <h3 class="eq-card-title">Brazo Articulado<br><strong>Z-45/25J</strong></h3>
+          <p class="eq-card-desc">Accede a zonas de difícil acceso con articulación de doble brazo. Tracción 4x4 para exteriores exigentes.</p>
+          <div class="eq-card-specs">
+            <div class="eq-spec"><span class="eq-spec-label">Altura</span><span class="eq-spec-val">16 m</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Capacidad</span><span class="eq-spec-val">227 kg</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Propulsión</span><span class="eq-spec-val">Diésel 4x4</span></div>
+          </div>
+          <button class="eq-card-btn" onclick="consultarEquipo('Brazo Articulado Z-45/25J')">Consultar Disponibilidad <span>›</span></button>
+        </div>
+      </div>
+
+      <!-- 2. Brazo Z-62/40 -->
+      <div class="eq-card" data-cat="brazo" role="listitem">
+        <div class="eq-card-bg">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="position:absolute;right:-20px;bottom:-20px;width:160px;height:160px;opacity:0.45" aria-hidden="true">
+            <circle cx="100" cy="100" r="55"  fill="none" stroke="rgba(192,0,31,0.55)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="80"  fill="none" stroke="rgba(192,0,31,0.30)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="105" fill="none" stroke="rgba(192,0,31,0.15)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="eq-card-image">
+          <img src="IMAGENES POR INCORPORAR/BRAZO ARTICULADO Z62 40.png" alt="Brazo Articulado Z-62/40" loading="lazy" onerror="this.style.opacity='0'">
+        </div>
+        <div class="eq-card-body">
+          <div class="eq-card-cat">Brazo Articulado</div>
+          <h3 class="eq-card-title">Brazo Articulado<br><strong>Z-62/40</strong></h3>
+          <p class="eq-card-desc">Plataforma de doble brazo con alcance horizontal extendido. Ideal para fachadas y estructuras industriales.</p>
+          <div class="eq-card-specs">
+            <div class="eq-spec"><span class="eq-spec-label">Altura</span><span class="eq-spec-val">19 m</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Capacidad</span><span class="eq-spec-val">227 kg</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Propulsión</span><span class="eq-spec-val">Diésel 4x4</span></div>
+          </div>
+          <button class="eq-card-btn" onclick="consultarEquipo('Brazo Articulado Z-62/40')">Consultar Disponibilidad <span>›</span></button>
+        </div>
+      </div>
+
+      <!-- 3. Brazo Z-80/60 -->
+      <div class="eq-card" data-cat="brazo" role="listitem">
+        <div class="eq-card-bg">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="position:absolute;right:-20px;bottom:-20px;width:160px;height:160px;opacity:0.45" aria-hidden="true">
+            <circle cx="100" cy="100" r="55"  fill="none" stroke="rgba(192,0,31,0.55)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="80"  fill="none" stroke="rgba(192,0,31,0.30)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="105" fill="none" stroke="rgba(192,0,31,0.15)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="eq-card-image">
+          <img src="IMAGENES POR INCORPORAR/Z80 60.png" alt="Brazo Articulado Z-80/60" loading="lazy" onerror="this.style.opacity='0'">
+        </div>
+        <div class="eq-card-body">
+          <div class="eq-card-cat">Brazo Articulado</div>
+          <h3 class="eq-card-title">Brazo Articulado<br><strong>Z-80/60</strong></h3>
+          <p class="eq-card-desc">Gran alcance vertical y horizontal para proyectos de infraestructura y obras de gran envergadura.</p>
+          <div class="eq-card-specs">
+            <div class="eq-spec"><span class="eq-spec-label">Altura</span><span class="eq-spec-val">26 m</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Capacidad</span><span class="eq-spec-val">227 kg</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Propulsión</span><span class="eq-spec-val">Diésel 4x4</span></div>
+          </div>
+          <button class="eq-card-btn" onclick="consultarEquipo('Brazo Articulado Z-80/60')">Consultar Disponibilidad <span>›</span></button>
+        </div>
+      </div>
+
+      <!-- 4. Tijera GS-3246 -->
+      <div class="eq-card" data-cat="tijera" role="listitem">
+        <div class="eq-card-bg">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="position:absolute;right:-20px;bottom:-20px;width:160px;height:160px;opacity:0.45" aria-hidden="true">
+            <circle cx="100" cy="100" r="55"  fill="none" stroke="rgba(192,0,31,0.55)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="80"  fill="none" stroke="rgba(192,0,31,0.30)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="105" fill="none" stroke="rgba(192,0,31,0.15)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="eq-card-image">
+          <img src="IMAGENES POR INCORPORAR/TIJERA.png" alt="Tijera Eléctrica GS-3246" loading="lazy" onerror="this.style.opacity='0'">
+        </div>
+        <div class="eq-card-body">
+          <div class="eq-card-cat">Tijera Eléctrica</div>
+          <h3 class="eq-card-title">Tijera Eléctrica<br><strong>GS-3246</strong></h3>
+          <p class="eq-card-desc">Compacta y silenciosa. Ideal para interiores: bodegas, centros comerciales e industria. Cero emisiones.</p>
+          <div class="eq-card-specs">
+            <div class="eq-spec"><span class="eq-spec-label">Altura</span><span class="eq-spec-val">12 m</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Capacidad</span><span class="eq-spec-val">454 kg</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Propulsión</span><span class="eq-spec-val">Eléctrico</span></div>
+          </div>
+          <button class="eq-card-btn" onclick="consultarEquipo('Tijera Eléctrica GS-3246')">Consultar Disponibilidad <span>›</span></button>
+        </div>
+      </div>
+
+      <!-- 5. Unipersonal AWP-36S -->
+      <div class="eq-card" data-cat="unipersonal" role="listitem">
+        <div class="eq-card-bg">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="position:absolute;right:-20px;bottom:-20px;width:160px;height:160px;opacity:0.45" aria-hidden="true">
+            <circle cx="100" cy="100" r="55"  fill="none" stroke="rgba(192,0,31,0.55)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="80"  fill="none" stroke="rgba(192,0,31,0.30)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="105" fill="none" stroke="rgba(192,0,31,0.15)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="eq-card-image">
+          <img src="IMAGENES POR INCORPORAR/UNI PERSONAL NO AUTOPROPULSADA.png" alt="Mástil Vertical AWP-36S" loading="lazy" onerror="this.style.opacity='0'">
+        </div>
+        <div class="eq-card-body">
+          <div class="eq-card-cat">Unipersonal</div>
+          <h3 class="eq-card-title">Mástil Vertical<br><strong>AWP-36S</strong></h3>
+          <p class="eq-card-desc">Plataforma unipersonal ultracompacta. Accede a espacios reducidos con hasta 11 m de altura de trabajo.</p>
+          <div class="eq-card-specs">
+            <div class="eq-spec"><span class="eq-spec-label">Altura</span><span class="eq-spec-val">11 m</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Capacidad</span><span class="eq-spec-val">159 kg</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Propulsión</span><span class="eq-spec-val">Eléctrico</span></div>
+          </div>
+          <button class="eq-card-btn" onclick="consultarEquipo('Mástil Vertical AWP-36S')">Consultar Disponibilidad <span>›</span></button>
+        </div>
+      </div>
+
+      <!-- 6. Unipersonal GR-20 (eq-wide) -->
+      <div class="eq-card" data-cat="unipersonal" role="listitem">
+        <div class="eq-card-bg">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="position:absolute;right:-20px;bottom:-20px;width:160px;height:160px;opacity:0.45" aria-hidden="true">
+            <circle cx="100" cy="100" r="55"  fill="none" stroke="rgba(192,0,31,0.55)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="80"  fill="none" stroke="rgba(192,0,31,0.30)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="105" fill="none" stroke="rgba(192,0,31,0.15)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="eq-card-image">
+          <img src="IMAGENES POR INCORPORAR/UNIPERSONAL AUTOPROPULSADA.png" alt="Unipersonal GR-20" loading="lazy" onerror="this.style.opacity='0'">
+        </div>
+        <div class="eq-card-body">
+          <div class="eq-card-cat">Unipersonal</div>
+          <h3 class="eq-card-title">Unipersonal<br><strong>GR-20</strong></h3>
+          <p class="eq-card-desc">Plataforma unipersonal autopropulsada ágil y compacta para espacios reducidos.</p>
+          <div class="eq-card-specs">
+            <div class="eq-spec"><span class="eq-spec-label">Altura</span><span class="eq-spec-val">7.79 m</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Capacidad</span><span class="eq-spec-val">159 kg</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Propulsión</span><span class="eq-spec-val">Eléctrico</span></div>
+          </div>
+          <button class="eq-card-btn" onclick="consultarEquipo('Unipersonal GR-20')">Consultar Disponibilidad <span>›</span></button>
+        </div>
+      </div>
+
+      <!-- 7. Telehandler GTH-5519 (eq-wide) -->
+      <div class="eq-card" data-cat="telehandler" role="listitem">
+        <div class="eq-card-bg">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="position:absolute;right:-20px;bottom:-20px;width:160px;height:160px;opacity:0.45" aria-hidden="true">
+            <circle cx="100" cy="100" r="55"  fill="none" stroke="rgba(192,0,31,0.55)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="80"  fill="none" stroke="rgba(192,0,31,0.30)" stroke-width="1"/>
+            <circle cx="100" cy="100" r="105" fill="none" stroke="rgba(192,0,31,0.15)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="eq-card-image">
+          <img src="IMAGENES POR INCORPORAR/Telehandler.png" alt="Telehandler GTH-5519" loading="lazy" onerror="this.style.opacity='0'">
+        </div>
+        <div class="eq-card-body">
+          <div class="eq-card-cat">Telehandler</div>
+          <h3 class="eq-card-title">Telehandler<br><strong>GTH-5519</strong></h3>
+          <p class="eq-card-desc">Manipulador telescópico para carga y elevación en obras de construcción. Versátil y potente.</p>
+          <div class="eq-card-specs">
+            <div class="eq-spec"><span class="eq-spec-label">Altura</span><span class="eq-spec-val">17 m</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Capacidad</span><span class="eq-spec-val">2 500 kg</span></div>
+            <div class="eq-spec"><span class="eq-spec-label">Propulsión</span><span class="eq-spec-val">Diésel</span></div>
+          </div>
+          <button class="eq-card-btn" onclick="consultarEquipo('Telehandler GTH-5519')">Consultar Disponibilidad <span>›</span></button>
+        </div>
+      </div>
+
+    </div><!-- /eq-grid -->
+  </section>
+
+  <!-- ==========================================
+       CONFIANZA
+  =========================================== -->
+  <section class="trust-section" id="confianza" aria-label="Por qué elegirnos">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Por qué UP</span>
+        <h2>Respaldo en cada operación</h2>
+        <p>Más de una década siendo el aliado de los proyectos más exigentes del país.</p>
+      </div>
+
+      <div class="trust-grid">
+        <div class="trust-card reveal">
+          <div class="trust-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C0001F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+          <h3>Equipos certificados</h3>
+          <p>Toda la flota pasa por revisión técnica antes de cada alquiler. Certificaciones vigentes y mantenimiento preventivo garantizado.</p>
+        </div>
+        <div class="trust-card reveal reveal-delay-1">
+          <div class="trust-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C0001F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+          <h3>Soporte técnico</h3>
+          <p>Técnicos certificados por GENIE disponibles para atención en campo. Respuesta rápida ante cualquier eventualidad en obra.</p>
+        </div>
+        <div class="trust-card reveal reveal-delay-2">
+          <div class="trust-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C0001F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v2z"/><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/><path d="M4 15v-3a8 8 0 0 1 16 0v3"/></svg></div>
+          <h3>Operadores capacitados</h3>
+          <p>Formación IPAF bajo norma ISO 18878. Certificamos a tu equipo para operar con los más altos estándares de seguridad.</p>
+        </div>
+        <div class="trust-card reveal reveal-delay-3">
+          <div class="trust-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C0001F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 14 8 14s8-8.75 8-14a8 8 0 0 0-8-8z"/></svg></div>
+          <h3>Cobertura nacional</h3>
+          <p>Sedes en Medellín, Bogotá y Barranquilla. Logística para proyectos en cualquier punto del territorio colombiano.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       STATEMENT (tipo Apple)
+  =========================================== -->
+  <section class="statement-section" aria-label="Propuesta de valor">
+    <div class="statement-bg">
+      <!-- Reemplazar por imagen real: fondo-industrial.jpg -->
+      <img
+        src="imagenes/fondo-industrial.jpg"
+        alt="Obra industrial con equipos de elevación"
+        onerror="this.style.display='none'; this.parentElement.style.background='#0a0a0a'"
+      >
+    </div>
+    <div class="statement-content reveal">
+      <h2>
+        Tecnología, seguridad<br>
+        y respaldo en<br>
+        <em>cada operación.</em>
+      </h2>
+      <p>
+        Somos el único aliado que necesitas para trabajar en altura
+        con total confianza, desde el primer metro hasta el último.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SEDES
+  =========================================== -->
+  <section class="sedes-section" id="sedes" aria-label="Nuestras sedes">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Presencia nacional</span>
+        <h2>Estamos donde tu proyecto</h2>
+      </div>
+
+      <div class="sedes-grid">
+        <div class="sede-card reveal">
+          <div class="sede-city">Sede principal</div>
+          <h3>Medellín</h3>
+          <div class="sede-info">
+            <div class="sede-info-item">
+              <span class="sede-info-icon">📍</span>
+              <span>Calle 30a # 65b – 59</span>
+            </div>
+            <div class="sede-info-item">
+              <span class="sede-info-icon">📞</span>
+              <span>604 4447178 · 311 7135363</span>
+            </div>
+            <div class="sede-info-item">
+              <span class="sede-info-icon">✉</span>
+              <span>apoyocomercialmed@equiposup.com</span>
+            </div>
+          </div>
+          <div class="sede-schedule">
+            Lun–Vie: 7:30 am – 5:30 pm · Sáb: 7:30 – 11:00 am
+          </div>
+        </div>
+
+        <div class="sede-card reveal reveal-delay-1">
+          <div class="sede-city">Sede Bogotá</div>
+          <h3>Bogotá</h3>
+          <div class="sede-info">
+            <div class="sede-info-item">
+              <span class="sede-info-icon">📍</span>
+              <span>Calle 14a # 123 – 53</span>
+            </div>
+            <div class="sede-info-item">
+              <span class="sede-info-icon">📞</span>
+              <span>318 8097240</span>
+            </div>
+            <div class="sede-info-item">
+              <span class="sede-info-icon">✉</span>
+              <span>ventasbgt2@equiposup.com</span>
+            </div>
+          </div>
+          <div class="sede-schedule">
+            Lun–Vie: 7:30 am – 5:30 pm · Sáb: 7:30 – 11:00 am
+          </div>
+        </div>
+
+        <div class="sede-card reveal reveal-delay-2">
+          <div class="sede-city">Sede Barranquilla</div>
+          <h3>Barranquilla</h3>
+          <div class="sede-info">
+            <div class="sede-info-item">
+              <span class="sede-info-icon">📍</span>
+              <span>Parque Industrial Stock Caribe – Galapa km 1 Bodega 14E</span>
+            </div>
+            <div class="sede-info-item">
+              <span class="sede-info-icon">📞</span>
+              <span>317 6362401</span>
+            </div>
+            <div class="sede-info-item">
+              <span class="sede-info-icon">✉</span>
+              <span>ventasbq@equiposup.com</span>
+            </div>
+          </div>
+          <div class="sede-schedule">
+            Lun–Vie: 7:30 am – 5:30 pm · Sáb: 7:30 – 11:00 am
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       CTA FINAL
+  =========================================== -->
+  <section class="cta-section" aria-label="Llamado a la acción">
+    <div class="reveal">
+      <h2>¿No sabes qué equipo<br>necesitas?</h2>
+      <p>Nuestro asesor puede orientarte en segundos y conectarte con el equipo comercial.</p>
+      <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn btn-white" id="cta-chat-btn">
+          ⚡ Iniciar asesoría
+        </button>
+        <a
+          href="https://wa.me/573117135363?text=Hola!%20Quiero%20información%20sobre%20equipos%20de%20elevación"
+          target="_blank"
+          rel="noopener"
+          class="btn btn-outline"
+        >
+          💬 WhatsApp directo
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       FOOTER
+  =========================================== -->
+  <footer role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <svg width="130" viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" aria-label="UP Equipos logo">
+            <polygon points="4,8 20,8 20,42 4,56" fill="#C0001F"/>
+            <text x="26" y="46" font-family="'Open Sans', sans-serif" font-weight="800" font-size="44" fill="#FFFFFF" letter-spacing="-2">UP</text>
+            <text x="26" y="58" font-family="'Open Sans', sans-serif" font-weight="400" font-size="10" fill="#888888" letter-spacing="4">EQUIPMENT</text>
+          </svg>
+          <p>Distribuidores autorizados GENIE en Colombia. Especialistas en alquiler, venta y certificación de equipos de trabajo en altura.</p>
+          <div class="footer-socials">
+            <a href="https://facebook.com" target="_blank" rel="noopener" class="social-link" aria-label="Facebook">f</a>
+            <a href="https://instagram.com" target="_blank" rel="noopener" class="social-link" aria-label="Instagram">in</a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener" class="social-link" aria-label="LinkedIn">li</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Servicios</h4>
+          <ul>
+            <li><a href="#catalogo">Alquiler de equipos</a></li>
+            <li><a href="#catalogo">Venta de equipos</a></li>
+            <li><a href="#confianza">Partes y servicios</a></li>
+            <li><a href="#confianza">Cursos y formación</a></li>
+            <li><a href="#confianza">Certificación IPAF</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Equipos</h4>
+          <ul>
+            <li><a href="#catalogo">Tijeras eléctricas</a></li>
+            <li><a href="#catalogo">Brazos articulados</a></li>
+            <li><a href="#catalogo">Telescópicos</a></li>
+            <li><a href="#catalogo">Telehandlers</a></li>
+            <li><a href="#catalogo">Unipersonales</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Contacto</h4>
+          <ul>
+            <li><a href="tel:6044447178">604 4447178</a></li>
+            <li><a href="tel:3117135363">311 7135363</a></li>
+            <li><a href="mailto:apoyocomercialmed@equiposup.com">Email Medellín</a></li>
+            <li><a href="mailto:ventasbgt2@equiposup.com">Email Bogotá</a></li>
+            <li><a href="mailto:ventasbq@equiposup.com">Email Barranquilla</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2025 UP Equipos S.A.S. Todos los derechos reservados.</p>
+        <div class="footer-genie">
+          <span>Distribuidor oficial</span>
+          <span class="genie-badge">GENIE</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================
+       WHATSAPP FLOTANTE
+  =========================================== -->
+  <div class="wa-float" aria-label="Contacto por WhatsApp">
+    <div class="wa-tooltip">¡Escríbenos ahora!</div>
+    <a
+      href="https://wa.me/573117135363?text=Hola!%20Quiero%20información%20sobre%20equipos%20de%20elevación"
+      target="_blank"
+      rel="noopener"
+      class="wa-btn"
+      aria-label="Contactar por WhatsApp"
+    >
+      💬
+    </a>
+  </div>
+
+  <!-- Filtrado tarjetas catálogo -->
+  <script>
+  (function () {
+    document.querySelectorAll('.filter-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var filtro = btn.dataset.filter;
+        document.querySelectorAll('.eq-card').forEach(function (card) {
+          card.style.display = (filtro === 'todos' || card.dataset.cat === filtro) ? '' : 'none';
+        });
+      });
+    });
+  })();
+  </script>
+
+  <!-- Scripts -->
+  <script src="js/assistant.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
