@@ -102,10 +102,26 @@ const UPAssistant = (() => {
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
+  // ---- Estilos para botones de redes sociales (inyectados una vez) ----
+  function injectSocialStyles() {
+    if (document.getElementById('chat-social-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'chat-social-styles';
+    style.textContent = [
+      '.chat-social-btn{display:inline-block;margin:4px 4px 0 0;padding:6px 14px;',
+      'border-radius:20px;background:#c0001f;color:#fff;font-size:.82rem;',
+      'font-weight:600;text-decoration:none}',
+      '.chat-social-btn:hover{opacity:.85}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
   // ---- Render mensaje ----
   function renderMessage(text, type) {
     const messages = document.getElementById('chat-messages');
     if (!messages) return;
+
+    injectSocialStyles();
 
     const msg = document.createElement('div');
     msg.className = `msg ${type}`;
@@ -116,7 +132,30 @@ const UPAssistant = (() => {
 
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
-    bubble.textContent = text;
+
+    // Renderizar links de redes sociales como botones
+    if (type === 'bot' && (text.includes('linkedin.com') || text.includes('instagram.com'))) {
+      const parts = text.split(/(https?:\/\/[^\s]+)/);
+      parts.forEach(part => {
+        if (/^https?:\/\//.test(part)) {
+          const isLinkedIn = part.includes('linkedin.com');
+          const btn = document.createElement('a');
+          btn.href = part;
+          btn.target = '_blank';
+          btn.rel = 'noopener';
+          btn.className = 'chat-social-btn';
+          btn.textContent = isLinkedIn ? '💼 Ver en LinkedIn' : '📸 Ver en Instagram';
+          bubble.appendChild(document.createElement('br'));
+          bubble.appendChild(btn);
+        } else if (part.trim()) {
+          const span = document.createElement('span');
+          span.textContent = part;
+          bubble.appendChild(span);
+        }
+      });
+    } else {
+      bubble.textContent = text;
+    }
 
     msg.appendChild(avatar);
     msg.appendChild(bubble);
@@ -165,6 +204,17 @@ const UPAssistant = (() => {
 
     // Mostrar typing
     showTyping();
+
+    // ---- Control de tokens lado cliente ----
+    const estimatedTokens = conversationHistory.reduce((acc, m) =>
+      acc + m.content.split(' ').length * 1.3, 0);
+    if (estimatedTokens > 1200) {
+      hideTyping();
+      renderMessage('Esta sesión llegó a su límite. Si quieres continuar, el equipo comercial te puede atender directamente. ¿Dejaste tus datos?', 'bot');
+      isTyping = false;
+      if (sendBtn) sendBtn.disabled = false;
+      return;
+    }
 
     // Simular delay de respuesta
     const delay = 1000 + Math.random() * 1000;
