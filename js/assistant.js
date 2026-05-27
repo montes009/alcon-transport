@@ -277,7 +277,7 @@ const UPAssistant = (() => {
     // Mensaje de bienvenida con delay
     setTimeout(() => {
       renderMessage(
-        'Hola 👋 Soy el asesor de UP Equipos. Cuéntame qué tipo de proyecto tienes y te ayudo a encontrar el equipo ideal para trabajos en altura.',
+        '¿Tienes alguna consulta sobre equipos de elevación? Nuestro asesor Liam está disponible para ayudarte. 💬',
         'bot'
       );
     }, 800);
