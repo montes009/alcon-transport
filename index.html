@@ -282,7 +282,7 @@
 
     <!-- Filtros -->
     <div class="catalogo-filters" role="group" aria-label="Filtrar equipos">
-      <button class="filter-btn active" data-filter="todos">Todos</button>
+      <button class="filter-btn active" data-filter="todos">Máquinas</button>
       <button class="filter-btn" data-filter="brazo">Brazos</button>
       <button class="filter-btn" data-filter="tijera">Tijeras</button>
       <button class="filter-btn" data-filter="unipersonal">Unipersonal</button>
@@ -978,12 +978,39 @@
   <!-- Filtrado tarjetas catálogo -->
   <script>
   (function () {
+    /* Muestra solo la primera tarjeta de cada data-cat */
+    function mostrarUnaXCategoria() {
+      var seen = {};
+      document.querySelectorAll('.eq-card').forEach(function (card) {
+        var cat = card.dataset.cat;
+        if (!seen[cat]) {
+          seen[cat] = true;
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    /* Estado inicial: filtro "Máquinas" activo */
+    mostrarUnaXCategoria();
+
     document.querySelectorAll('.filter-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        var filtro = btn.dataset.filter;
-        document.querySelectorAll('.eq-card').forEach(function (card) {
-          card.style.display = (filtro === 'todos' || card.dataset.cat === filtro) ? '' : 'none';
+        /* Actualizar clase active */
+        document.querySelectorAll('.filter-btn').forEach(function (b) {
+          b.classList.remove('active');
         });
+        btn.classList.add('active');
+
+        var filtro = btn.dataset.filter;
+        if (filtro === 'todos') {
+          mostrarUnaXCategoria();
+        } else {
+          document.querySelectorAll('.eq-card').forEach(function (card) {
+            card.style.display = (card.dataset.cat === filtro) ? '' : 'none';
+          });
+        }
       });
     });
   })();
