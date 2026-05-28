@@ -220,7 +220,7 @@ ul { list-style: none; }
    ============================================ */
 .hero {
   position: relative;
-  min-height: 100vh;
+  min-height: 85vh;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -233,12 +233,13 @@ ul { list-style: none; }
 .hero-image {
   position: absolute;
   right: -2%;
-  top: 50%;
-  transform: translateY(-50%);
+  top: auto;
+  bottom: 0;
+  transform: none;
   width: min(55vw, 860px);
   max-height: 95vh;
   object-fit: contain;
-  object-position: center right;
+  object-position: bottom right;
   z-index: 1;
   filter: drop-shadow(0 20px 60px rgba(180, 0, 35, 0.4));
   pointer-events: none;
@@ -282,7 +283,7 @@ ul { list-style: none; }
   position: relative;
   z-index: 2;
   max-width: 720px;
-  padding: 120px 24px 80px;
+  padding: 90px 24px 60px;
   margin: 0 auto 0 calc((100vw - 1200px) / 2 + 24px);
 }
 .hero-eyebrow {
