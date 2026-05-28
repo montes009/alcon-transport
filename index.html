@@ -125,7 +125,8 @@
   =========================================== -->
   <nav class="navbar" role="navigation" aria-label="Navegación principal">
     <div class="nav-inner">
-      <a href="#inicio" class="nav-logo" aria-label="UP Equipos - Inicio">
+      <a href="#inicio" class="nav-logo" aria-label="UP Equipos - Inicio"
+   id="nav-logo-secret">
         <img src="IMAGENES POR INCORPORAR/logo up.png"
              alt="UP Equipos"
              class="nav-logo-svg"
@@ -1112,5 +1113,76 @@
   <!-- Scripts -->
   <script src="js/assistant.js"></script>
   <script src="js/main.js"></script>
+
+<script>
+(function(){
+  var logo = document.getElementById('nav-logo-secret');
+  var timer = null;
+  var overlay = null;
+
+  function showCountdown(seconds) {
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);border:1px solid rgba(192,0,31,0.4);color:#fff;padding:10px 24px;border-radius:4px;font-family:Open Sans,sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;z-index:99999;pointer-events:none;transition:opacity 0.3s;';
+      document.body.appendChild(overlay);
+    }
+    overlay.style.opacity = '1';
+    overlay.textContent = 'Acceso admin... ' + seconds + 's';
+  }
+
+  function hideOverlay() {
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(function(){
+        if(overlay){ overlay.remove(); overlay = null; }
+      }, 300);
+    }
+  }
+
+  logo.addEventListener('mousedown', function(e){
+    var count = 10;
+    showCountdown(count);
+    timer = setInterval(function(){
+      count--;
+      if (count > 0) {
+        showCountdown(count);
+      } else {
+        clearInterval(timer);
+        timer = null;
+        hideOverlay();
+        window.location.href = 'seo/';
+      }
+    }, 1000);
+  });
+
+  logo.addEventListener('mouseup', function(){
+    if (timer) { clearInterval(timer); timer = null; hideOverlay(); }
+  });
+
+  logo.addEventListener('mouseleave', function(){
+    if (timer) { clearInterval(timer); timer = null; hideOverlay(); }
+  });
+
+  // Touch para móvil
+  logo.addEventListener('touchstart', function(e){
+    var count = 10;
+    showCountdown(count);
+    timer = setInterval(function(){
+      count--;
+      if (count > 0) {
+        showCountdown(count);
+      } else {
+        clearInterval(timer); timer = null;
+        hideOverlay();
+        window.location.href = 'seo/';
+      }
+    }, 1000);
+  });
+
+  logo.addEventListener('touchend', function(){
+    if (timer) { clearInterval(timer); timer = null; hideOverlay(); }
+  });
+})();
+</script>
 </body>
 </html>
