@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UP Equipos — Panel SEO</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg2: #111111;
+      --bg3: #1a1a1a;
+      --red: #C0001F;
+      --red2: #e8001f;
+      --white: #ffffff;
+      --gray: rgba(255,255,255,0.55);
+      --gray2: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.08);
+      --sidebar-w: 220px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: var(--bg);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0; left: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .sidebar-brand {
+      padding: 20px 16px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-brand img {
+      height: 36px;
+      width: auto;
+      filter: brightness(1.1);
+    }
+
+    .sidebar-brand-text {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--red);
+      line-height: 1.3;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 0;
+      overflow-y: auto;
+    }
+
+    .nav-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      padding: 12px 16px 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray);
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 2px solid transparent;
+      text-decoration: none;
+    }
+
+    .nav-item:hover { color: var(--white); background: var(--gray2); }
+    .nav-item.active { color: var(--red); border-left-color: var(--red); background: rgba(192,0,31,0.08); }
+
+    .nav-item .nav-icon { font-size: 14px; width: 18px; text-align: center; }
+
+    .sidebar-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-ver {
+      display: block;
+      text-align: center;
+      padding: 9px 12px;
+      background: var(--red);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .btn-ver:hover { background: var(--red2); }
+
+    /* ── MAIN ── */
+    #main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      padding: 32px;
+      max-width: calc(100% - var(--sidebar-w));
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .page-header h1 span { color: var(--red); }
+
+    /* ── SECTION ── */
+    .seo-section {
+      margin-bottom: 40px;
+      scroll-margin-top: 24px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    /* ── SCORE CIRCLE ── */
+    .score-wrap {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .score-circle-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      flex-shrink: 0;
+    }
+
+    .score-circle-container svg {
+      transform: rotate(-90deg);
+    }
+
+    .score-circle-bg { fill: none; stroke: var(--bg3); stroke-width: 10; }
+    .score-circle-fill {
+      fill: none;
+      stroke-width: 10;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.8s cubic-bezier(.4,0,.2,1), stroke 0.4s;
+    }
+
+    .score-number {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .score-label-text {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-top: 2px;
+    }
+
+    .score-details { flex: 1; min-width: 200px; }
+    .score-details h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .score-details p { font-size: 12px; color: var(--gray); line-height: 1.6; }
+
+    .score-bars { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+
+    .score-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+    }
+
+    .score-bar-label { width: 130px; color: var(--gray); }
+
+    .score-bar-track {
+      flex: 1;
+      height: 5px;
+      background: var(--bg3);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--red);
+      transition: width 0.6s ease;
+    }
+
+    .score-bar-val { width: 30px; text-align: right; font-weight: 600; }
+
+    /* ── FORM ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-grid.single { grid-template-columns: 1fr; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field.span2 { grid-column: span 2; }
+
+    .field label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--gray);
+      text-transform: uppercase;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      background: var(--bg3);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 5px;
+      color: var(--white);
+      font-family: 'Open Sans', sans-serif;
+      font-size: 13px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: var(--red);
+    }
+
+    .field select option { background: #1a1a1a; }
+
+    .field textarea { resize: vertical; min-height: 70px; }
+
+    .char-counter {
+      font-size: 10px;
+      color: var(--gray);
+      text-align: right;
+    }
+
+    .char-counter.warn { color: #f59e0b; }
+    .char-counter.over { color: var(--red); }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border: none;
+      border-radius: 5px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: var(--red); color: var(--white); }
+    .btn-primary:hover { background: var(--red2); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--gray);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { color: var(--white); border-color: rgba(255,255,255,0.25); }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* ── CHECKLIST ── */
+    .checklist { display: flex; flex-direction: column; gap: 8px; }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--bg3);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .check-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+    .check-text { flex: 1; }
+    .check-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .badge-ok { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .badge-warn { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .badge-err { background: rgba(192,0,31,0.15); color: #ff4060; }
+
+    /* ── GOOGLE PREVIEW ── */
+    .google-preview {
+      background: #fff;
+      border-radius: 8px;
+      padding: 18px 20px;
+      max-width: 600px;
+    }
+
+    .gp-url {
+      font-size: 12px;
+      color: #1a0dab;
+      margin-bottom: 2px;
+      font-family: arial, sans-serif;
+    }
+
+    .gp-title {
+      font-size: 20px;
+      color: #1a0dab;
+      font-family: arial, sans-serif;
+      cursor: pointer;
+      line-height: 1.3;
+      margin-bottom: 3px;
+    }
+
+    .gp-title:hover { text-decoration: underline; }
+
+    .gp-desc {
+      font-size: 14px;
+      color: #4d5156;
+      font-family: arial, sans-serif;
+      line-height: 1.58;
+    }
+
+    .gp-url-green {
+      font-size: 14px;
+      color: #202124;
+      font-family: arial, sans-serif;
+      margin-bottom: 3px;
+    }
+
+    /* ── SOCIAL PREVIEW ── */
+    .social-preview {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      max-width: 400px;
+    }
+
+    .social-img-placeholder {
+      width: 100%;
+      height: 200px;
+      background: #1e1e1e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray);
+      font-size: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .social-img-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .social-content { padding: 12px 14px; }
+    .social-domain { font-size: 11px; color: var(--gray); text-transform: uppercase; margin-bottom: 4px; }
+    .social-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+    .social-desc { font-size: 12px; color: var(--gray); line-height: 1.5; }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #a8d8a8;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .code-block.xml { color: #89dcff; }
+    .code-block.json { color: #ffd700; }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .code-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    /* ── METRICS ── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .metric-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .metric-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .metric-sub {
+      font-size: 11px;
+      color: var(--gray);
+      margin-top: 3px;
+    }
+
+    .metric-speed {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .speed-fast { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .speed-med { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .speed-slow { background: rgba(192,0,31,0.15); color: #ff4060; }
+
+    /* ── FINAL CODE ── */
+    .final-textarea {
+      width: 100%;
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #a8d8a8;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      padding: 14px;
+      line-height: 1.6;
+      resize: vertical;
+      min-height: 280px;
+      outline: none;
+    }
+
+    .final-textarea:focus { border-color: var(--red); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #22c55e;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      transform: translateY(60px);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── TABS ── */
+    .tab-row {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      padding: 9px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+      font-family: 'Open Sans', sans-serif;
+    }
+
+    .tab-btn:hover { color: var(--white); }
+    .tab-btn.active { color: var(--red); border-bottom-color: var(--red); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      #sidebar {
+        width: 100%;
+        min-height: auto;
+        position: relative;
+        flex-direction: row;
+        flex-wrap: wrap;
+        overflow-x: auto;
+      }
+
+      #main { margin-left: 0; max-width: 100%; }
+
+      body { flex-direction: column; }
+
+      .sidebar-nav { display: flex; flex-direction: row; padding: 0; overflow-x: auto; }
+      .nav-label { display: none; }
+      .nav-item { white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
+      .nav-item.active { border-bottom-color: var(--red); border-left: none; }
+      .sidebar-footer { display: none; }
+
+      .form-grid { grid-template-columns: 1fr; }
+      .field.span2 { grid-column: span 1; }
+    }
+
+    @media (max-width: 600px) {
+      #main { padding: 16px; }
+      .score-wrap { flex-direction: column; }
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside id="sidebar">
+  <div class="sidebar-brand">
+    <img src="../IMAGENES POR INCORPORAR/logo up.png" alt="UP Equipos" onerror="this.style.display='none'">
+    <div class="sidebar-brand-text">Panel<br>SEO</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">Análisis</div>
+    <a class="nav-item active" href="#score" onclick="setActive(this)">
+      <span class="nav-icon">🎯</span> Puntuación
+    </a>
+    <a class="nav-item" href="#checklist" onclick="setActive(this)">
+      <span class="nav-icon">✅</span> Checklist
+    </a>
+    <div class="nav-label">Contenido</div>
+    <a class="nav-item" href="#metatags" onclick="setActive(this)">
+      <span class="nav-icon">🏷️</span> Meta Tags
+    </a>
+    <a class="nav-item" href="#preview-google" onclick="setActive(this)">
+      <span class="nav-icon">🔍</span> Preview Google
+    </a>
+    <a class="nav-item" href="#preview-social" onclick="setActive(this)">
+      <span class="nav-icon">📱</span> Preview Social
+    </a>
+    <div class="nav-label">Archivos</div>
+    <a class="nav-item" href="#archivos-seo" onclick="setActive(this)">
+      <span class="nav-icon">📄</span> Archivos SEO
+    </a>
+    <a class="nav-item" href="#schema" onclick="setActive(this)">
+      <span class="nav-icon">🏢</span> Schema.org
+    </a>
+    <div class="nav-label">Extra</div>
+    <a class="nav-item" href="#metricas" onclick="setActive(this)">
+      <span class="nav-icon">📊</span> Métricas
+    </a>
+    <a class="nav-item" href="#codigo-final" onclick="setActive(this)">
+      <span class="nav-icon">💾</span> Código Final
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a class="btn-ver" href="../index.html" target="_blank">↗ Ver página</a>
+  </div>
+</aside>
+
+<!-- ── MAIN CONTENT ── -->
+<main id="main">
+
+  <div class="page-header">
+    <h1>UP Equipos — <span>Panel SEO</span></h1>
+    <a class="btn btn-primary" href="../index.html" target="_blank">↗ Ver página</a>
+  </div>
+
+  <!-- ══════════════════════════════
+       SECCIÓN 1: PUNTUACIÓN SEO
+  ══════════════════════════════ -->
+  <section class="seo-section" id="score">
+    <div class="section-title">🎯 Puntuación SEO General</div>
+    <div class="card">
+      <div class="score-wrap">
+        <div class="score-circle-container">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle class="score-circle-bg" cx="60" cy="60" r="52"/>
+            <circle id="scoreCircle" class="score-circle-fill" cx="60" cy="60" r="52"
+              stroke-dasharray="326.7"
+              stroke-dashoffset="326.7"
+              stroke="#22c55e"/>
+          </svg>
+          <div class="score-number">
+            <span id="scoreNum">0</span>
+            <span class="score-label-text">/ 100</span>
+          </div>
+        </div>
+
+        <div class="score-details">
+          <h3 id="scoreLabel">Calculando...</h3>
+          <p id="scoreDesc">Completa los campos de meta tags para mejorar tu puntuación SEO.</p>
+          <div class="score-bars">
+            <div class="score-bar-row">
+              <span class="score-bar-label">Meta Tags</span>
+              <div class="score-bar-track"><div class="score-bar-fill" id="bar-meta" style="width:0%"></div></div>
+              <span class="score-bar-val" id="val-meta">0%</span>
+            </div>
+            <div class="score-bar-row">
+              <span class="score-bar-label">Open Graph</span>
+              <div class="score-bar-track"><div class="score-bar-fill" id="bar-og" style="width:0%"></div></div>
+              <span class="score-bar-val" id="val-og">0%</span>
+            </div>
+            <div class="score-bar-row">
+              <span class="score-bar-label">Archivos SEO</span>
+              <div class="score-bar-track"><div class="score-bar-fill" id="bar-files" style="width:0%"></div></div>
+              <span class="score-bar-val" id="val-files">0%</span>
+            </div>
+            <div class="score-bar-row">
+              <span class="score-bar-label">Schema.org</span>
+              <div class="score-bar-track"><div class="score-bar-fill" id="bar-schema" style="width:0%"></div></div>
+              <span class="score-bar-val" id="val-schema">0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       SECCIÓN 2: META TAGS
+  ══════════════════════════════ -->
+  <section class="seo-section" id="metatags">
+    <div class="section-title">🏷️ Meta Tags</div>
+    <div class="card">
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="showTab('basic',this)">Básicos</button>
+        <button class="tab-btn" onclick="showTab('og',this)">Open Graph</button>
+        <button class="tab-btn" onclick="showTab('twitter',this)">Twitter</button>
+      </div>
+
+      <div id="tab-basic" class="tab-panel active">
+        <div class="form-grid">
+          <div class="field span2">
+            <label>Title Tag</label>
+            <input type="text" id="f-title" maxlength="70" oninput="onFieldChange()" placeholder="Título de la página...">
+            <div class="char-counter" id="cc-title">0 / 60 caracteres recomendados</div>
+          </div>
+          <div class="field span2">
+            <label>Meta Description</label>
+            <textarea id="f-desc" maxlength="200" oninput="onFieldChange()" placeholder="Descripción de la página..."></textarea>
+            <div class="char-counter" id="cc-desc">0 / 160 caracteres recomendados</div>
+          </div>
+          <div class="field span2">
+            <label>Keywords (separadas por coma)</label>
+            <input type="text" id="f-keywords" oninput="onFieldChange()" placeholder="palabra1, palabra2, palabra3...">
+          </div>
+          <div class="field">
+            <label>Canonical URL</label>
+            <input type="url" id="f-canonical" oninput="onFieldChange()" placeholder="https://equiposup.com/">
+          </div>
+          <div class="field">
+            <label>Robots</label>
+            <select id="f-robots" onchange="onFieldChange()">
+              <option value="index, follow">index, follow (recomendado)</option>
+              <option value="noindex, follow">noindex, follow</option>
+              <option value="index, nofollow">index, nofollow</option>
+              <option value="noindex, nofollow">noindex, nofollow</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Author</label>
+            <input type="text" id="f-author" oninput="onFieldChange()" placeholder="UP Equipos S.A.S.">
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-og" class="tab-panel">
+        <div class="form-grid">
+          <div class="field span2">
+            <label>OG Title</label>
+            <input type="text" id="f-og-title" oninput="onFieldChange()" placeholder="Título para redes sociales...">
+          </div>
+          <div class="field span2">
+            <label>OG Description</label>
+            <textarea id="f-og-desc" maxlength="200" oninput="onFieldChange()" placeholder="Descripción para redes sociales..."></textarea>
+          </div>
+          <div class="field span2">
+            <label>OG Image URL</label>
+            <input type="url" id="f-og-image" oninput="onFieldChange()" placeholder="https://equiposup.com/imagen.png">
+          </div>
+          <div class="field">
+            <label>OG Locale</label>
+            <input type="text" id="f-og-locale" oninput="onFieldChange()" placeholder="es_CO">
+          </div>
+          <div class="field">
+            <label>OG Site Name</label>
+            <input type="text" id="f-og-sitename" oninput="onFieldChange()" placeholder="UP Equipos">
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-twitter" class="tab-panel">
+        <div class="form-grid">
+          <div class="field">
+            <label>Twitter Card</label>
+            <select id="f-tw-card" onchange="onFieldChange()">
+              <option value="summary_large_image">summary_large_image</option>
+              <option value="summary">summary</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Twitter Handle (opcional)</label>
+            <input type="text" id="f-tw-handle" oninput="onFieldChange()" placeholder="@tu_usuario">
+          </div>
+          <div class="field span2">
+            <label>Twitter Title</label>
+            <input type="text" id="f-tw-title" oninput="onFieldChange()" placeholder="Título para Twitter...">
+          </div>
+          <div class="field span2">
+            <label>Twitter Description</label>
+            <textarea id="f-tw-desc" oninput="onFieldChange()" placeholder="Descripción para Twitter..."></textarea>
+          </div>
+          <div class="field span2">
+            <label>Twitter Image URL</label>
+            <input type="url" id="f-tw-image" oninput="onFieldChange()" placeholder="https://equiposup.com/imagen.png">
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="generateMetaCode()">⚙️ Generar código HTML</button>
+        <button class="btn btn-secondary" onclick="copyMetaCode()">📋 Copiar código</button>
+      </div>
+
+      <div id="meta-code-wrap" style="margin-top:14px; display:none;">
+        <div class="code-header">
+          <span class="code-title">Código generado — pegar en &lt;head&gt;</span>
+        </div>
+        <div class="code-block" id="meta-code-output"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       SECCIÓN 3: CHECKLIST
+  ══════════════════════════════ -->
+  <section class="seo-section" id="checklist">
+    <div class="section-title">✅ Análisis de la Página</div>
+    <div class="card">
+      <div class="checklist" id="checklist-items"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       SECCIÓN 4: PREVIEW GOOGLE
+  ══════════════════════════════ -->
+  <section class="seo-section" id="preview-google">
+    <div class="section-title">🔍 Preview Google</div>
+    <div class="card">
+      <p style="font-size:12px; color:var(--gray); margin-bottom:16px;">
+        Así aparece tu página en los resultados de búsqueda de Google.
+      </p>
+      <div class="google-preview">
+        <div class="gp-url-green">
+          <span id="gp-favicon" style="margin-right:6px;">🌐</span>
+          <span id="gp-sitename-disp">UP Equipos</span>
+        </div>
+        <div class="gp-url" id="gp-url-disp">equiposup.com › inicio</div>
+        <div class="gp-title" id="gp-title-disp">UP Equipos — Plataformas Elevadoras | Distribuidor GENIE Colombia</div>
+        <div class="gp-desc" id="gp-desc-disp">Alquiler y venta de plataformas elevadoras certificadas. Distribuidor autorizado GENIE en Colombia. Medellín, Bogotá y Barranquilla.</div>
+      </div>
+      <p style="font-size:11px; color:rgba(255,255,255,0.25); margin-top:12px;">
+        * Simulación aproximada. Google puede mostrar variaciones.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       SECCIÓN 5: PREVIEW SOCIAL
+  ══════════════════════════════ -->
+  <section class="seo-section" id="preview-social">
+    <div class="section-title">📱 Preview Redes Sociales</div>
+    <div class="card">
+      <p style="font-size:12px; color:var(--gray); margin-bottom:16px;">
+        Así se ve el enlace al compartirlo en WhatsApp, Facebook, LinkedIn, etc.
+      </p>
+      <div class="social-preview">
+        <div class="social-img-placeholder" id="social-img-wrap">
+          <img id="social-img-preview" src="" alt="" style="display:none;" onerror="this.style.display='none'">
+          <span id="social-img-text">Sin imagen OG configurada</span>
+        </div>
+        <div class="social-content">
+          <div class="social-domain" id="social-domain-disp">EQUIPOSUP.COM</div>
+          <div class="social-title" id="social-title-disp">UP Equipos — Plataformas Elevadoras</div>
+          <div class="social-desc" id="social-desc-disp">Distribuidor autorizado GENIE en Colombia. Alquiler y venta de plataformas elevadoras certificadas.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       SECCIÓN 6: ARCHIVOS SEO
+  ══════════════════════════════ -->
+  <section class="seo-section" id="archivos-seo">
+    <div class="section-title">📄 Archivos SEO</div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; flex-wrap:wrap;">
+
+      <!-- SITEMAP -->
+      <div class="card">
+        <div class="code-header">
+          <span class="code-title">📋 sitemap.xml</span>
+          <button class="btn btn-secondary" onclick="downloadFile('sitemap.xml', getSitemapContent())">⬇ Descargar</button>
+        </div>
+        <div class="code-block xml" id="sitemap-preview"></div>
+      </div>
+
+      <!-- ROBOTS -->
+      <div class="card">
+        <div class="code-header">
+          <span class="code-title">🤖 robots.txt</span>
+          <button class="btn btn-secondary" onclick="downloadFile('robots.txt', getRobotsContent())">⬇ Descargar</button>
+        </div>
+        <div class="code-block" id="robots-preview"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       SECCIÓN 7: SCHEMA.ORG
+  ══════════════════════════════ -->
+  <section class="seo-section" id="schema">
+    <div class="section-title">🏢 Schema.org JSON-LD</div>
+    <div class="card">
+      <div class="form-grid">
+        <div class="field">
+          <label>Nombre empresa</label>
+          <input type="text" id="s-name" oninput="generateSchema()" placeholder="UP Equipos S.A.S.">
+        </div>
+        <div class="field">
+          <label>URL</label>
+          <input type="url" id="s-url" oninput="generateSchema()" placeholder="https://equiposup.com">
+        </div>
+        <div class="field span2">
+          <label>Descripción</label>
+          <textarea id="s-desc" oninput="generateSchema()" placeholder="Descripción del negocio..."></textarea>
+        </div>
+        <div class="field">
+          <label>Teléfono Medellín</label>
+          <input type="text" id="s-tel-med" oninput="generateSchema()" placeholder="604 4447178">
+        </div>
+        <div class="field">
+          <label>Teléfono Bogotá</label>
+          <input type="text" id="s-tel-bog" oninput="generateSchema()" placeholder="318 8097240">
+        </div>
+        <div class="field">
+          <label>Teléfono Barranquilla</label>
+          <input type="text" id="s-tel-baq" oninput="generateSchema()" placeholder="317 6362401">
+        </div>
+        <div class="field">
+          <label>Dirección Medellín</label>
+          <input type="text" id="s-addr" oninput="generateSchema()" placeholder="Calle 30a # 65b - 59">
+        </div>
+        <div class="field">
+          <label>Horario</label>
+          <input type="text" id="s-hours" oninput="generateSchema()" placeholder="Mo-Fr 07:30-17:30">
+        </div>
+        <div class="field">
+          <label>Rango de precios</label>
+          <select id="s-price" onchange="generateSchema()">
+            <option value="$">$ (Económico)</option>
+            <option value="$$" selected>$$ (Moderado)</option>
+            <option value="$$$">$$$ (Premium)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Logo URL</label>
+          <input type="url" id="s-logo" oninput="generateSchema()" placeholder="https://equiposup.com/logo.png">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="generateSchema()">⚙️ Generar Schema</button>
+        <button class="btn btn-secondary" onclick="copyCode('schema-output')">📋 Copiar</button>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div class="code-header">
+          <span class="code-title">JSON-LD generado</span>
+        </div>
+        <div class="code-block json" id="schema-output"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       SECCIÓN 8: MÉTRICAS
+  ══════════════════════════════ -->
+  <section class="seo-section" id="metricas">
+    <div class="section-title">📊 Métricas de Rendimiento</div>
+    <div class="card">
+      <div class="field" style="margin-bottom:16px; max-width:500px;">
+        <label>Palabras clave principales (para calcular densidad)</label>
+        <input type="text" id="m-keywords" oninput="calcMetrics()" placeholder="manlift, plataformas elevadoras, GENIE...">
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Palabras clave</div>
+          <div class="metric-value" id="m-kw-count">—</div>
+          <div class="metric-sub">keywords configuradas</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Longitud del título</div>
+          <div class="metric-value" id="m-title-len">0</div>
+          <div class="metric-sub">caracteres (ideal: 30-60)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Longitud descripción</div>
+          <div class="metric-value" id="m-desc-len">0</div>
+          <div class="metric-sub">caracteres (ideal: 120-160)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Estimación de velocidad</div>
+          <div class="metric-value" id="m-speed">
+            <span class="metric-speed speed-fast">RÁPIDO</span>
+          </div>
+          <div class="metric-sub">basado en tamaño de página</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Meta tags completados</div>
+          <div class="metric-value" id="m-meta-count">0/8</div>
+          <div class="metric-sub">campos configurados</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Puntuación SEO</div>
+          <div class="metric-value" id="m-score-disp" style="color:var(--red)">0</div>
+          <div class="metric-sub">sobre 100 puntos</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       SECCIÓN 9: CÓDIGO FINAL
+  ══════════════════════════════ -->
+  <section class="seo-section" id="codigo-final">
+    <div class="section-title">💾 Código Final Completo</div>
+    <div class="card">
+      <p style="font-size:12px; color:var(--gray); margin-bottom:16px;">
+        Todo el código SEO listo. Copia y pega dentro del <code style="color:var(--red)">&lt;head&gt;</code> de tu index.html.
+      </p>
+      <textarea class="final-textarea" id="final-code" readonly></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="copyFinalCode()">📋 Copiar todo el código</button>
+        <button class="btn btn-secondary" onclick="refreshFinalCode()">🔄 Actualizar</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- TOAST -->
+<div id="toast">¡Copiado al portapapeles!</div>
+
+<script>
+  // ──────────────────────────────────────────
+  //  DATOS POR DEFECTO
+  // ──────────────────────────────────────────
+  const DEFAULTS = {
+    title: 'UP Equipos — Plataformas Elevadoras | Distribuidor GENIE Colombia',
+    desc: 'Alquiler y venta de plataformas elevadoras certificadas. Distribuidor autorizado GENIE en Colombia. Medellín, Bogotá y Barranquilla.',
+    keywords: 'manlift, plataformas elevadoras, alquiler, tijera eléctrica, brazo articulado, GENIE, Colombia, IPAF',
+    canonical: 'https://equiposup.com/',
+    robots: 'index, follow',
+    author: 'UP Equipos S.A.S.',
+    ogTitle: 'UP Equipos — Plataformas Elevadoras',
+    ogDesc: 'Distribuidor autorizado GENIE en Colombia. Alquiler y venta de plataformas elevadoras certificadas.',
+    ogImage: 'https://equiposup.com/IMAGENES POR INCORPORAR/logo up.png',
+    ogLocale: 'es_CO',
+    ogSitename: 'UP Equipos',
+    twCard: 'summary_large_image',
+    twTitle: 'UP Equipos — Plataformas Elevadoras',
+    twDesc: 'Distribuidor autorizado GENIE en Colombia.',
+    twImage: 'https://equiposup.com/IMAGENES POR INCORPORAR/logo up.png',
+    sName: 'UP Equipos S.A.S.',
+    sUrl: 'https://equiposup.com',
+    sDesc: 'Distribuidor autorizado GENIE en Colombia. Especialistas en alquiler, venta y servicio técnico de plataformas elevadoras.',
+    sTelMed: '604 4447178',
+    sTelBog: '318 8097240',
+    sTelBaq: '317 6362401',
+    sAddr: 'Calle 30a # 65b - 59',
+    sHours: 'Mo-Fr 07:30-17:30',
+    sPrice: '$$',
+    sLogo: 'https://equiposup.com/IMAGENES POR INCORPORAR/logo up.png',
+    mKeywords: 'manlift, plataformas elevadoras, GENIE, Colombia'
+  };
+
+  // ──────────────────────────────────────────
+  //  INIT
+  // ──────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    // Poblar formulario meta
+    setValue('f-title', DEFAULTS.title);
+    setValue('f-desc', DEFAULTS.desc);
+    setValue('f-keywords', DEFAULTS.keywords);
+    setValue('f-canonical', DEFAULTS.canonical);
+    setSelect('f-robots', DEFAULTS.robots);
+    setValue('f-author', DEFAULTS.author);
+    // OG
+    setValue('f-og-title', DEFAULTS.ogTitle);
+    setValue('f-og-desc', DEFAULTS.ogDesc);
+    setValue('f-og-image', DEFAULTS.ogImage);
+    setValue('f-og-locale', DEFAULTS.ogLocale);
+    setValue('f-og-sitename', DEFAULTS.ogSitename);
+    // Twitter
+    setSelect('f-tw-card', DEFAULTS.twCard);
+    setValue('f-tw-title', DEFAULTS.twTitle);
+    setValue('f-tw-desc', DEFAULTS.twDesc);
+    setValue('f-tw-image', DEFAULTS.twImage);
+    // Schema
+    setValue('s-name', DEFAULTS.sName);
+    setValue('s-url', DEFAULTS.sUrl);
+    setValue('s-desc', DEFAULTS.sDesc);
+    setValue('s-tel-med', DEFAULTS.sTelMed);
+    setValue('s-tel-bog', DEFAULTS.sTelBog);
+    setValue('s-tel-baq', DEFAULTS.sTelBaq);
+    setValue('s-addr', DEFAULTS.sAddr);
+    setValue('s-hours', DEFAULTS.sHours);
+    setSelect('s-price', DEFAULTS.sPrice);
+    setValue('s-logo', DEFAULTS.sLogo);
+    // Metrics keyword
+    setValue('m-keywords', DEFAULTS.mKeywords);
+
+    // Run all
+    onFieldChange();
+    generateSchema();
+    renderSitemapRobots();
+    calcMetrics();
+    refreshFinalCode();
+  });
+
+  function setValue(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  }
+
+  function setSelect(id, val) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    for (let opt of el.options) {
+      if (opt.value === val) { opt.selected = true; break; }
+    }
+  }
+
+  function g(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  // ──────────────────────────────────────────
+  //  TABS
+  // ──────────────────────────────────────────
+  function showTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    const panel = document.getElementById('tab-' + name);
+    if (panel) panel.classList.add('active');
+    if (btn) btn.classList.add('active');
+  }
+
+  // ──────────────────────────────────────────
+  //  SIDEBAR ACTIVE
+  // ──────────────────────────────────────────
+  function setActive(link) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    link.classList.add('active');
+  }
+
+  // ──────────────────────────────────────────
+  //  CHAR COUNTERS
+  // ──────────────────────────────────────────
+  function updateCounter(inputId, counterId, max, recommended) {
+    const el = document.getElementById(inputId);
+    const cc = document.getElementById(counterId);
+    if (!el || !cc) return;
+    const len = el.value.length;
+    cc.textContent = len + ' / ' + recommended + ' caracteres recomendados';
+    cc.className = 'char-counter';
+    if (len > max) cc.classList.add('over');
+    else if (len > recommended) cc.classList.add('warn');
+  }
+
+  // ──────────────────────────────────────────
+  //  MAIN CHANGE HANDLER
+  // ──────────────────────────────────────────
+  function onFieldChange() {
+    updateCounter('f-title', 'cc-title', 70, 60);
+    updateCounter('f-desc', 'cc-desc', 200, 160);
+    updateGooglePreview();
+    updateSocialPreview();
+    updateChecklist();
+    updateScore();
+    calcMetrics();
+    refreshFinalCode();
+  }
+
+  // ──────────────────────────────────────────
+  //  GOOGLE PREVIEW
+  // ──────────────────────────────────────────
+  function updateGooglePreview() {
+    const title = g('f-title') || 'Sin título';
+    const desc  = g('f-desc')  || 'Sin descripción';
+    const url   = g('f-canonical') || 'https://equiposup.com/';
+    let urlDisp = url.replace('https://','').replace('http://','');
+    if (urlDisp.endsWith('/')) urlDisp = urlDisp.slice(0,-1);
+    urlDisp = urlDisp.replace('equiposup.com', 'equiposup.com');
+
+    const sitename = g('f-og-sitename') || 'UP Equipos';
+
+    setText('gp-sitename-disp', sitename);
+    setText('gp-url-disp', urlDisp + ' › inicio');
+    setText('gp-title-disp', title.length > 60 ? title.slice(0,60) + '...' : title);
+    setText('gp-desc-disp', desc.length > 160 ? desc.slice(0,160) + '...' : desc);
+  }
+
+  // ──────────────────────────────────────────
+  //  SOCIAL PREVIEW
+  // ──────────────────────────────────────────
+  function updateSocialPreview() {
+    const title  = g('f-og-title') || g('f-title') || 'Sin título';
+    const desc   = g('f-og-desc')  || g('f-desc')  || 'Sin descripción';
+    const img    = g('f-og-image');
+    const url    = g('f-canonical') || 'https://equiposup.com/';
+    let domain   = url.replace('https://','').replace('http://','').split('/')[0].toUpperCase();
+
+    setText('social-title-disp', title);
+    setText('social-desc-disp', desc.length > 100 ? desc.slice(0,100) + '...' : desc);
+    setText('social-domain-disp', domain);
+
+    const imgEl   = document.getElementById('social-img-preview');
+    const imgText = document.getElementById('social-img-text');
+    if (img) {
+      imgEl.src = img;
+      imgEl.style.display = 'block';
+      if (imgText) imgText.style.display = 'none';
+    } else {
+      imgEl.style.display = 'none';
+      if (imgText) imgText.style.display = '';
+    }
+  }
+
+  function setText(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  // ──────────────────────────────────────────
+  //  CHECKLIST
+  // ──────────────────────────────────────────
+  const checks = [
+    { id:'c-title',     label:'¿Tiene title tag?',                     fn: () => !!g('f-title') },
+    { id:'c-title-len', label:'¿Title tiene entre 30-60 caracteres?',  fn: () => { const l=g('f-title').length; return l>=30&&l<=60; }, warn: () => { const l=g('f-title').length; return l>0&&(l<30||l>60); } },
+    { id:'c-desc',      label:'¿Tiene meta description?',              fn: () => !!g('f-desc') },
+    { id:'c-desc-len',  label:'¿Description tiene 120-160 caracteres?',fn: () => { const l=g('f-desc').length; return l>=120&&l<=160; }, warn: () => { const l=g('f-desc').length; return l>0&&(l<120||l>160); } },
+    { id:'c-og',        label:'¿Tiene Open Graph tags?',               fn: () => !!(g('f-og-title')&&g('f-og-desc')&&g('f-og-image')) },
+    { id:'c-schema',    label:'¿Tiene Schema.org configurado?',        fn: () => !!(g('s-name')&&g('s-url')) },
+    { id:'c-sitemap',   label:'¿Tiene sitemap.xml?',                   fn: () => true, static: '✅', staticBadge: 'ok', staticText: 'CREADO' },
+    { id:'c-robots',    label:'¿Tiene robots.txt?',                    fn: () => true, static: '✅', staticBadge: 'ok', staticText: 'CREADO' },
+    { id:'c-canonical', label:'¿Tiene canonical URL?',                 fn: () => !!g('f-canonical') },
+    { id:'c-keywords',  label:'¿Tiene meta keywords?',                 fn: () => !!g('f-keywords') },
+  ];
+
+  function updateChecklist() {
+    const list = document.getElementById('checklist-items');
+    list.innerHTML = '';
+    checks.forEach(c => {
+      const isOk   = c.static ? true : c.fn();
+      const isWarn = !isOk && c.warn && c.warn();
+      const icon   = c.static || (isOk ? '✅' : (isWarn ? '⚠️' : '❌'));
+      const badgeCls = isOk ? 'badge-ok' : (isWarn ? 'badge-warn' : 'badge-err');
+      const badgeTxt = c.staticText || (isOk ? 'OK' : (isWarn ? 'MEJORAR' : 'FALTA'));
+      list.innerHTML += `
+        <div class="check-item">
+          <span class="check-icon">${icon}</span>
+          <span class="check-text">${c.label}</span>
+          <span class="check-badge ${badgeCls}">${badgeTxt}</span>
+        </div>`;
+    });
+  }
+
+  // ──────────────────────────────────────────
+  //  SCORE
+  // ──────────────────────────────────────────
+  function updateScore() {
+    let metaScore = 0, ogScore = 0, filesScore = 100, schemaScore = 0;
+
+    // Meta
+    if (g('f-title'))     metaScore += 25;
+    const tl = g('f-title').length;
+    if (tl >= 30 && tl <= 60) metaScore += 15;
+    if (g('f-desc'))      metaScore += 20;
+    const dl = g('f-desc').length;
+    if (dl >= 120 && dl <= 160) metaScore += 15;
+    if (g('f-keywords'))  metaScore += 10;
+    if (g('f-canonical')) metaScore += 15;
+    metaScore = Math.min(metaScore, 100);
+
+    // OG
+    if (g('f-og-title'))   ogScore += 30;
+    if (g('f-og-desc'))    ogScore += 30;
+    if (g('f-og-image'))   ogScore += 40;
+
+    // Schema
+    if (g('s-name'))       schemaScore += 40;
+    if (g('s-url'))        schemaScore += 20;
+    if (g('s-desc'))       schemaScore += 20;
+    if (g('s-tel-med'))    schemaScore += 20;
+
+    const overall = Math.round((metaScore * 0.4) + (ogScore * 0.25) + (filesScore * 0.15) + (schemaScore * 0.2));
+
+    // Circle
+    const circumference = 326.7;
+    const offset = circumference - (overall / 100) * circumference;
+    const circle = document.getElementById('scoreCircle');
+    if (circle) {
+      circle.style.strokeDashoffset = offset;
+      circle.style.stroke = overall >= 80 ? '#22c55e' : overall >= 50 ? '#f59e0b' : '#C0001F';
+    }
+
+    setText('scoreNum', overall);
+
+    const label = document.getElementById('scoreLabel');
+    const desc2 = document.getElementById('scoreDesc');
+    if (overall >= 80) {
+      label.textContent = 'Excelente SEO';
+      label.style.color = '#22c55e';
+      if (desc2) desc2.textContent = 'Tu página está muy bien optimizada para buscadores.';
+    } else if (overall >= 50) {
+      label.textContent = 'SEO Moderado';
+      label.style.color = '#f59e0b';
+      if (desc2) desc2.textContent = 'Hay mejoras posibles. Completa los campos faltantes.';
+    } else {
+      label.textContent = 'SEO Básico';
+      label.style.color = '#C0001F';
+      if (desc2) desc2.textContent = 'Completa los meta tags y Open Graph para mejorar.';
+    }
+
+    setBar('bar-meta',   'val-meta',   metaScore);
+    setBar('bar-og',     'val-og',     ogScore);
+    setBar('bar-files',  'val-files',  filesScore);
+    setBar('bar-schema', 'val-schema', schemaScore);
+
+    setText('m-score-disp', overall);
+  }
+
+  function setBar(barId, valId, pct) {
+    const bar = document.getElementById(barId);
+    const val = document.getElementById(valId);
+    if (bar) bar.style.width = pct + '%';
+    if (val) val.textContent = pct + '%';
+  }
+
+  // ──────────────────────────────────────────
+  //  META CODE GENERATOR
+  // ──────────────────────────────────────────
+  function buildMetaCode() {
+    const lines = [];
+    if (g('f-title'))     lines.push(`<title>${esc(g('f-title'))}</title>`);
+    if (g('f-desc'))      lines.push(`<meta name="description" content="${esc(g('f-desc'))}">`);
+    if (g('f-keywords'))  lines.push(`<meta name="keywords" content="${esc(g('f-keywords'))}">`);
+    if (g('f-robots'))    lines.push(`<meta name="robots" content="${esc(g('f-robots'))}">`);
+    if (g('f-author'))    lines.push(`<meta name="author" content="${esc(g('f-author'))}">`);
+    if (g('f-canonical')) lines.push(`<link rel="canonical" href="${esc(g('f-canonical'))}">`);
+    lines.push('');
+    lines.push('<!-- Open Graph -->');
+    lines.push(`<meta property="og:type" content="website">`);
+    if (g('f-canonical')) lines.push(`<meta property="og:url" content="${esc(g('f-canonical'))}">`);
+    if (g('f-og-title'))  lines.push(`<meta property="og:title" content="${esc(g('f-og-title'))}">`);
+    if (g('f-og-desc'))   lines.push(`<meta property="og:description" content="${esc(g('f-og-desc'))}">`);
+    if (g('f-og-image'))  lines.push(`<meta property="og:image" content="${esc(g('f-og-image'))}">`);
+    if (g('f-og-locale')) lines.push(`<meta property="og:locale" content="${esc(g('f-og-locale'))}">`);
+    if (g('f-og-sitename')) lines.push(`<meta property="og:site_name" content="${esc(g('f-og-sitename'))}">`);
+    lines.push('');
+    lines.push('<!-- Twitter Card -->');
+    lines.push(`<meta name="twitter:card" content="${esc(g('f-tw-card') || 'summary_large_image')}">`);
+    if (g('f-tw-handle')) lines.push(`<meta name="twitter:site" content="${esc(g('f-tw-handle'))}">`);
+    if (g('f-tw-title'))  lines.push(`<meta name="twitter:title" content="${esc(g('f-tw-title'))}">`);
+    if (g('f-tw-desc'))   lines.push(`<meta name="twitter:description" content="${esc(g('f-tw-desc'))}">`);
+    if (g('f-tw-image'))  lines.push(`<meta name="twitter:image" content="${esc(g('f-tw-image'))}">`);
+    return lines.join('\n');
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function generateMetaCode() {
+    const code = buildMetaCode();
+    const el = document.getElementById('meta-code-output');
+    const wrap = document.getElementById('meta-code-wrap');
+    if (el) el.textContent = code;
+    if (wrap) wrap.style.display = '';
+    showToast('Código generado');
+  }
+
+  function copyMetaCode() {
+    const code = buildMetaCode();
+    navigator.clipboard.writeText(code).then(() => showToast('¡Código copiado!'));
+  }
+
+  // ──────────────────────────────────────────
+  //  SCHEMA GENERATOR
+  // ──────────────────────────────────────────
+  function generateSchema() {
+    const name    = g('s-name')    || 'UP Equipos S.A.S.';
+    const url     = g('s-url')     || 'https://equiposup.com';
+    const desc    = g('s-desc')    || '';
+    const telMed  = g('s-tel-med') || '';
+    const telBog  = g('s-tel-bog') || '';
+    const telBaq  = g('s-tel-baq') || '';
+    const addr    = g('s-addr')    || '';
+    const hours   = g('s-hours')   || '';
+    const price   = g('s-price')   || '$$';
+    const logo    = g('s-logo')    || '';
+
+    const tels = [telMed, telBog, telBaq]
+      .filter(Boolean)
+      .map(t => '+57' + t.replace(/\s/g,''))
+      ;
+
+    const obj = {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": name
+    };
+    if (desc)   obj.description = desc;
+    if (url)    obj.url = url;
+    if (logo)   obj.logo = logo;
+    if (tels.length) obj.telephone = tels.length === 1 ? tels[0] : tels;
+    if (addr) {
+      obj.address = {
+        "@type": "PostalAddress",
+        "streetAddress": addr,
+        "addressLocality": "Medellín",
+        "addressRegion": "Antioquia",
+        "addressCountry": "CO"
+      };
+    }
+    if (url) obj.sameAs = [url];
+    if (price)  obj.priceRange = price;
+    if (hours)  obj.openingHours = hours;
+
+    const json = JSON.stringify(obj, null, 2);
+    const wrapped = `<script type="application/ld+json">\n${json}\n<\/script>`;
+    const el = document.getElementById('schema-output');
+    if (el) el.textContent = wrapped;
+
+    updateScore();
+    refreshFinalCode();
+  }
+
+  // ──────────────────────────────────────────
+  //  SITEMAP & ROBOTS
+  // ──────────────────────────────────────────
+  function getSitemapContent() {
+    const today = new Date().toISOString().split('T')[0];
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://equiposup.com/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://equiposup.com/#catalogo</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://equiposup.com/#venta</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://equiposup.com/#partes</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://equiposup.com/#ipaf</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://equiposup.com/#nosotros</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://equiposup.com/#sedes</loc>
+    <priority>0.7</priority>
+  </url>
+</urlset>`;
+  }
+
+  function getRobotsContent() {
+    return `User-agent: *\nAllow: /\nDisallow: /seo/\n\nSitemap: https://equiposup.com/sitemap.xml`;
+  }
+
+  function renderSitemapRobots() {
+    const sm = document.getElementById('sitemap-preview');
+    const rb = document.getElementById('robots-preview');
+    if (sm) sm.textContent = getSitemapContent();
+    if (rb) rb.textContent = getRobotsContent();
+  }
+
+  // ──────────────────────────────────────────
+  //  DOWNLOAD
+  // ──────────────────────────────────────────
+  function downloadFile(filename, content) {
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('Descargando ' + filename);
+  }
+
+  // ──────────────────────────────────────────
+  //  METRICS
+  // ──────────────────────────────────────────
+  function calcMetrics() {
+    const kw = g('m-keywords');
+    const kwList = kw ? kw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+    setText('m-kw-count', kwList.length || '—');
+
+    const tLen = g('f-title').length;
+    const dLen = g('f-desc').length;
+    setText('m-title-len', tLen);
+    setText('m-desc-len', dLen);
+
+    // meta count
+    const metaFields = ['f-title','f-desc','f-keywords','f-canonical','f-og-title','f-og-desc','f-og-image','s-name'];
+    const filled = metaFields.filter(id => !!g(id)).length;
+    setText('m-meta-count', filled + '/' + metaFields.length);
+  }
+
+  // ──────────────────────────────────────────
+  //  FINAL CODE
+  // ──────────────────────────────────────────
+  function refreshFinalCode() {
+    const schemaEl = document.getElementById('schema-output');
+    const schemaCode = schemaEl ? schemaEl.textContent : '';
+    const full = buildMetaCode() + '\n\n' + schemaCode;
+    const el = document.getElementById('final-code');
+    if (el) el.value = full;
+  }
+
+  function copyFinalCode() {
+    const el = document.getElementById('final-code');
+    if (!el) return;
+    navigator.clipboard.writeText(el.value).then(() => showToast('¡Todo el código copiado!'));
+  }
+
+  // ──────────────────────────────────────────
+  //  COPY HELPER
+  // ──────────────────────────────────────────
+  function copyCode(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    navigator.clipboard.writeText(el.textContent).then(() => showToast('¡Copiado!'));
+  }
+
+  // ──────────────────────────────────────────
+  //  TOAST
+  // ──────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg || '¡Copiado!';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // ──────────────────────────────────────────
+  //  SCROLL SPY
+  // ──────────────────────────────────────────
+  const sectionIds = ['score','metatags','checklist','preview-google','preview-social','archivos-seo','schema','metricas','codigo-final'];
+  const navLinks = {};
+
+  document.querySelectorAll('.nav-item').forEach(link => {
+    const href = link.getAttribute('href');
+    if (href && href.startsWith('#')) navLinks[href.slice(1)] = link;
+  });
+
+  window.addEventListener('scroll', () => {
+    let current = 'score';
+    sectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < 120) current = id;
+    });
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (navLinks[current]) navLinks[current].classList.add('active');
+  });
+</script>
+</body>
+</html>

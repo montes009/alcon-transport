@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /seo/
+
+Sitemap: https://equiposup.com/sitemap.xml
