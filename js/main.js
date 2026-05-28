@@ -353,3 +353,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log('[UP Equipos] Sistema iniciado correctamente.');
 });
+
+/* ---- Selector de sedes en el mapa ---- */
+(function(){
+  var iframe = document.getElementById('mapa-iframe');
+  var dirBtn = document.getElementById('mapa-directions-btn');
+  var btns   = document.querySelectorAll('.mapa-sede-btn');
+
+  btns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      btns.forEach(function(b){ b.classList.remove('active'); });
+      this.classList.add('active');
+
+      var lat = this.dataset.lat;
+      var lng = this.dataset.lng;
+
+      if(iframe){
+        iframe.src = 'https://maps.google.com/maps?q=' +
+          lat + ',' + lng + '&z=16&output=embed&hl=es';
+      }
+
+      if(dirBtn){
+        dirBtn.href = 'https://www.google.com/maps/dir/?api=1&destination=' +
+          lat + ',' + lng;
+      }
+    });
+  });
+})();
