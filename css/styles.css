@@ -232,14 +232,15 @@ ul { list-style: none; }
 /* ── Imagen del equipo flotante (derecha) ── */
 .hero-image {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  width: min(42vw, 680px);
-  max-height: 85vh;
+  right: -2%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(55vw, 860px);
+  max-height: 95vh;
   object-fit: contain;
-  object-position: bottom right;
+  object-position: center right;
   z-index: 1;
-  filter: drop-shadow(0 30px 45px rgba(0,0,0,0.65));
+  filter: drop-shadow(0 20px 60px rgba(180, 0, 35, 0.4));
   pointer-events: none;
   user-select: none;
 }
