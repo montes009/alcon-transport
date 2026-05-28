@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UP Equipos — Panel SEO</title>
+  <title>UP Equipos — Panel Admin</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -635,6 +635,137 @@
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+    /* ── ANALYTICS ── */
+    .an-range-btns { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+
+    .an-range-btn {
+      padding: 6px 14px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--gray);
+      font-family: 'Open Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .an-range-btn:hover { color: var(--white); border-color: rgba(255,255,255,0.25); }
+    .an-range-btn.active { background: var(--red); border-color: var(--red); color: var(--white); }
+
+    .an-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .an-kpi-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 18px;
+      transition: border-color 0.2s;
+    }
+    .an-kpi-card:hover { border-color: rgba(192,0,31,0.4); }
+
+    .an-kpi-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--gray); margin-bottom: 8px;
+    }
+    .an-kpi-val { font-size: 32px; font-weight: 700; line-height: 1; }
+    .an-kpi-sub { font-size: 11px; color: var(--gray); margin-top: 4px; }
+
+    .an-bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 140px;
+      padding: 0 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .an-bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+    .an-bar {
+      width: 100%;
+      background: var(--red);
+      border-radius: 3px 3px 0 0;
+      min-height: 3px;
+      transition: height 0.4s ease;
+    }
+    .an-bar-day { font-size: 9px; color: var(--gray); text-align: center; }
+    .an-bar-num { font-size: 9px; color: var(--gray); }
+
+    .an-table { width: 100%; border-collapse: collapse; }
+    .an-table th {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--gray);
+      text-align: left; padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .an-table td {
+      font-size: 12px; padding: 9px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+    .an-table tr:last-child td { border-bottom: none; }
+    .an-table tr:hover td { background: var(--gray2); }
+
+    .an-bar-mini-track { height: 4px; background: var(--bg); border-radius: 2px; width: 100px; overflow: hidden; }
+    .an-bar-mini-fill  { height: 100%; background: var(--red); border-radius: 2px; }
+
+    .an-device-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .an-device-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px;
+      text-align: center;
+    }
+    .an-device-icon  { font-size: 28px; margin-bottom: 10px; }
+    .an-device-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gray); margin-bottom: 6px; }
+    .an-device-pct   { font-size: 26px; font-weight: 700; margin-bottom: 10px; }
+    .an-device-track { height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+    .an-device-fill  { height: 100%; background: var(--red); border-radius: 3px; transition: width 0.5s ease; }
+
+    .an-loading {
+      text-align: center; padding: 32px; color: var(--gray); font-size: 13px;
+    }
+    .an-loading span { display: block; font-size: 24px; margin-bottom: 8px; }
+
+    .rt-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #22c55e;
+      background: rgba(34,197,94,0.1); padding: 3px 10px; border-radius: 10px;
+    }
+    .rt-dot {
+      width: 6px; height: 6px; background: #22c55e; border-radius: 50%;
+      animation: rtpulse 1.5s ease infinite;
+    }
+    @keyframes rtpulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    @media (max-width: 700px) {
+      .an-device-grid { grid-template-columns: 1fr; }
+      .an-kpi-grid    { grid-template-columns: 1fr 1fr; }
+      .an-bar-mini-track { width: 60px; }
+    }
   </style>
 </head>
 <body>
@@ -643,7 +774,7 @@
 <aside id="sidebar">
   <div class="sidebar-brand">
     <img src="../IMAGENES POR INCORPORAR/logo up.png" alt="UP Equipos" onerror="this.style.display='none'">
-    <div class="sidebar-brand-text">Panel<br>SEO</div>
+    <div class="sidebar-brand-text">Panel<br>Admin</div>
   </div>
 
   <nav class="sidebar-nav">
@@ -678,6 +809,22 @@
     <a class="nav-item" href="#codigo-final" onclick="setActive(this)">
       <span class="nav-icon">💾</span> Código Final
     </a>
+    <div class="nav-label">Analytics</div>
+    <a class="nav-item" href="#analytics-kpis" onclick="setActive(this); showAnalyticsSection('analytics-kpis'); return false;">
+      <span class="nav-icon">📈</span> KPIs
+    </a>
+    <a class="nav-item" href="#analytics-eventos" onclick="setActive(this); showAnalyticsSection('analytics-eventos'); return false;">
+      <span class="nav-icon">📋</span> Eventos
+    </a>
+    <a class="nav-item" href="#analytics-dispositivos" onclick="setActive(this); showAnalyticsSection('analytics-dispositivos'); return false;">
+      <span class="nav-icon">📱</span> Dispositivos
+    </a>
+    <a class="nav-item" href="#analytics-campanas" onclick="setActive(this); showAnalyticsSection('analytics-campanas'); return false;">
+      <span class="nav-icon">📣</span> Campañas UTM
+    </a>
+    <a class="nav-item" href="#analytics-realtime" onclick="setActive(this); showAnalyticsSection('analytics-realtime'); return false;">
+      <span class="nav-icon">⚡</span> Tiempo Real
+    </a>
   </nav>
 
   <div class="sidebar-footer">
@@ -689,7 +836,7 @@
 <main id="main">
 
   <div class="page-header">
-    <h1>UP Equipos — <span>Panel SEO</span></h1>
+    <h1>UP Equipos — <span>Panel Admin</span></h1>
     <a class="btn btn-primary" href="../index.html" target="_blank">↗ Ver página</a>
   </div>
 
@@ -1071,6 +1218,103 @@
       <div class="btn-row">
         <button class="btn btn-primary" onclick="copyFinalCode()">📋 Copiar todo el código</button>
         <button class="btn btn-secondary" onclick="refreshFinalCode()">🔄 Actualizar</button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════
+       ANALYTICS 1: KPIs
+  ══════════════════════════════ -->
+  <section class="seo-section" id="analytics-kpis" style="display:none;">
+    <div class="section-title">📈 KPIs — Métricas clave</div>
+    <div class="card">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; flex-wrap:wrap; gap:10px;">
+        <div class="an-range-btns">
+          <button class="an-range-btn active" data-dias="1">Hoy</button>
+          <button class="an-range-btn" data-dias="7">7 días</button>
+          <button class="an-range-btn" data-dias="30">30 días</button>
+          <button class="an-range-btn" data-dias="0">Todo</button>
+        </div>
+        <span class="rt-badge"><span class="rt-dot"></span> En vivo</span>
+      </div>
+      <div class="an-kpi-grid">
+        <div class="an-kpi-card">
+          <div class="an-kpi-label">Visitas totales</div>
+          <div class="an-kpi-val" id="kpi-visitas">—</div>
+          <div class="an-kpi-sub">page_view</div>
+        </div>
+        <div class="an-kpi-card">
+          <div class="an-kpi-label">Clics WhatsApp</div>
+          <div class="an-kpi-val" id="kpi-whatsapp">—</div>
+          <div class="an-kpi-sub">clic_whatsapp</div>
+        </div>
+        <div class="an-kpi-card">
+          <div class="an-kpi-label">Consultas equipos</div>
+          <div class="an-kpi-val" id="kpi-consultas">—</div>
+          <div class="an-kpi-sub">consultar_disponibilidad</div>
+        </div>
+        <div class="an-kpi-card">
+          <div class="an-kpi-label">Mensajes chatbot</div>
+          <div class="an-kpi-val" id="kpi-chatbot">—</div>
+          <div class="an-kpi-sub">mensaje_chatbot</div>
+        </div>
+      </div>
+      <div class="section-title" style="margin-bottom:12px; font-size:11px;">Visitas por día — últimos 7 días</div>
+      <div class="an-bar-chart" id="kpi-bar-chart">
+        <div class="an-loading"><span>📊</span>Cargando datos...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       ANALYTICS 2: EVENTOS
+  ══════════════════════════════ -->
+  <section class="seo-section" id="analytics-eventos" style="display:none;">
+    <div class="section-title">📋 Eventos más frecuentes</div>
+    <div class="card">
+      <div id="eventos-table-wrap">
+        <div class="an-loading"><span>📋</span>Cargando eventos...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       ANALYTICS 3: DISPOSITIVOS
+  ══════════════════════════════ -->
+  <section class="seo-section" id="analytics-dispositivos" style="display:none;">
+    <div class="section-title">📱 Dispositivos</div>
+    <div class="card">
+      <div class="an-device-grid" id="device-grid">
+        <div class="an-loading" style="grid-column:span 3;"><span>📱</span>Cargando...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       ANALYTICS 4: CAMPAÑAS UTM
+  ══════════════════════════════ -->
+  <section class="seo-section" id="analytics-campanas" style="display:none;">
+    <div class="section-title">📣 Campañas UTM</div>
+    <div class="card">
+      <div id="campanas-wrap">
+        <div class="an-loading"><span>📣</span>Cargando campañas...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       ANALYTICS 5: TIEMPO REAL
+  ══════════════════════════════ -->
+  <section class="seo-section" id="analytics-realtime" style="display:none;">
+    <div class="section-title" style="justify-content:flex-start; gap:12px;">
+      ⚡ Últimos eventos
+      <span class="rt-badge"><span class="rt-dot"></span> cada 30s</span>
+      <button class="btn btn-secondary" style="margin-left:auto; font-size:11px;" onclick="loadAnalytics()">🔄 Actualizar ahora</button>
+    </div>
+    <div class="card">
+      <div id="realtime-wrap">
+        <div class="an-loading"><span>⚡</span>Cargando eventos recientes...</div>
       </div>
     </div>
   </section>
@@ -1602,7 +1846,12 @@
   // ──────────────────────────────────────────
   //  SCROLL SPY
   // ──────────────────────────────────────────
-  const sectionIds = ['score','metatags','checklist','preview-google','preview-social','archivos-seo','schema','metricas','codigo-final'];
+  const sectionIds = [
+    'score','metatags','checklist','preview-google','preview-social',
+    'archivos-seo','schema','metricas','codigo-final',
+    'analytics-kpis','analytics-eventos','analytics-dispositivos',
+    'analytics-campanas','analytics-realtime'
+  ];
   const navLinks = {};
 
   document.querySelectorAll('.nav-item').forEach(link => {
@@ -1614,11 +1863,240 @@
     let current = 'score';
     sectionIds.forEach(id => {
       const el = document.getElementById(id);
-      if (el && el.getBoundingClientRect().top < 120) current = id;
+      if (el && el.style.display !== 'none' && el.getBoundingClientRect().top < 120) current = id;
     });
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     if (navLinks[current]) navLinks[current].classList.add('active');
   });
+
+  // ──────────────────────────────────────────
+  //  ANALYTICS — CONFIGURACIÓN
+  // ──────────────────────────────────────────
+  var SUPABASE_URL = 'https://oguxdohmutqgacahcwop.supabase.co';
+  var ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndXhkb2htdXRxZ2FjYWhjd29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjc0NzcsImV4cCI6MjA4ODMwMzQ3N30.RRruTo8B7k4R97Igq7_KV1PV58FqrpIzEu0R_MXIwR8';
+  var diasFiltro       = 1;
+  var _analyticsLoaded = false;
+
+  // ── Mostrar sección analytics y cargar datos la primera vez
+  function showAnalyticsSection(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.style.display = '';
+      setTimeout(function(){ el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+    }
+    if (!_analyticsLoaded) {
+      _analyticsLoaded = true;
+      loadAnalytics();
+    }
+  }
+
+  // ── Fetch desde Supabase
+  function fetchAnalytics(dias, callback) {
+    var desde = new Date();
+    desde.setDate(desde.getDate() - (dias <= 0 ? 3650 : dias));
+    var url = SUPABASE_URL + '/rest/v1/up_analytics' +
+      '?created_at=gte.' + desde.toISOString() +
+      '&order=created_at.desc&limit=1000';
+    fetch(url, {
+      headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY }
+    })
+    .then(function(r) { return r.json(); })
+    .then(callback)
+    .catch(function(e) { console.warn('Analytics error:', e); callback([]); });
+  }
+
+  // ── KPIs + gráfico de barras
+  function renderKPIs(data) {
+    var counts = { page_view: 0, clic_whatsapp: 0, consultar_disponibilidad: 0, mensaje_chatbot: 0 };
+    data.forEach(function(row) {
+      var ev = row.evento || row.event_name || '';
+      if (counts.hasOwnProperty(ev)) counts[ev]++;
+    });
+    setText('kpi-visitas',   counts.page_view);
+    setText('kpi-whatsapp',  counts.clic_whatsapp);
+    setText('kpi-consultas', counts.consultar_disponibilidad);
+    setText('kpi-chatbot',   counts.mensaje_chatbot);
+
+    // Bar chart — últimos 7 días (page_view)
+    var days = {};
+    var today = new Date();
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(today);
+      d.setDate(d.getDate() - i);
+      days[d.toISOString().split('T')[0]] = 0;
+    }
+    data.forEach(function(row) {
+      if ((row.evento || row.event_name || '') !== 'page_view') return;
+      var day = (row.created_at || '').split('T')[0];
+      if (days.hasOwnProperty(day)) days[day]++;
+    });
+
+    var keys   = Object.keys(days);
+    var vals   = keys.map(function(k){ return days[k]; });
+    var maxVal = Math.max.apply(null, vals) || 1;
+    var chart  = document.getElementById('kpi-bar-chart');
+    if (!chart) return;
+    chart.innerHTML = '';
+    keys.forEach(function(k, i) {
+      var v   = vals[i];
+      var pct = Math.max((v / maxVal) * 100, 3);
+      var wrap = document.createElement('div');
+      wrap.className = 'an-bar-wrap';
+      wrap.title = k + ': ' + v + ' visitas';
+      wrap.innerHTML =
+        '<div class="an-bar-num">' + (v > 0 ? v : '') + '</div>' +
+        '<div class="an-bar" style="height:' + pct.toFixed(1) + '%"></div>' +
+        '<div class="an-bar-day">' + k.slice(5) + '</div>';
+      chart.appendChild(wrap);
+    });
+  }
+
+  // ── Tabla de eventos
+  function renderEventos(data) {
+    var counts = {};
+    data.forEach(function(row) {
+      var ev = row.evento || row.event_name || 'desconocido';
+      counts[ev] = (counts[ev] || 0) + 1;
+    });
+    var sorted = Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; });
+    var total  = data.length || 1;
+    var wrap   = document.getElementById('eventos-table-wrap');
+    if (!wrap) return;
+    if (sorted.length === 0) {
+      wrap.innerHTML = '<div class="an-loading"><span>📋</span>Sin eventos en el período seleccionado.</div>';
+      return;
+    }
+    var html = '<table class="an-table"><thead><tr><th>Evento</th><th>Total</th><th>Frecuencia</th><th>%</th></tr></thead><tbody>';
+    sorted.forEach(function(ev) {
+      var n   = counts[ev];
+      var pct = Math.round((n / total) * 100);
+      html += '<tr><td><code style="color:var(--red);font-size:12px;">' + ev + '</code></td>' +
+        '<td style="font-weight:700;">' + n + '</td>' +
+        '<td><div class="an-bar-mini-track"><div class="an-bar-mini-fill" style="width:' + pct + '%"></div></div></td>' +
+        '<td style="color:var(--gray);">' + pct + '%</td></tr>';
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  }
+
+  // ── Dispositivos
+  function renderDispositivos(data) {
+    var counts = { desktop: 0, mobile: 0, tablet: 0 };
+    data.forEach(function(row) {
+      var d = (row.dispositivo || row.device || '').toLowerCase();
+      if      (d.indexOf('mobile') !== -1 || d.indexOf('móvil') !== -1) counts.mobile++;
+      else if (d.indexOf('tablet') !== -1) counts.tablet++;
+      else    counts.desktop++;
+    });
+    var total  = data.length || 1;
+    var grid   = document.getElementById('device-grid');
+    if (!grid) return;
+    var devices = [
+      { icon:'🖥️', label:'Desktop', val: counts.desktop },
+      { icon:'⬛',  label:'Tablet',  val: counts.tablet  },
+      { icon:'📱', label:'Móvil',   val: counts.mobile  }
+    ];
+    grid.innerHTML = '';
+    devices.forEach(function(d) {
+      var pct = Math.round((d.val / total) * 100);
+      var el  = document.createElement('div');
+      el.className = 'an-device-card';
+      el.innerHTML =
+        '<div class="an-device-icon">' + d.icon + '</div>' +
+        '<div class="an-device-label">' + d.label + '</div>' +
+        '<div class="an-device-pct">' + pct + '%</div>' +
+        '<div style="font-size:11px;color:var(--gray);margin-bottom:8px;">' + d.val + ' eventos</div>' +
+        '<div class="an-device-track"><div class="an-device-fill" style="width:' + pct + '%"></div></div>';
+      grid.appendChild(el);
+    });
+  }
+
+  // ── Campañas UTM
+  function renderCampanas(data) {
+    var campaigns = {};
+    data.forEach(function(row) {
+      var src = row.utm_source || null;
+      if (!src) return;
+      var med  = row.utm_medium   || '—';
+      var camp = row.utm_campaign || '—';
+      var key  = src + '|' + med + '|' + camp;
+      if (!campaigns[key]) campaigns[key] = { source: src, medium: med, campaign: camp, count: 0 };
+      campaigns[key].count++;
+    });
+    var rows = Object.values(campaigns).sort(function(a,b){ return b.count - a.count; });
+    var wrap = document.getElementById('campanas-wrap');
+    if (!wrap) return;
+    if (rows.length === 0) {
+      wrap.innerHTML = '<div class="an-loading"><span>📣</span>Sin campañas activas aún.<br><small style="margin-top:6px;display:block;">Agrega <code style="color:var(--red)">?utm_source=</code> a tus links de publicidad.</small></div>';
+      return;
+    }
+    var html = '<table class="an-table"><thead><tr><th>Source</th><th>Medium</th><th>Campaign</th><th>Visitas</th></tr></thead><tbody>';
+    rows.forEach(function(r) {
+      html += '<tr><td style="color:var(--red);font-weight:600;">' + r.source + '</td>' +
+        '<td>' + r.medium + '</td><td>' + r.campaign + '</td>' +
+        '<td style="font-weight:700;">' + r.count + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  }
+
+  // ── Tiempo real
+  function renderRealtime(data) {
+    var wrap  = document.getElementById('realtime-wrap');
+    if (!wrap) return;
+    var last20 = data.slice(0, 20);
+    if (last20.length === 0) {
+      wrap.innerHTML = '<div class="an-loading"><span>⚡</span>Sin eventos recientes.</div>';
+      return;
+    }
+    var html = '<div style="overflow-x:auto;"><table class="an-table"><thead><tr>' +
+      '<th>Hora</th><th>Evento</th><th>Dispositivo</th><th>Referrer</th><th>UTM</th>' +
+      '</tr></thead><tbody>';
+    last20.forEach(function(row) {
+      var ts   = row.created_at || '';
+      var hora = ts ? new Date(ts).toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'}) : '—';
+      var ev   = row.evento    || row.event_name || '—';
+      var dev  = row.dispositivo || row.device   || '—';
+      var ref  = (row.referrer  || '—').replace(/https?:\/\//,'').split('/')[0] || '—';
+      var utm  = row.utm_source || '—';
+      html += '<tr>' +
+        '<td style="color:var(--gray);white-space:nowrap;">' + hora + '</td>' +
+        '<td><code style="color:var(--red);font-size:11px;">' + ev + '</code></td>' +
+        '<td style="color:var(--gray);">' + dev + '</td>' +
+        '<td style="color:var(--gray);font-size:11px;">' + ref + '</td>' +
+        '<td style="color:var(--gray);">' + utm + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    html += '<p style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:10px;">Últimos ' + last20.length + ' eventos · Auto-actualización cada 30s</p>';
+    wrap.innerHTML = html;
+  }
+
+  // ── Cargar todo
+  function loadAnalytics() {
+    fetchAnalytics(diasFiltro, function(data) {
+      renderKPIs(data);
+      renderEventos(data);
+      renderDispositivos(data);
+      renderCampanas(data);
+      renderRealtime(data);
+    });
+  }
+
+  // ── Botones de rango de fechas
+  document.querySelectorAll('.an-range-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      diasFiltro = parseInt(this.dataset.dias);
+      document.querySelectorAll('.an-range-btn').forEach(function(b){ b.classList.remove('active'); });
+      this.classList.add('active');
+      loadAnalytics();
+    });
+  });
+
+  // ── Auto-refresh cada 30s cuando está en sección realtime
+  setInterval(function() {
+    var rt = document.getElementById('analytics-realtime');
+    if (rt && rt.style.display !== 'none') { loadAnalytics(); }
+  }, 30000);
 </script>
 </body>
 </html>
