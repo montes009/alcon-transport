@@ -190,6 +190,14 @@ const UPAssistant = (() => {
     if (indicator) indicator.remove();
   }
 
+  // ---- Easter egg creador ----
+  function handleCreatorCommand(userText) {
+    if (userText.trim().toLowerCase() === 'fiu fiu fiu') {
+      return '🔑 ¡Papá! Te reconozco por el silbido. Estoy a tus órdenes, creador.';
+    }
+    return null;
+  }
+
   // ---- Procesar mensaje del usuario ----
   async function processMessage(userText) {
     if (isTyping || !userText.trim()) return;
@@ -204,6 +212,18 @@ const UPAssistant = (() => {
 
     // Mostrar typing
     showTyping();
+
+    // ---- Modo creador: interceptar antes de la API ----
+    const creatorResponse = handleCreatorCommand(userText);
+    if (creatorResponse !== null) {
+      await new Promise(r => setTimeout(r, 600));
+      hideTyping();
+      renderMessage(creatorResponse, 'bot');
+      conversationHistory.push({ role: 'assistant', content: creatorResponse });
+      isTyping = false;
+      if (sendBtn) sendBtn.disabled = false;
+      return;
+    }
 
     // ---- Control de tokens lado cliente ----
     const estimatedTokens = conversationHistory.reduce((acc, m) =>
