@@ -2,6 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <!-- Security headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://oguxdohmutqgacahcwop.supabase.co; frame-ancestors 'none';">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UP Equipos — Panel Admin</title>
   <meta name="robots" content="noindex, nofollow">
@@ -1324,6 +1328,7 @@
 <!-- TOAST -->
 <div id="toast">¡Copiado al portapapeles!</div>
 
+<script src="../js/config.js"></script>
 <script>
   // ──────────────────────────────────────────
   //  DATOS POR DEFECTO
@@ -1534,20 +1539,31 @@
 
   function updateChecklist() {
     const list = document.getElementById('checklist-items');
-    list.innerHTML = '';
+    const frag = document.createDocumentFragment();
     checks.forEach(c => {
-      const isOk   = c.static ? true : c.fn();
-      const isWarn = !isOk && c.warn && c.warn();
-      const icon   = c.static || (isOk ? '✅' : (isWarn ? '⚠️' : '❌'));
+      const isOk    = c.static ? true : c.fn();
+      const isWarn  = !isOk && c.warn && c.warn();
+      const icon    = c.static || (isOk ? '✅' : (isWarn ? '⚠️' : '❌'));
       const badgeCls = isOk ? 'badge-ok' : (isWarn ? 'badge-warn' : 'badge-err');
       const badgeTxt = c.staticText || (isOk ? 'OK' : (isWarn ? 'MEJORAR' : 'FALTA'));
-      list.innerHTML += `
-        <div class="check-item">
-          <span class="check-icon">${icon}</span>
-          <span class="check-text">${c.label}</span>
-          <span class="check-badge ${badgeCls}">${badgeTxt}</span>
-        </div>`;
+      const div = document.createElement('div');
+      div.className = 'check-item';
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'check-icon';
+      iconSpan.textContent = icon;
+      const textSpan = document.createElement('span');
+      textSpan.className = 'check-text';
+      textSpan.textContent = c.label;
+      const badgeSpan = document.createElement('span');
+      badgeSpan.className = 'check-badge ' + badgeCls;
+      badgeSpan.textContent = badgeTxt;
+      div.appendChild(iconSpan);
+      div.appendChild(textSpan);
+      div.appendChild(badgeSpan);
+      frag.appendChild(div);
     });
+    list.innerHTML = '';
+    list.appendChild(frag);
   }
 
   // ──────────────────────────────────────────
@@ -1872,10 +1888,16 @@
   // ──────────────────────────────────────────
   //  ANALYTICS — CONFIGURACIÓN
   // ──────────────────────────────────────────
-  var SUPABASE_URL = 'https://oguxdohmutqgacahcwop.supabase.co';
-  var ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndXhkb2htdXRxZ2FjYWhjd29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjc0NzcsImV4cCI6MjA4ODMwMzQ3N30.RRruTo8B7k4R97Igq7_KV1PV58FqrpIzEu0R_MXIwR8';
+  var SUPABASE_URL = window.UP_CONFIG.supabaseUrl;
+  var ANON_KEY     = window.UP_CONFIG.anonKey;
   var diasFiltro       = 1;
   var _analyticsLoaded = false;
+
+  function escHTML(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
 
   // ── Mostrar sección analytics y cargar datos la primera vez
   function showAnalyticsSection(id) {
@@ -1970,10 +1992,10 @@
     sorted.forEach(function(ev) {
       var n   = counts[ev];
       var pct = Math.round((n / total) * 100);
-      html += '<tr><td><code style="color:var(--red);font-size:12px;">' + ev + '</code></td>' +
-        '<td style="font-weight:700;">' + n + '</td>' +
-        '<td><div class="an-bar-mini-track"><div class="an-bar-mini-fill" style="width:' + pct + '%"></div></div></td>' +
-        '<td style="color:var(--gray);">' + pct + '%</td></tr>';
+      html += '<tr><td><code style="color:var(--red);font-size:12px;">' + escHTML(ev) + '</code></td>' +
+        '<td style="font-weight:700;">' + escHTML(n) + '</td>' +
+        '<td><div class="an-bar-mini-track"><div class="an-bar-mini-fill" style="width:' + escHTML(pct) + '%"></div></div></td>' +
+        '<td style="color:var(--gray);">' + escHTML(pct) + '%</td></tr>';
     });
     html += '</tbody></table>';
     wrap.innerHTML = html;
@@ -2032,9 +2054,9 @@
     }
     var html = '<table class="an-table"><thead><tr><th>Source</th><th>Medium</th><th>Campaign</th><th>Visitas</th></tr></thead><tbody>';
     rows.forEach(function(r) {
-      html += '<tr><td style="color:var(--red);font-weight:600;">' + r.source + '</td>' +
-        '<td>' + r.medium + '</td><td>' + r.campaign + '</td>' +
-        '<td style="font-weight:700;">' + r.count + '</td></tr>';
+      html += '<tr><td style="color:var(--red);font-weight:600;">' + escHTML(r.source) + '</td>' +
+        '<td>' + escHTML(r.medium) + '</td><td>' + escHTML(r.campaign) + '</td>' +
+        '<td style="font-weight:700;">' + escHTML(r.count) + '</td></tr>';
     });
     html += '</tbody></table>';
     wrap.innerHTML = html;
@@ -2060,11 +2082,11 @@
       var ref  = (row.referrer  || '—').replace(/https?:\/\//,'').split('/')[0] || '—';
       var utm  = row.utm_source || '—';
       html += '<tr>' +
-        '<td style="color:var(--gray);white-space:nowrap;">' + hora + '</td>' +
-        '<td><code style="color:var(--red);font-size:11px;">' + ev + '</code></td>' +
-        '<td style="color:var(--gray);">' + dev + '</td>' +
-        '<td style="color:var(--gray);font-size:11px;">' + ref + '</td>' +
-        '<td style="color:var(--gray);">' + utm + '</td></tr>';
+        '<td style="color:var(--gray);white-space:nowrap;">' + escHTML(hora) + '</td>' +
+        '<td><code style="color:var(--red);font-size:11px;">' + escHTML(ev) + '</code></td>' +
+        '<td style="color:var(--gray);">' + escHTML(dev) + '</td>' +
+        '<td style="color:var(--gray);font-size:11px;">' + escHTML(ref) + '</td>' +
+        '<td style="color:var(--gray);">' + escHTML(utm) + '</td></tr>';
     });
     html += '</tbody></table></div>';
     html += '<p style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:10px;">Últimos ' + last20.length + ' eventos · Auto-actualización cada 30s</p>';

@@ -193,6 +193,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
 
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
   // ---- Render catálogo ----
   function renderCatalogo(filtro = 'todos') {
     const grid = document.getElementById('catalogo-grid');
@@ -205,7 +211,8 @@ document.addEventListener('DOMContentLoaded', () => {
         : equipos.filter(e => e.tipo === filtro);
 
     grid.innerHTML = filtered.map(eq => {
-      const modeloHTML = eq.modelo.replace('/', '<span class="slash">/</span>');
+      // Solo el separador / se convierte en span; el modelo ya escapado primero
+      const modeloHTML = esc(eq.modelo).replace('/', '<span class="slash">/</span>');
 
       const specsHTML = eq.specs.map(s => `
         <div class="spec-item">
@@ -214,14 +221,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ${getSpecIconPath(s.icon)}
           </svg>
           <div class="spec-data">
-            <span class="spec-label">${s.label}</span>
-            <span class="spec-val">${s.valor}</span>
+            <span class="spec-label">${esc(s.label)}</span>
+            <span class="spec-val">${esc(s.valor)}</span>
           </div>
         </div>
       `).join('');
 
       return `
-        <article class="equipo-card" data-id="${eq.id}" role="listitem">
+        <article class="equipo-card" data-id="${esc(eq.id)}" data-equipo="${esc(eq.categoria_label + ' ' + eq.modelo)}" role="listitem">
           <svg class="card-circles" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle cx="450" cy="300" r="200" fill="none" stroke="rgba(192,0,31,0.15)" stroke-width="1.5"/>
             <circle cx="450" cy="300" r="275" fill="none" stroke="rgba(192,0,31,0.09)" stroke-width="1"/>
@@ -232,19 +239,19 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="card-content">
             <div class="card-cat">
               <span class="card-cat-line"></span>
-              <span class="card-cat-text">${eq.categoria_label}</span>
+              <span class="card-cat-text">${esc(eq.categoria_label)}</span>
             </div>
             <h3 class="card-nombre">${modeloHTML}</h3>
-            <p class="card-desc">${eq.desc}</p>
+            <p class="card-desc">${esc(eq.desc)}</p>
             <div class="card-specs">${specsHTML}</div>
-            <button class="card-btn" onclick="consultarEquipo('${eq.categoria_label} ${eq.modelo}')">
+            <button class="card-btn js-consultar">
               Consultar Disponibilidad &rsaquo;
             </button>
           </div>
           <div class="card-image">
             <img
-              src="${eq.imagen}"
-              alt="${eq.categoria_label} ${eq.modelo}"
+              src="${esc(eq.imagen)}"
+              alt="${esc(eq.categoria_label + ' ' + eq.modelo)}"
               loading="lazy"
               onerror="this.style.opacity='0'"
             >

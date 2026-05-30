@@ -234,14 +234,11 @@ const UPAssistant = (() => {
       // ============================================
       // MODO API — conectado con Claude via Supabase
       // ============================================
-      const SUPABASE_URL = 'https://oguxdohmutqgacahcwop.supabase.co/functions/v1/up-asesor';
-      const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndXhkb2htdXRxZ2FjYWhjd29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjc0NzcsImV4cCI6MjA4ODMwMzQ3N30.RRruTo8B7k4R97Igq7_KV1PV58FqrpIzEu0R_MXIwR8';
-
-      const response = await fetch(SUPABASE_URL, {
+      const response = await fetch(window.UP_CONFIG.edgeFunctionUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${ANON_KEY}`
+          'Authorization': `Bearer ${window.UP_CONFIG.anonKey}`
         },
         body: JSON.stringify({
           message: userText,
