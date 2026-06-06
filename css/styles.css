@@ -1521,130 +1521,188 @@ footer {
 .eq-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 14px;
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 32px 80px;
 }
 
+/* ---- Tarjeta principal ---- */
 .eq-card {
   position: relative;
   width: 100%;
-  min-height: 460px;
-  background: #0d0d0d;
+  background: #111111;
   border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.3s ease, transform 0.3s ease;
+  transition: border-color 0.25s ease, transform 0.25s ease;
   cursor: pointer;
 }
 .eq-card:hover {
-  border-color: rgba(192,0,31,0.5);
+  border-color: rgba(192,0,31,0.6);
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
 }
 
+/* Acento rojo deslizante en el top al hover */
+.eq-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: #C0001F;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+  z-index: 3;
+}
+.eq-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* Fondo decorativo */
 .eq-card-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
 }
-.eq-card-bg::after {
-  content: '';
+.eq-card-bg svg {
   position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 110% 50%,
-    rgba(192,0,31,0.35) 0%,
-    rgba(100,0,15,0.15) 40%,
-    transparent 70%);
+  right: -20px;
+  bottom: -20px;
+  width: 140px;
+  height: 140px;
+  opacity: 0.06;
+}
+
+/* ---- Zona superior: categoría + icono + imagen ---- */
+.eq-card-top {
+  position: relative;
+  z-index: 1;
+  padding: 18px 18px 12px;
+}
+
+.eq-card-cat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.eq-card-cat {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #C0001F;
+  background: rgba(192,0,31,0.1);
+  border: 1px solid rgba(192,0,31,0.2);
+  padding: 3px 10px;
+  border-radius: 2px;
+}
+
+.eq-card-prop-icon {
+  width: 28px;
+  height: 28px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.eq-card-prop-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: rgba(255,255,255,0.35);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .eq-card-image {
   position: relative;
   z-index: 1;
-  height: 200px;
-  flex-shrink: 0;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
   overflow: hidden;
 }
 .eq-card-image img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: center center;
+  object-position: center;
   mix-blend-mode: lighten;
   filter: drop-shadow(0 8px 24px rgba(0,0,0,0.8)) brightness(1.05);
   transition: transform 0.4s ease;
 }
 .eq-card:hover .eq-card-image img {
-  transform: scale(1.06);
+  transform: scale(1.07);
 }
 
+/* ---- Cuerpo: nombre, descripción, specs, botón ---- */
 .eq-card-body {
   position: relative;
   z-index: 1;
-  padding: 20px 20px 24px;
+  padding: 16px 18px 18px;
   display: flex;
   flex-direction: column;
   flex: 1;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid rgba(255,255,255,0.05);
 }
 
-.eq-card-cat {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2.5px;
+.eq-card-model {
+  margin-bottom: 8px;
+}
+.eq-card-model-sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  color: #C0001F;
-  margin-bottom: 8px;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 2px;
 }
-
 .eq-card-title {
-  font-size: 15px;
-  font-weight: 400;
-  color: #aaaaaa;
-  line-height: 1.3;
-  margin-bottom: 8px;
-}
-.eq-card-title strong {
-  display: block;
   font-size: 22px;
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.5px;
+  line-height: 1;
 }
 
 .eq-card-desc {
   font-size: 12px;
-  color: #666666;
-  line-height: 1.6;
-  margin-bottom: 16px;
+  color: rgba(255,255,255,0.38);
+  line-height: 1.65;
+  margin-bottom: 14px;
   flex: 1;
 }
 
 .eq-card-specs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0;
-  margin-bottom: 16px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
   padding: 10px 0;
 }
 .eq-spec {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding-right: 8px;
-  border-right: 1px solid rgba(255,255,255,0.06);
+  gap: 3px;
+  padding: 0 8px;
+  border-right: 1px solid rgba(255,255,255,0.05);
 }
-.eq-spec:last-child { border-right: none; padding-right: 0; }
+.eq-spec:first-child { padding-left: 0; }
+.eq-spec:last-child { border-right: none; }
 .eq-spec-label {
   font-size: 8px;
   font-weight: 700;
@@ -1658,11 +1716,46 @@ footer {
   color: #ffffff;
 }
 
+/* Fila disponibilidad + marca */
+.eq-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.eq-card-availability {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #4ade80;
+  letter-spacing: 0.5px;
+}
+.eq-card-availability-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: eqDotBlink 2s ease infinite;
+}
+@keyframes eqDotBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+.eq-card-brand {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.18);
+}
+
 .eq-card-btn {
   width: 100%;
-  padding: 10px 16px;
+  padding: 10px 14px;
   background: transparent;
-  border: 1px solid rgba(192,0,31,0.5);
+  border: 1px solid rgba(192,0,31,0.45);
   color: #ffffff;
   font-family: 'Open Sans', sans-serif;
   font-size: 10px;
@@ -1674,14 +1767,17 @@ footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 .eq-card-btn:hover {
   background: #C0001F;
   border-color: #C0001F;
 }
+.eq-card-btn-arrow {
+  font-size: 14px;
+  line-height: 1;
+}
 
-/* .eq-card.eq-wide { grid-column: span 2; } — desactivado: todas iguales */
 @media (max-width: 1200px) {
   .eq-grid { grid-template-columns: repeat(3, 1fr); }
 }
@@ -1690,7 +1786,7 @@ footer {
 }
 @media (max-width: 480px) {
   .eq-grid { grid-template-columns: 1fr; }
-  .eq-card-image { height: 180px; }
+  .eq-card-image { height: 150px; }
 }
 
 /* ---- conservado por compatibilidad (sin uso visual activo) ---- */
