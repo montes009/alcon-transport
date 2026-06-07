@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================
   // STATS - contador animado
   // ============================================
-  function animateCounter(el, target, suffix = '') {
+  function animateCounter(el, target) {
     const duration = 1500;
     const startTime = performance.now();
     const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
@@ -62,10 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const current = target * eased;
 
       if (progress < 1) {
-        el.textContent = Math.floor(current) + suffix;
+        el.textContent = Math.floor(current);
         requestAnimationFrame(frame);
       } else {
-        el.textContent = target + suffix;
+        el.textContent = target;
       }
     }
 
@@ -75,16 +75,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const statsObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        const counters = entry.target.querySelectorAll('[data-count]');
+        const counters = entry.target.querySelectorAll('.stat-val[data-count]');
         counters.forEach(counter => {
           const target = parseInt(counter.dataset.count);
-          const suffix = counter.dataset.suffix || '';
-          animateCounter(counter, target, suffix);
+          animateCounter(counter, target);
         });
         statsObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.2 });
+  }, { threshold: 0.15 });
 
   const statsBar = document.querySelector('.stats-inner');
   if (statsBar) statsObserver.observe(statsBar);
