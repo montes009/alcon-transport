@@ -501,10 +501,19 @@ ul { list-style: none; }
    STATS / TRUST BAR
    ============================================ */
 .stats-bar {
-  background: var(--gris-800);
+  position: relative;
+  background: var(--gris-900);
   border-top: 1px solid rgba(255,255,255,0.06);
   border-bottom: 1px solid rgba(255,255,255,0.06);
-  padding: 40px 24px;
+  padding: 0;
+  overflow: hidden;
+}
+.stats-bar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #C0001F 20%, #C0001F 80%, transparent);
 }
 .stats-inner {
   max-width: 1200px;
@@ -514,26 +523,69 @@ ul { list-style: none; }
   gap: 0;
 }
 .stat-item {
+  position: relative;
   text-align: center;
-  padding: 0 24px;
-  border-right: 1px solid rgba(255,255,255,0.08);
+  padding: 36px 24px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+  transition: background var(--transition);
 }
 .stat-item:last-child { border-right: none; }
+.stat-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 40px; height: 2px;
+  background: var(--rojo);
+  transition: transform 0.3s ease;
+}
+.stat-item:hover { background: rgba(192,0,31,0.04); }
+.stat-item:hover::after { transform: translateX(-50%) scaleX(1); }
+.stat-icon {
+  width: 36px; height: 36px;
+  background: rgba(192,0,31,0.08);
+  border: 1px solid rgba(192,0,31,0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  color: var(--rojo);
+  font-size: 16px;
+}
+.stat-icon svg {
+  width: 18px; height: 18px;
+  stroke: var(--rojo);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .stat-number {
-  font-size: 42px;
+  font-size: 48px;
   font-weight: 800;
   color: var(--blanco);
   line-height: 1;
-  margin-bottom: 6px;
-  letter-spacing: -1px;
+  margin-bottom: 8px;
+  letter-spacing: -2px;
 }
-.stat-number span { color: var(--rojo); }
+.stat-number .stat-val { color: var(--rojo); }
+.stat-number .stat-suffix {
+  color: var(--rojo);
+  font-size: 36px;
+}
 .stat-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
   color: var(--gris-300);
+}
+.stat-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.2);
+  margin-top: 4px;
 }
 
 /* ============================================
@@ -1462,9 +1514,10 @@ footer {
   .nav-links { display: none; }
   .nav-toggle { display: flex; }
   .hero-content { margin: 0; padding: 110px 24px 80px; }
-  .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-  .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 24px; }
-  .stat-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.08); }
+  .stats-inner { grid-template-columns: repeat(2, 1fr); }
+  .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .stat-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.06); }
+  .stat-item:nth-child(3), .stat-item:nth-child(4) { border-bottom: none; }
   .trust-grid { grid-template-columns: 1fr 1fr; gap: 2px; }
   .sedes-grid { grid-template-columns: 1fr; }
   .footer-top { grid-template-columns: 1fr; gap: 32px; }
