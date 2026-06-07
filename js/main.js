@@ -51,18 +51,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // STATS - contador animado
   // ============================================
   function animateCounter(el, target, suffix = '') {
-    let current = 0;
-    const duration = 1800;
-    const step = target / (duration / 16);
+    const duration = 1500;
+    const startTime = performance.now();
+    const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
 
-    const timer = setInterval(() => {
-      current += step;
-      if (current >= target) {
-        current = target;
-        clearInterval(timer);
+    function frame(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutCubic(progress);
+      const current = target * eased;
+
+      if (progress < 1) {
+        el.textContent = Math.floor(current) + suffix;
+        requestAnimationFrame(frame);
+      } else {
+        el.textContent = target + suffix;
       }
-      el.textContent = Math.floor(current) + suffix;
-    }, 16);
+    }
+
+    requestAnimationFrame(frame);
   }
 
   const statsObserver = new IntersectionObserver((entries) => {
@@ -77,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statsObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.3 });
+  }, { threshold: 0.2 });
 
   const statsBar = document.querySelector('.stats-inner');
   if (statsBar) statsObserver.observe(statsBar);
