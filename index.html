@@ -3,10 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <!-- Security headers -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://oguxdohmutqgacahcwop.supabase.co; frame-src https://maps.google.com https://www.google.com; frame-ancestors 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://oguxdohmutqgacahcwop.supabase.co https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net; frame-src https://maps.google.com https://www.google.com; frame-ancestors 'none';">
   <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- ================================================
+       RENDIMIENTO: preconnect y dns-prefetch
+       para Google Fonts, Google Tag Manager y WhatsApp
+  ================================================= -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+  <link rel="dns-prefetch" href="https://www.google-analytics.com">
+  <link rel="dns-prefetch" href="https://wa.me">
+
+  <!-- CSS crítico: preload antes de parsear -->
+  <link rel="preload" href="css/styles.css" as="style">
+
   <link rel="preload" as="image" href="/IMAGENES POR INCORPORAR/logo up.webp">
   <link rel="stylesheet" href="css/fonts.css">
+
+  <!-- ================================================
+       GOOGLE ADS + GOOGLE ANALYTICS 4
+       IMPORTANTE: reemplaza los dos IDs de abajo antes
+       de publicar en producción:
+         · AW-XXXXXXXXX  → tu ID de conversión Google Ads
+         · G-XXXXXXXXX   → tu ID de propiedad GA4
+  ================================================= -->
+  <!-- Reemplaza AW-XXXXXXXXX con tu ID real de Google Ads -->
+  <!-- Reemplaza G-XXXXXXXXX  con tu ID real de GA4        -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-XXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-XXXXXXXXX'); /* ← reemplaza con tu ID Google Ads */
+    gtag('config', 'G-XXXXXXXXX');  /* ← reemplaza con tu ID GA4        */
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UP Equipos — Plataformas Elevadoras | Distribuidor GENIE Colombia</title>
   <meta name="description" content="Alquiler y venta de plataformas elevadoras certificadas. Distribuidor autorizado GENIE en Colombia. Medellín, Bogotá y Barranquilla.">
@@ -1087,6 +1119,7 @@
           <img src="IMAGENES POR INCORPORAR/logo up.webp"
                alt="UP Equipos"
                class="nav-logo-svg"
+               loading="lazy"
                style="height:48px; width:auto; margin-bottom:16px;">
           <p>Distribuidores autorizados GENIE en Colombia. Especialistas en alquiler, venta y certificación de equipos de trabajo en altura.</p>
           <div class="footer-socials">
@@ -1250,9 +1283,9 @@
   </script>
 
   <!-- Scripts -->
-  <script src="js/config.js"></script>
-  <script src="js/assistant.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/config.js" defer></script>
+  <script src="js/assistant.js" defer></script>
+  <script src="js/main.js" defer></script>
 
 <script>
 (function(){
@@ -1282,6 +1315,62 @@
   logo.addEventListener('touchend', function(){
     if(timer){ clearTimeout(timer); timer = null; }
   });
+})();
+</script>
+
+<!-- ================================================
+     EVENTO DE CONVERSIÓN WHATSAPP — Google Ads + GA4
+     IMPORTANTE: reemplaza AW-XXXXXXXXX/XXXXXXXXX con
+     tu etiqueta de conversión real de Google Ads.
+     El primer segmento es el ID de cuenta (AW-...)
+     y el segundo es el ID de la acción de conversión.
+================================================= -->
+<script>
+(function () {
+  /* ← reemplaza con tu etiqueta de conversión de Google Ads */
+  var WA_CONVERSION = 'AW-XXXXXXXXX/XXXXXXXXX';
+
+  function dispararConversionWA(label) {
+    if (typeof gtag !== 'function') return;
+    /* Conversión principal Google Ads */
+    gtag('event', 'conversion', { send_to: WA_CONVERSION });
+    /* Evento GA4 para análisis de comportamiento */
+    gtag('event', 'whatsapp_click', {
+      event_category: 'contacto',
+      event_label: label || location.pathname
+    });
+  }
+
+  function bindWA(el) {
+    ['click', 'touchstart'].forEach(function (ev) {
+      el.addEventListener(ev, function () {
+        dispararConversionWA(el.dataset.waLabel || location.pathname);
+      }, { passive: true, once: false });
+    });
+  }
+
+  function init() {
+    /* 1. Botón flotante WhatsApp */
+    var waBtn = document.querySelector('.wa-btn');
+    if (waBtn) bindWA(waBtn);
+
+    /* 2. CTA final: "WhatsApp directo" (href con wa.me) */
+    document.querySelectorAll('a[href*="wa.me"]').forEach(bindWA);
+
+    /* 3. Botón "Iniciar asesoría" del CTA final */
+    var ctaBtn = document.getElementById('cta-chat-btn');
+    if (ctaBtn) {
+      ctaBtn.addEventListener('click', function () {
+        dispararConversionWA('cta_iniciar_asesoria');
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
 </script>
 </body>
