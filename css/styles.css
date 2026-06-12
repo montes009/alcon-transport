@@ -570,9 +570,9 @@ ul { list-style: none; }
   margin-bottom: 8px;
   letter-spacing: -2px;
 }
-.stat-number .stat-val { color: var(--rojo); }
+.stat-number .stat-val { color: var(--blanco); }
 .stat-number .stat-suffix {
-  color: var(--rojo);
+  color: var(--blanco);
   font-size: 36px;
 }
 .stat-label {
