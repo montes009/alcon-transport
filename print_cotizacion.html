@@ -78,6 +78,7 @@
     <div class="section-title">Datos del Cliente</div>
     <div class="data-grid">
       <div class="data-field"><label>Cliente</label><div class="val" id="cliNombre">—</div></div>
+      <div class="data-field"><label>NIT</label><div class="val" id="cliNit">—</div></div>
       <div class="data-field"><label>Contacto</label><div class="val" id="cliContacto">—</div></div>
       <div class="data-field"><label>Teléfono</label><div class="val" id="cliTelefono">—</div></div>
       <div class="data-field"><label>Correo</label><div class="val" id="cliCorreo">—</div></div>
@@ -169,6 +170,7 @@ async function load() {
     document.title = `Cotización ${c.nro || ''} — UP Equipos`;
 
     set('cliNombre', c.cliente);
+    set('cliNit', c.nit);
     set('cliContacto', c.contacto);
     set('cliTelefono', c.telefono);
     set('cliCorreo', c.correo);

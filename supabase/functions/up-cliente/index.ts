@@ -18,6 +18,7 @@ Deno.serve(async (req) => {
     const correo = (body.correo || "").trim() || null;
     const ciudad = (body.ciudad || "").trim() || null;
     const empresa = (body.empresa || "").trim() || null;
+    const nit = (body.nit || "").trim() || null;
 
     if (!nombre) throw new Error("El nombre es obligatorio.");
     if (!telefono || telefono.length < 7) throw new Error("El telefono es obligatorio y debe ser valido.");
@@ -36,11 +37,11 @@ Deno.serve(async (req) => {
     if (existente) {
       id = existente.id;
       await supabase.from("clientes_web").update({
-        nombre, correo, ciudad, empresa, ultima_cotizacion: ahora,
+        nombre, correo, ciudad, empresa, nit, ultima_cotizacion: ahora,
       }).eq("id", id);
     } else {
       const { data: nuevo, error } = await supabase.from("clientes_web").insert({
-        nombre, telefono, correo, ciudad, empresa,
+        nombre, telefono, correo, ciudad, empresa, nit,
         total_cotizaciones: 0,
         primera_cotizacion: ahora, ultima_cotizacion: ahora,
       }).select("id").single();

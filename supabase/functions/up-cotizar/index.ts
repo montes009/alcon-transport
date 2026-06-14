@@ -107,6 +107,7 @@ Deno.serve(async (req) => {
     const correo = cli?.correo || body.correo || null;
     const ciudad = body.ciudad || cli?.ciudad || null;
     const empresa = cli?.empresa || body.empresa_cliente || null;
+    const nit = cli?.nit || body.nit || null;
 
     // ---- Numeracion y guardado ----
     const { count } = await supabase.from("cotizaciones_web").select("id", { count: "exact", head: true });
@@ -118,7 +119,7 @@ Deno.serve(async (req) => {
       id, nro,
       cliente: empresa || nombre || "Cliente Web",
       contacto: nombre,
-      telefono, correo, ciudad,
+      telefono, correo, ciudad, nit,
       cliente_web_id: clienteWebId,
       tipo: equipoLabel,
       subtipo: tarifa.tipo,

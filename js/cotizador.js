@@ -192,14 +192,18 @@ const UPCotizador = (() => {
           </select>
         </div>
       </div>
+      <div class="cotz-frow">
+        <label>Correo (opcional)</label>
+        <input id="cl-correo" type="email" placeholder="tu@correo.com">
+      </div>
       <div class="cotz-2">
         <div class="cotz-frow">
-          <label>Correo (opcional)</label>
-          <input id="cl-correo" type="email" placeholder="tu@correo.com">
+          <label>Empresa (opcional)</label>
+          <input id="cl-empresa" type="text" placeholder="Nombre de la empresa">
         </div>
         <div class="cotz-frow">
-          <label>Empresa (opcional)</label>
-          <input id="cl-empresa" type="text" placeholder="Empresa / NIT">
+          <label>NIT (opcional)</label>
+          <input id="cl-nit" type="text" placeholder="900123456-7">
         </div>
       </div>
       <button class="cotz-submit" id="cl-go">Crear cliente y continuar</button>
@@ -223,7 +227,8 @@ const UPCotizador = (() => {
       nombre, telefono: tel,
       correo: get('#cl-correo'),
       ciudad: get('#cl-ciudad'),
-      empresa: get('#cl-empresa')
+      empresa: get('#cl-empresa'),
+      nit: get('#cl-nit')
     };
 
     try {
@@ -241,6 +246,7 @@ const UPCotizador = (() => {
       data.correo = payload.correo;
       data.ciudad = payload.ciudad;
       data.empresa = payload.empresa;
+      data.nit = payload.nit;
 
       card.querySelectorAll('input,select,button').forEach(el => el.disabled = true);
       echoUser(`${nombre} · ${tel}`);
@@ -313,6 +319,7 @@ const UPCotizador = (() => {
       telefono: data.telefono,
       correo: data.correo,
       empresa_cliente: data.empresa,
+      nit: data.nit,
       utm_source: params.get('utm_source') || '',
       utm_campaign: params.get('utm_campaign') || '',
       page_url: window.location.href
