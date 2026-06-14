@@ -144,19 +144,23 @@ const fmt = d => { if (!d) return '—'; const [y,m,dd] = String(d).split('-'); 
 
 const params = new URLSearchParams(window.location.search);
 const COT_ID = params.get('id');
+const COT_NRO = params.get('nro');
+const AUTO_PRINT = params.get('print') === '1';
 
-if (!COT_ID) {
+if (!COT_ID && !COT_NRO) {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('error').style.display = 'flex';
-  document.getElementById('errMsg').textContent = 'No se especificó ID de cotización (?id=XXX)';
+  document.getElementById('errMsg').textContent = 'No se especificó la cotización (?id=XXX o ?nro=COT-WXXXX)';
 } else {
   load();
 }
 
 async function load() {
   try {
-    // Lee SOLO de cotizaciones_web (aislada del ERP Alcon OPS)
-    const { data: c, error } = await sb.from('cotizaciones_web').select('*').eq('id', COT_ID).single();
+    // Lee SOLO de cotizaciones_web (aislada del ERP Alcon OPS). Por id o por N°.
+    let query = sb.from('cotizaciones_web').select('*');
+    query = COT_ID ? query.eq('id', COT_ID) : query.eq('nro', COT_NRO);
+    const { data: c, error } = await query.maybeSingle();
     if (error || !c) throw new Error('Cotización no encontrada');
 
     set('docNro', c.nro || COT_ID);
@@ -187,6 +191,7 @@ async function load() {
     set('footerFecha', new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' }));
     document.getElementById('loading').style.display = 'none';
     document.getElementById('docContent').style.display = '';
+    if (AUTO_PRINT) setTimeout(() => window.print(), 600);
   } catch (err) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error').style.display = 'flex';

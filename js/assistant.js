@@ -210,6 +210,14 @@ const UPAssistant = (() => {
     renderMessage(userText, 'user');
     conversationHistory.push({ role: 'user', content: userText });
 
+    // ---- Modo cotización: Liam captura los datos paso a paso ----
+    if (typeof UPCotizador !== 'undefined' && UPCotizador.active) {
+      isTyping = false;
+      if (sendBtn) sendBtn.disabled = false;
+      UPCotizador.handleAnswer(userText);
+      return;
+    }
+
     // Mostrar typing
     showTyping();
 
@@ -286,38 +294,14 @@ const UPAssistant = (() => {
     if (sendBtn) sendBtn.disabled = false;
   }
 
-  // ---- Ofrecer cotizador cuando hay intención de precio ----
-  let quoteOffered = false;
+  // ---- Iniciar cotización guiada cuando hay intención de cotizar ----
+  let quoteStarted = false;
   function maybeOfferQuote(userText) {
-    if (quoteOffered || typeof UPCotizador === 'undefined') return;
-    if (!/precio|costo|cu[aá]nto|tarifa|valor|cotiz/i.test(userText)) return;
-    quoteOffered = true;
-
-    const messages = document.getElementById('chat-messages');
-    if (!messages) return;
-
-    const wrap = document.createElement('div');
-    wrap.className = 'msg bot';
-    wrap.innerHTML = '<div class="msg-avatar">🔧</div>';
-    const bubble = document.createElement('div');
-    bubble.className = 'msg-bubble';
-    bubble.style.background = 'transparent';
-    bubble.style.padding = '0';
-
-    const btn = document.createElement('button');
-    btn.textContent = '📋 Cotizar ahora';
-    btn.style.cssText = 'padding:10px 18px;border:none;border-radius:20px;background:#C0001F;' +
-      'color:#fff;font-weight:700;font-size:.88rem;cursor:pointer';
-    btn.addEventListener('click', () => {
-      btn.disabled = true;
-      btn.style.opacity = '.5';
-      UPCotizador.renderForm();
-    });
-
-    bubble.appendChild(btn);
-    wrap.appendChild(bubble);
-    messages.appendChild(wrap);
-    messages.scrollTop = messages.scrollHeight;
+    if (quoteStarted || typeof UPCotizador === 'undefined') return;
+    if (UPCotizador.active) return;
+    if (!/precio|costo|cu[aá]nto|tarifa|valor|cotiz|alquil|rent/i.test(userText)) return;
+    quoteStarted = true;
+    setTimeout(() => UPCotizador.start(), 500);
   }
 
   // ---- Mensaje inicial automático ----
