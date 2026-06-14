@@ -1,5 +1,6 @@
-// up-cotizar — Liam (asesor web). Cotiza con TARIFAS 2 (tabla tarifas_web)
-// y guarda en cotizaciones_web (AISLADA del ERP Alcon OPS).
+// up-cotizar — Liam (asesor web). Cotiza con TARIFAS 2 (tabla tarifas_web),
+// guarda la cotizacion en cotizaciones_web y registra al cliente en
+// clientes_web (CRM de leads). Todo AISLADO del ERP Alcon OPS.
 // Tarifas SIN IVA -> se suma 19%. Pagina: print_cotizacion.html?id=<id>
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
@@ -46,7 +47,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Buscar la tarifa elegida (por id; fallback por ref)
+    // Tarifa elegida (por id; fallback por ref)
     let tarifa: any = null;
     if (body.tarifa_id) {
       const { data } = await supabase.from("tarifas_web").select("*").eq("id", body.tarifa_id).maybeSingle();
@@ -63,19 +64,47 @@ Deno.serve(async (req) => {
     const totalIva = Math.round(subtotal * IVA_PCT / 100);
     const totalConIva = subtotal + totalIva;
 
+    const nombre = body.nombre || null;
+    const telefono = (body.telefono || "").trim() || null;
+    const correo = body.correo || null;
+    const ciudad = body.ciudad || null;
+    const empresa = body.empresa_cliente || null;
+
+    // ---- CRM: registrar / actualizar al cliente (dedup por telefono) ----
+    let clienteWebId: string | null = null;
+    if (telefono) {
+      const ahora = new Date().toISOString();
+      const { data: existente } = await supabase
+        .from("clientes_web").select("id,total_cotizaciones").eq("telefono", telefono).maybeSingle();
+      if (existente) {
+        clienteWebId = existente.id;
+        await supabase.from("clientes_web").update({
+          nombre, correo, ciudad, empresa,
+          total_cotizaciones: (existente.total_cotizaciones || 0) + 1,
+          ultima_cotizacion: ahora,
+        }).eq("id", existente.id);
+      } else {
+        const { data: nuevo } = await supabase.from("clientes_web").insert({
+          nombre, telefono, correo, ciudad, empresa,
+          total_cotizaciones: 1,
+          primera_cotizacion: ahora, ultima_cotizacion: ahora,
+        }).select("id").single();
+        clienteWebId = nuevo?.id ?? null;
+      }
+    }
+
+    // ---- Numeracion y guardado de la cotizacion ----
     const { count } = await supabase.from("cotizaciones_web").select("id", { count: "exact", head: true });
     const nro = "COT-W" + String((count ?? 0) + 1).padStart(4, "0");
     const id = genId();
-
     const equipoLabel = `${tarifa.ref} · ${tarifa.tipo} ${tarifa.altura_m}m (${tarifa.descripcion})`;
 
     const { error } = await supabase.from("cotizaciones_web").insert({
       id, nro,
-      cliente: body.empresa_cliente || body.nombre || "Cliente Web",
-      contacto: body.nombre ?? null,
-      telefono: body.telefono ?? null,
-      correo: body.correo ?? null,
-      ciudad: body.ciudad ?? null,
+      cliente: empresa || nombre || "Cliente Web",
+      contacto: nombre,
+      telefono, correo, ciudad,
+      cliente_web_id: clienteWebId,
       tipo: equipoLabel,
       subtipo: tarifa.tipo,
       altura: tarifa.altura_m ? `${tarifa.altura_m} m` : null,
@@ -98,6 +127,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({
       ok: true, id, nro,
+      cliente_web_id: clienteWebId,
       tipo: equipoLabel,
       tramo: tramoLabel(dias),
       precio_dia: precioDia,
