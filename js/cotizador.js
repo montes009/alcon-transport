@@ -223,34 +223,41 @@ const UPCotizador = (() => {
     btn.disabled = true;
     btn.textContent = 'Creando cliente...';
 
-    const payload = {
-      nombre, telefono: tel,
-      correo: get('#cl-correo'),
-      ciudad: get('#cl-ciudad'),
-      empresa: get('#cl-empresa'),
-      nit: get('#cl-nit')
-    };
+    const correo = get('#cl-correo');
+    const ciudad = get('#cl-ciudad');
+    const empresa = get('#cl-empresa');
+    const nit = get('#cl-nit');
 
     try {
-      const res = await fetch(window.UP_CONFIG.clienteUrl, {
+      // Crea/actualiza el cliente vía RPC (incluye NIT), sin depender de Edge Function.
+      const res = await fetch(`${window.UP_CONFIG.supabaseUrl}/rest/v1/rpc/crear_cliente_web`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${window.UP_CONFIG.anonKey}` },
-        body: JSON.stringify(payload)
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': window.UP_CONFIG.anonKey,
+          'Authorization': `Bearer ${window.UP_CONFIG.anonKey}`
+        },
+        body: JSON.stringify({
+          p_nombre: nombre, p_telefono: tel, p_correo: correo,
+          p_ciudad: ciudad, p_empresa: empresa, p_nit: nit
+        })
       });
       const out = await res.json();
-      if (!res.ok || !out.ok) throw new Error(out.error || 'Error');
+      if (!res.ok) throw new Error((out && out.message) || 'Error');
+      const clienteId = typeof out === 'string' ? out : ((out && out.id) || out);
+      if (!clienteId) throw new Error('Sin id de cliente');
 
-      data.cliente_web_id = out.cliente_web_id;
+      data.cliente_web_id = clienteId;
       data.nombre = nombre;
       data.telefono = tel;
-      data.correo = payload.correo;
-      data.ciudad = payload.ciudad;
-      data.empresa = payload.empresa;
-      data.nit = payload.nit;
+      data.correo = correo;
+      data.ciudad = ciudad;
+      data.empresa = empresa;
+      data.nit = nit;
 
       card.querySelectorAll('input,select,button').forEach(el => el.disabled = true);
       echoUser(`${nombre} · ${tel}`);
-      renderBubble(out.creado ? '✅ ¡Cliente registrado! Ahora elige el equipo.' : '✅ Ya te tenía registrado. Continuemos con el equipo.');
+      renderBubble('✅ ¡Cliente registrado! Ahora elige el equipo.');
       askEquipo();
     } catch (e) {
       btn.disabled = false;
