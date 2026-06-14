@@ -1,14 +1,11 @@
-// up-cotizar — Liam (asesor web) genera una cotizacion estimada
-// y la guarda en public.cotizaciones (empresa UP Equipos, origen='web').
-// Reutiliza el formato imprimible existente: print_cotizacion.html?id=<id>
+// up-cotizar — Liam (asesor web) genera una cotizacion estimada y la guarda
+// en public.cotizaciones_web (tabla AISLADA del ERP Alcon OPS).
+// Pagina de impresion: print_cotizacion.html?id=<id>
 //
-// AJUSTA AQUI las tarifas base (COP/dia). Son referencia; el total se marca
-// como ESTIMADO sujeto a confirmacion del equipo comercial.
-//
+// AJUSTA AQUI las tarifas base (COP/dia). Total = ESTIMADO sujeto a confirmacion.
 // Deploy: supabase functions deploy up-cotizar  (o via MCP/Studio)
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const EMPRESA_UP = "23041bf0-04b0-4611-98ed-ebc567585393"; // UP Equipos
 const IVA_PCT = 19;
 
 const TARIFAS: Record<string, number> = {
@@ -19,7 +16,6 @@ const TARIFAS: Record<string, number> = {
   telehandler:      520000,
   camion_grua:      900000,
 };
-
 const LABELS: Record<string, string> = {
   tijera_electrica: "Tijera Eléctrica",
   tijera_diesel:    "Tijera Diésel",
@@ -54,7 +50,7 @@ function normalizaTipo(tipo = "", subtipo = ""): string {
   return "tijera_electrica";
 }
 function genId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  return "web" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
 const cors = {
@@ -83,42 +79,35 @@ Deno.serve(async (req) => {
     );
 
     const { count } = await supabase
-      .from("cotizaciones")
-      .select("id", { count: "exact", head: true })
-      .eq("empresa_id", EMPRESA_UP)
-      .eq("origen", "web");
-    const nro = "COT-W" + String((count ?? 0) + 1).padStart(3, "0");
+      .from("cotizaciones_web")
+      .select("id", { count: "exact", head: true });
+    const nro = "COT-W" + String((count ?? 0) + 1).padStart(4, "0");
 
     const id = genId();
-    const hoy = new Date().toISOString().slice(0, 10);
-    const nombreCliente = body.empresa_cliente || body.nombre || "Cliente Web";
-    const obsPartes = [
-      body.nombre ? `Contacto: ${body.nombre}` : null,
-      body.telefono ? `Tel: ${body.telefono}` : null,
-      body.correo ? `Correo: ${body.correo}` : null,
-      body.ciudad ? `Ciudad: ${body.ciudad}` : null,
-      body.mensaje ? `Mensaje: ${body.mensaje}` : null,
-      "Cotizacion generada automaticamente por el asesor web (Liam). Valor estimado sujeto a confirmacion.",
-    ].filter(Boolean);
-
-    const { error } = await supabase.from("cotizaciones").insert({
+    const { error } = await supabase.from("cotizaciones_web").insert({
       id,
       nro,
-      empresa_id: EMPRESA_UP,
-      cliente: nombreCliente,
+      cliente: body.empresa_cliente || body.nombre || "Cliente Web",
+      contacto: body.nombre ?? null,
+      telefono: body.telefono ?? null,
+      correo: body.correo ?? null,
+      ciudad: body.ciudad ?? null,
       tipo: LABELS[key],
+      subtipo: key,
       altura: altura ? `${altura} m` : null,
+      modalidad: "alquiler_dia",
       dias,
       precio: precioDia,
-      modalidad: "alquiler_dia",
-      iva_equipo: IVA_PCT,
+      iva_pct: IVA_PCT,
       subtotal,
       total_iva: totalIva,
       total_con_iva: totalConIva,
-      estado: "borrador",
+      obs: body.mensaje ?? null,
+      estado: "nueva",
       origen: "web",
-      fecha: hoy,
-      obs: obsPartes.join(" | "),
+      utm_source: body.utm_source ?? null,
+      utm_campaign: body.utm_campaign ?? null,
+      page_url: body.page_url ?? null,
     });
     if (error) throw error;
 
