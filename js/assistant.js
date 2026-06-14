@@ -299,7 +299,7 @@ const UPAssistant = (() => {
   function maybeOfferQuote(userText) {
     if (quoteStarted || typeof UPCotizador === 'undefined') return;
     if (UPCotizador.active) return;
-    if (!/precio|costo|cu[aá]nto|tarifa|valor|cotiz|alquil|rent/i.test(userText)) return;
+    if (!/cotiz|valor exacto|precio exacto|quiero cotizar|hacer una cotiz/i.test(userText)) return;
     quoteStarted = true;
     setTimeout(() => UPCotizador.start(), 500);
   }
