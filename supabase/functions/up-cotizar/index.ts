@@ -1,6 +1,6 @@
-// up-cotizar — Liam (asesor web). Cotiza con TARIFAS 2 (tabla tarifas_web),
-// guarda la cotizacion en cotizaciones_web y registra al cliente en
-// clientes_web (CRM de leads). Todo AISLADO del ERP Alcon OPS.
+// up-cotizar — Liam (asesor web). Cotiza con TARIFAS 2 (tabla tarifas_web).
+// El cliente ya fue creado por up-cliente (se recibe cliente_web_id).
+// Guarda en cotizaciones_web. Todo AISLADO del ERP Alcon OPS.
 // Tarifas SIN IVA -> se suma 19%. Pagina: print_cotizacion.html?id=<id>
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Tarifa elegida (por id; fallback por ref)
+    // Tarifa elegida
     let tarifa: any = null;
     if (body.tarifa_id) {
       const { data } = await supabase.from("tarifas_web").select("*").eq("id", body.tarifa_id).maybeSingle();
@@ -64,36 +64,51 @@ Deno.serve(async (req) => {
     const totalIva = Math.round(subtotal * IVA_PCT / 100);
     const totalConIva = subtotal + totalIva;
 
-    const nombre = body.nombre || null;
-    const telefono = (body.telefono || "").trim() || null;
-    const correo = body.correo || null;
-    const ciudad = body.ciudad || null;
-    const empresa = body.empresa_cliente || null;
+    // ---- Cliente: usar el creado por up-cliente; si no, crear por telefono ----
+    let clienteWebId: string | null = body.cliente_web_id || null;
+    let cli: any = null;
+    const ahora = new Date().toISOString();
 
-    // ---- CRM: registrar / actualizar al cliente (dedup por telefono) ----
-    let clienteWebId: string | null = null;
-    if (telefono) {
-      const ahora = new Date().toISOString();
-      const { data: existente } = await supabase
-        .from("clientes_web").select("id,total_cotizaciones").eq("telefono", telefono).maybeSingle();
-      if (existente) {
-        clienteWebId = existente.id;
+    if (clienteWebId) {
+      const { data } = await supabase.from("clientes_web").select("*").eq("id", clienteWebId).maybeSingle();
+      cli = data;
+      if (cli) {
         await supabase.from("clientes_web").update({
-          nombre, correo, ciudad, empresa,
-          total_cotizaciones: (existente.total_cotizaciones || 0) + 1,
+          total_cotizaciones: (cli.total_cotizaciones || 0) + 1,
           ultima_cotizacion: ahora,
-        }).eq("id", existente.id);
+        }).eq("id", clienteWebId);
       } else {
-        const { data: nuevo } = await supabase.from("clientes_web").insert({
-          nombre, telefono, correo, ciudad, empresa,
-          total_cotizaciones: 1,
-          primera_cotizacion: ahora, ultima_cotizacion: ahora,
-        }).select("id").single();
-        clienteWebId = nuevo?.id ?? null;
+        clienteWebId = null;
+      }
+    }
+    if (!clienteWebId) {
+      const telefono = (body.telefono || "").replace(/[^\d+]/g, "") || null;
+      if (telefono) {
+        const { data: existente } = await supabase
+          .from("clientes_web").select("id,total_cotizaciones").eq("telefono", telefono).maybeSingle();
+        if (existente) {
+          clienteWebId = existente.id;
+          await supabase.from("clientes_web").update({
+            nombre: body.nombre ?? null, correo: body.correo ?? null, ciudad: body.ciudad ?? null,
+            total_cotizaciones: (existente.total_cotizaciones || 0) + 1, ultima_cotizacion: ahora,
+          }).eq("id", existente.id);
+        } else {
+          const { data: nuevo } = await supabase.from("clientes_web").insert({
+            nombre: body.nombre ?? null, telefono, correo: body.correo ?? null, ciudad: body.ciudad ?? null,
+            total_cotizaciones: 1, primera_cotizacion: ahora, ultima_cotizacion: ahora,
+          }).select("id").single();
+          clienteWebId = nuevo?.id ?? null;
+        }
       }
     }
 
-    // ---- Numeracion y guardado de la cotizacion ----
+    const nombre = cli?.nombre || body.nombre || null;
+    const telefono = cli?.telefono || ((body.telefono || "").replace(/[^\d+]/g, "") || null);
+    const correo = cli?.correo || body.correo || null;
+    const ciudad = body.ciudad || cli?.ciudad || null;
+    const empresa = cli?.empresa || body.empresa_cliente || null;
+
+    // ---- Numeracion y guardado ----
     const { count } = await supabase.from("cotizaciones_web").select("id", { count: "exact", head: true });
     const nro = "COT-W" + String((count ?? 0) + 1).padStart(4, "0");
     const id = genId();
