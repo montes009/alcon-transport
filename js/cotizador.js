@@ -302,9 +302,14 @@ const UPCotizador = (() => {
     appendNode(card);
   }
 
+  function isQuoteRequest(text) {
+    return /cotiz|valor exacto|precio exacto|cot[ií]zame|me cotizas/i.test(text || '');
+  }
+
   return {
     start,
     handleAnswer,
+    isQuoteRequest,
     get active() { return active; }
   };
 })();

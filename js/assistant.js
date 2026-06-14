@@ -218,6 +218,16 @@ const UPAssistant = (() => {
       return;
     }
 
+    // ---- El cliente pide una cotización: arrancar el flujo guiado (sin pasar por la API) ----
+    if (typeof UPCotizador !== 'undefined' && !quoteStarted &&
+        UPCotizador.isQuoteRequest && UPCotizador.isQuoteRequest(userText)) {
+      quoteStarted = true;
+      isTyping = false;
+      if (sendBtn) sendBtn.disabled = false;
+      UPCotizador.start();
+      return;
+    }
+
     // Mostrar typing
     showTyping();
 
@@ -281,8 +291,8 @@ const UPAssistant = (() => {
       renderMessage(botResponse, 'bot');
       conversationHistory.push({ role: 'assistant', content: botResponse });
 
-      // ---- Si el usuario pide precio/cotización, ofrecer el cotizador ----
-      maybeOfferQuote(userText);
+      // ---- Si Liam ofrece cotizar, arrancar el flujo guiado ----
+      maybeOfferQuote(userText, botResponse);
 
     } catch (error) {
       hideTyping();
@@ -294,14 +304,15 @@ const UPAssistant = (() => {
     if (sendBtn) sendBtn.disabled = false;
   }
 
-  // ---- Iniciar cotización guiada cuando hay intención de cotizar ----
+  // ---- Fallback: si Liam ofrece generar la cotización, arrancar el flujo ----
   let quoteStarted = false;
-  function maybeOfferQuote(userText) {
-    if (quoteStarted || typeof UPCotizador === 'undefined') return;
-    if (UPCotizador.active) return;
-    if (!/cotiz|valor exacto|precio exacto|quiero cotizar|hacer una cotiz/i.test(userText)) return;
+  function maybeOfferQuote(userText, botResponse) {
+    if (quoteStarted || typeof UPCotizador === 'undefined' || UPCotizador.active) return;
+    const botWants = /genera(r|ndo)?\s+(tu|la|una)\s+cotiz|te armo la cotiz|voy a generar.*cotiz|prepar\w*\s+(tu|la)\s+cotiz/i.test(botResponse || '');
+    const userWants = UPCotizador.isQuoteRequest && UPCotizador.isQuoteRequest(userText);
+    if (!botWants && !userWants) return;
     quoteStarted = true;
-    setTimeout(() => UPCotizador.start(), 500);
+    setTimeout(() => UPCotizador.start(), 400);
   }
 
   // ---- Mensaje inicial automático ----
