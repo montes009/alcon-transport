@@ -1,53 +1,29 @@
-// up-cotizar — Liam (asesor web) genera una cotizacion estimada y la guarda
-// en public.cotizaciones_web (tabla AISLADA del ERP Alcon OPS).
-// Pagina de impresion: print_cotizacion.html?id=<id>
-//
-// AJUSTA AQUI las tarifas base (COP/dia). Total = ESTIMADO sujeto a confirmacion.
-// Deploy: supabase functions deploy up-cotizar  (o via MCP/Studio)
+// up-cotizar — Liam (asesor web). Cotiza con TARIFAS 2 (tabla tarifas_web)
+// y guarda en cotizaciones_web (AISLADA del ERP Alcon OPS).
+// Tarifas SIN IVA -> se suma 19%. Pagina: print_cotizacion.html?id=<id>
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const IVA_PCT = 19;
 
-const TARIFAS: Record<string, number> = {
-  tijera_electrica: 180000,
-  tijera_diesel:    260000,
-  brazo_articulado: 420000,
-  telescopico:      650000,
-  telehandler:      520000,
-  camion_grua:      900000,
-};
-const LABELS: Record<string, string> = {
-  tijera_electrica: "Tijera Eléctrica",
-  tijera_diesel:    "Tijera Diésel",
-  brazo_articulado: "Brazo Articulado",
-  telescopico:      "Brazo Telescópico",
-  telehandler:      "Telehandler",
-  camion_grua:      "Camión Grúa",
-};
+const OBSERVACIONES = [
+  "El combustible es por parte del cliente. El equipo se entrega con 1/4 de tanque y debe ser devuelto con el mismo nivel. Galón ACPM $18.000 + IVA.",
+  "Stand by transporte: $150.000/hora (si en obra nos hacen esperar).",
+  "Operador: Barranquilla $305.000 · alrededores $350.000 · fuera del Atlántico $380.000 (día de 8 horas).",
+  "Hora extra (después de 8 horas) $40.275 · Hora nocturna (8pm-6am) $50.525 · Hora dominical o festiva $55.465 · Hora nocturna en festivo / extra nocturna $55.685.",
+  "Fuera de Barranquilla se deben sumar viáticos.",
+].map((o) => "• " + o).join("\n");
 
-function factorAltura(alt: number): number {
-  if (!alt || alt <= 0) return 1;
-  if (alt <= 10) return 1;
-  if (alt <= 16) return 1.25;
-  if (alt <= 24) return 1.6;
-  if (alt <= 32) return 2.1;
-  return 2.6;
+function tarifaPorDias(t: any, dias: number): number {
+  if (dias >= 30 && t.tarifa_mes) return Math.round(Number(t.tarifa_mes) / 30);
+  if (dias >= 16) return Number(t.tarifa_16mas);
+  if (dias >= 4)  return Number(t.tarifa_4_15);
+  return Number(t.tarifa_1_3);
 }
-function factorDias(dias: number): number {
-  if (dias >= 30) return 0.72;
-  if (dias >= 15) return 0.82;
-  if (dias >= 7)  return 0.9;
-  return 1;
-}
-function normalizaTipo(tipo = "", subtipo = ""): string {
-  const t = (subtipo + " " + tipo).toLowerCase();
-  if (t.includes("telehandler")) return "telehandler";
-  if (t.includes("camion") || t.includes("grúa") || t.includes("grua")) return "camion_grua";
-  if (t.includes("telesc")) return "telescopico";
-  if (t.includes("brazo") || t.includes("articulado") || t.includes("boom")) return "brazo_articulado";
-  if (t.includes("diesel") || t.includes("diésel")) return "tijera_diesel";
-  if (t.includes("tijera") || t.includes("scissor")) return "tijera_electrica";
-  return "tijera_electrica";
+function tramoLabel(dias: number): string {
+  if (dias >= 30) return "Tarifa mes";
+  if (dias >= 16) return "Más de 16 días";
+  if (dias >= 4)  return "4 a 15 días";
+  return "1 a 3 días";
 }
 function genId(): string {
   return "web" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -64,37 +40,45 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json();
     const dias = Math.max(1, parseInt(body.dias) || 1);
-    const altura = parseFloat(body.altura_m) || 0;
-    const key = normalizaTipo(body.tipo_equipo, body.subtipo);
-    const base = TARIFAS[key] ?? TARIFAS.tijera_electrica;
-
-    const precioDia = Math.round(base * factorAltura(altura) * factorDias(dias) / 1000) * 1000;
-    const subtotal = precioDia * dias;
-    const totalIva = Math.round(subtotal * IVA_PCT / 100);
-    const totalConIva = subtotal + totalIva;
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { count } = await supabase
-      .from("cotizaciones_web")
-      .select("id", { count: "exact", head: true });
-    const nro = "COT-W" + String((count ?? 0) + 1).padStart(4, "0");
+    // Buscar la tarifa elegida (por id; fallback por ref)
+    let tarifa: any = null;
+    if (body.tarifa_id) {
+      const { data } = await supabase.from("tarifas_web").select("*").eq("id", body.tarifa_id).maybeSingle();
+      tarifa = data;
+    }
+    if (!tarifa && body.ref) {
+      const { data } = await supabase.from("tarifas_web").select("*").eq("ref", body.ref).maybeSingle();
+      tarifa = data;
+    }
+    if (!tarifa) throw new Error("Tarifa no encontrada. Selecciona un equipo del catálogo.");
 
+    const precioDia = tarifaPorDias(tarifa, dias);
+    const subtotal = precioDia * dias;
+    const totalIva = Math.round(subtotal * IVA_PCT / 100);
+    const totalConIva = subtotal + totalIva;
+
+    const { count } = await supabase.from("cotizaciones_web").select("id", { count: "exact", head: true });
+    const nro = "COT-W" + String((count ?? 0) + 1).padStart(4, "0");
     const id = genId();
+
+    const equipoLabel = `${tarifa.ref} · ${tarifa.tipo} ${tarifa.altura_m}m (${tarifa.descripcion})`;
+
     const { error } = await supabase.from("cotizaciones_web").insert({
-      id,
-      nro,
+      id, nro,
       cliente: body.empresa_cliente || body.nombre || "Cliente Web",
       contacto: body.nombre ?? null,
       telefono: body.telefono ?? null,
       correo: body.correo ?? null,
       ciudad: body.ciudad ?? null,
-      tipo: LABELS[key],
-      subtipo: key,
-      altura: altura ? `${altura} m` : null,
+      tipo: equipoLabel,
+      subtipo: tarifa.tipo,
+      altura: tarifa.altura_m ? `${tarifa.altura_m} m` : null,
       modalidad: "alquiler_dia",
       dias,
       precio: precioDia,
@@ -103,6 +87,7 @@ Deno.serve(async (req) => {
       total_iva: totalIva,
       total_con_iva: totalConIva,
       obs: body.mensaje ?? null,
+      observaciones: OBSERVACIONES,
       estado: "nueva",
       origen: "web",
       utm_source: body.utm_source ?? null,
@@ -112,15 +97,16 @@ Deno.serve(async (req) => {
     if (error) throw error;
 
     return new Response(JSON.stringify({
-      ok: true,
-      id, nro,
-      tipo: LABELS[key],
+      ok: true, id, nro,
+      tipo: equipoLabel,
+      tramo: tramoLabel(dias),
       precio_dia: precioDia,
       dias, subtotal,
       iva: totalIva,
       total: totalConIva,
       moneda: "COP",
-      nota: "Valor estimado sujeto a confirmacion del equipo comercial.",
+      observaciones: OBSERVACIONES,
+      nota: "Valor estimado + IVA, sujeto a confirmacion del equipo comercial.",
     }), { headers: { ...cors, "Content-Type": "application/json" } });
   } catch (e) {
     return new Response(JSON.stringify({ ok: false, error: String(e) }), {

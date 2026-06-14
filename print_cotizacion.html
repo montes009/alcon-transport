@@ -110,6 +110,11 @@
     <div class="obs-box" id="obsContent"></div>
   </div>
 
+  <div class="section" id="secObsOper" style="display:none">
+    <div class="section-title">Observaciones operativas</div>
+    <div class="obs-box" id="obsOperContent" style="white-space:pre-line"></div>
+  </div>
+
   <div class="section">
     <div class="section-title">Condiciones Comerciales</div>
     <div class="obs-box">
@@ -177,6 +182,7 @@ async function load() {
     set('totFinal', money(c.total_con_iva));
 
     if (c.obs) { document.getElementById('obsContent').textContent = c.obs; document.getElementById('secObs').style.display = ''; }
+    if (c.observaciones) { document.getElementById('obsOperContent').textContent = c.observaciones; document.getElementById('secObsOper').style.display = ''; }
 
     set('footerFecha', new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' }));
     document.getElementById('loading').style.display = 'none';
