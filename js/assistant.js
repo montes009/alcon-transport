@@ -13,6 +13,7 @@ const UPAssistant = (() => {
   // ---- Estado ----
   let isTyping = false;
   let conversationHistory = [];
+  let assistedMode = false;   // true = Liam guía como asesor (cliente primerizo)
 
   // ---- Respuestas simuladas por palabras clave ----
   const responses = {
@@ -280,7 +281,8 @@ const UPAssistant = (() => {
         },
         body: JSON.stringify({
           message: userText,
-          history: conversationHistory.slice(-6)
+          history: conversationHistory.slice(-6),
+          mode: assistedMode ? 'asistido' : 'directo'
         })
       });
 
@@ -315,6 +317,72 @@ const UPAssistant = (() => {
     setTimeout(() => UPCotizador.start(), 400);
   }
 
+  // ---- Selector de modo al iniciar el chat ----
+  let modeChosen = false;
+  function showModeSelector() {
+    const messages = document.getElementById('chat-messages');
+    if (!messages) return;
+
+    if (!document.getElementById('chat-mode-styles')) {
+      const st = document.createElement('style');
+      st.id = 'chat-mode-styles';
+      st.textContent =
+        '.chat-mode-wrap{display:flex;flex-direction:column;gap:8px;margin:2px 0}' +
+        '.chat-mode-btn{display:flex;flex-direction:column;gap:2px;text-align:left;padding:11px 14px;' +
+        'border:1px solid #C0001F;background:#fff;border-radius:12px;cursor:pointer;font-family:inherit;width:100%}' +
+        '.chat-mode-btn:hover{background:#fff5f6}' +
+        '.chat-mode-btn b{color:#C0001F;font-size:.9rem;font-weight:800}' +
+        '.chat-mode-btn span{color:#6b7280;font-size:.78rem;line-height:1.3}';
+      document.head.appendChild(st);
+    }
+
+    const wrap = document.createElement('div');
+    wrap.className = 'msg bot';
+    wrap.innerHTML = '<div class="msg-avatar">🔧</div>';
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.style.background = 'transparent';
+    bubble.style.padding = '0';
+
+    const cont = document.createElement('div');
+    cont.className = 'chat-mode-wrap';
+    cont.innerHTML =
+      '<button class="chat-mode-btn" data-mode="asistido">' +
+        '<b>🧭 Asesórame</b><span>No sé qué equipo necesito. Que Liam me guíe según mi obra.</span></button>' +
+      '<button class="chat-mode-btn" data-mode="directo">' +
+        '<b>⚡ Ya sé qué cotizar</b><span>Conozco el equipo. Ir directo a la cotización.</span></button>';
+    bubble.appendChild(cont);
+    wrap.appendChild(bubble);
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+
+    cont.querySelectorAll('.chat-mode-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        if (modeChosen) return;
+        modeChosen = true;
+        cont.querySelectorAll('button').forEach(x => x.disabled = true);
+        const mode = b.getAttribute('data-mode');
+        if (mode === 'directo') {
+          renderMessage('Perfecto, vamos directo a tu cotización. ⚡', 'bot');
+          if (typeof UPCotizador !== 'undefined') {
+            quoteStarted = true;       // evita doble arranque
+            setTimeout(() => UPCotizador.start(), 400);
+          }
+        } else {
+          assistedMode = true;
+          renderMessage(
+            'Listo, te asesoro como si estuviéramos en obra 👷. Cuéntame:\n' +
+            '¿el trabajo es en interior o exterior?, ¿qué altura necesitas alcanzar (en metros)? ' +
+            'y ¿el piso es firme/parejo o es terreno irregular?\n\n' +
+            'Con eso te recomiendo el equipo ideal. Por ejemplo, una unipersonal o tijera eléctrica ' +
+            'es para interiores y piso firme; para exteriores o terreno irregular van los brazos diésel 4x4.',
+            'bot'
+          );
+        }
+      });
+    });
+  }
+
   // ---- Mensaje inicial automático ----
   function init() {
     const messages = document.getElementById('chat-messages');
@@ -323,12 +391,13 @@ const UPAssistant = (() => {
 
     if (!messages) return;
 
-    // Mensaje de bienvenida con delay
+    // Bienvenida + selector de modo (asistido vs directo)
     setTimeout(() => {
       renderMessage(
-        '¿Tienes alguna consulta sobre equipos de elevación? Nuestro asesor Liam está disponible para ayudarte. 💬',
+        '¡Hola! Soy Liam, tu asesor de UP Equipos 👷. ¿Cómo prefieres avanzar?',
         'bot'
       );
+      showModeSelector();
     }, 800);
 
     // Enviar con botón
