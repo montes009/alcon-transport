@@ -210,6 +210,14 @@ const UPAssistant = (() => {
     renderMessage(userText, 'user');
     conversationHistory.push({ role: 'user', content: userText });
 
+    // ---- Modo cotización: Liam captura los datos paso a paso ----
+    if (typeof UPCotizador !== 'undefined' && UPCotizador.active) {
+      isTyping = false;
+      if (sendBtn) sendBtn.disabled = false;
+      UPCotizador.handleAnswer(userText);
+      return;
+    }
+
     // Mostrar typing
     showTyping();
 
@@ -273,6 +281,9 @@ const UPAssistant = (() => {
       renderMessage(botResponse, 'bot');
       conversationHistory.push({ role: 'assistant', content: botResponse });
 
+      // ---- Si el usuario pide precio/cotización, ofrecer el cotizador ----
+      maybeOfferQuote(userText);
+
     } catch (error) {
       hideTyping();
       renderMessage('Disculpa, hubo un problema de conexión. Por favor comunícate con nosotros al 604 4447178.', 'bot');
@@ -281,6 +292,16 @@ const UPAssistant = (() => {
 
     isTyping = false;
     if (sendBtn) sendBtn.disabled = false;
+  }
+
+  // ---- Iniciar cotización guiada cuando hay intención de cotizar ----
+  let quoteStarted = false;
+  function maybeOfferQuote(userText) {
+    if (quoteStarted || typeof UPCotizador === 'undefined') return;
+    if (UPCotizador.active) return;
+    if (!/cotiz|valor exacto|precio exacto|quiero cotizar|hacer una cotiz/i.test(userText)) return;
+    quoteStarted = true;
+    setTimeout(() => UPCotizador.start(), 500);
   }
 
   // ---- Mensaje inicial automático ----

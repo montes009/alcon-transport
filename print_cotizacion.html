@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Cotización — UP Equipos</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #1a1a1a; background: #f5f5f5; padding: 20px; }
+    .doc { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; padding: 18mm; box-shadow: 0 2px 20px rgba(0,0,0,.12); position: relative; }
+    .doc-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #C0001F; padding-bottom: 14px; margin-bottom: 18px; }
+    .logo-area .company-name { font-size: 22pt; font-weight: 900; color: #C0001F; letter-spacing: -0.5px; line-height: 1; }
+    .logo-area .company-name span { color: #1a1a1a; }
+    .logo-area .company-sub { font-size: 8.5pt; color: #666; margin-top: 3px; letter-spacing: .5px; text-transform: uppercase; }
+    .doc-meta { text-align: right; }
+    .doc-meta .doc-type { font-size: 14pt; font-weight: 800; color: #1a1a1a; text-transform: uppercase; letter-spacing: 1px; }
+    .doc-meta .doc-nro { font-size: 18pt; font-weight: 900; color: #C0001F; font-family: 'Courier New', monospace; }
+    .doc-meta .doc-fecha { font-size: 9pt; color: #666; margin-top: 2px; }
+    .estado-badge { display: inline-block; margin-top: 4px; padding: 2px 10px; border-radius: 20px; font-size: 8.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; background: #dbeafe; color: #1d4ed8; }
+    .section { margin-bottom: 16px; }
+    .section-title { font-size: 7.5pt; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #C0001F; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; margin-bottom: 10px; }
+    .data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .data-field label { display: block; font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #9ca3af; margin-bottom: 2px; }
+    .data-field .val { font-size: 10.5pt; font-weight: 600; color: #1a1a1a; word-break: break-word; }
+    .data-field .val.accent { color: #C0001F; }
+    .obs-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 14px; font-size: 10pt; color: #374151; min-height: 40px; }
+    .tot-wrap { display: flex; flex-direction: column; gap: 4px; max-width: 300px; margin-left: auto; }
+    .tot-line { display: flex; justify-content: space-between; font-size: 10pt; color: #6b7280; }
+    .tot-final { display: flex; justify-content: space-between; font-weight: 800; font-size: 13pt; border-top: 2px solid #C0001F; padding-top: 6px; margin-top: 4px; }
+    .tot-final span:last-child { color: #C0001F; }
+    .firma-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px; }
+    .firma-box { border-top: 1.5px solid #1a1a1a; padding-top: 6px; font-size: 8.5pt; color: #6b7280; }
+    .firma-box .firma-nombre { font-weight: 700; color: #1a1a1a; }
+    .doc-footer { margin-top: 20px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 7.5pt; color: #9ca3af; text-align: center; }
+    #loading, #error { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; z-index: 100; gap: 12px; font-size: 14pt; color: #374151; }
+    #error { color: #dc2626; }
+    .spinner { width: 40px; height: 40px; border: 4px solid #f1f5f9; border-top-color: #C0001F; border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .print-actions { position: fixed; top: 16px; right: 16px; display: flex; gap: 8px; z-index: 200; }
+    .btn-print, .btn-close { padding: 8px 18px; border: none; border-radius: 6px; font-size: 12pt; font-weight: 700; cursor: pointer; }
+    .btn-print { background: #C0001F; color: #fff; }
+    .btn-close { background: #f1f5f9; color: #374151; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .doc { box-shadow: none; padding: 12mm 15mm 15mm; margin: 0; width: 100%; }
+      .print-actions, #loading, #error { display: none !important; }
+      @page { size: A4; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+<div id="loading"><div class="spinner"></div><span>Cargando cotización...</span></div>
+<div id="error" style="display:none"><span id="errMsg">No se pudo cargar la cotización.</span></div>
+
+<div class="print-actions">
+  <button class="btn-print" onclick="window.print()">Imprimir / Guardar PDF</button>
+  <button class="btn-close" onclick="window.close()">Cerrar</button>
+</div>
+
+<div class="doc" id="docContent" style="display:none">
+  <div class="doc-header">
+    <div class="logo-area">
+      <div class="company-name">UP EQUIPOS <span>S.A.S.</span></div>
+      <div class="company-sub">Distribuidor autorizado GENIE · Plataformas elevadoras</div>
+      <div style="font-size:8pt;color:#999;margin-top:6px">NIT: 900.447.666</div>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-type">Cotización</div>
+      <div class="doc-nro" id="docNro">—</div>
+      <div class="doc-fecha" id="docFecha">—</div>
+      <div><span class="estado-badge" id="docEstado">nueva</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Datos del Cliente</div>
+    <div class="data-grid">
+      <div class="data-field"><label>Cliente</label><div class="val" id="cliNombre">—</div></div>
+      <div class="data-field"><label>Contacto</label><div class="val" id="cliContacto">—</div></div>
+      <div class="data-field"><label>Teléfono</label><div class="val" id="cliTelefono">—</div></div>
+      <div class="data-field"><label>Correo</label><div class="val" id="cliCorreo">—</div></div>
+      <div class="data-field"><label>Ciudad</label><div class="val" id="cliCiudad">—</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Detalle del Servicio</div>
+    <div class="data-grid">
+      <div class="data-field"><label>Tipo de equipo</label><div class="val" id="svcTipo">—</div></div>
+      <div class="data-field"><label>Modalidad</label><div class="val accent">Alquiler por día</div></div>
+      <div class="data-field"><label>Altura / Metraje</label><div class="val" id="svcAltura">—</div></div>
+      <div class="data-field"><label>Días estimados</label><div class="val" id="svcDias">—</div></div>
+      <div class="data-field"><label>Tarifa / día</label><div class="val" id="svcPrecio">—</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Total Estimado</div>
+    <div class="tot-wrap">
+      <div class="tot-line"><span>Subtotal:</span><span id="totSubtotal">—</span></div>
+      <div class="tot-line"><span>IVA (<span id="ivaPct">19</span>%):</span><span id="totIva">—</span></div>
+      <div class="tot-final"><span>TOTAL CON IVA:</span><span id="totFinal">—</span></div>
+    </div>
+  </div>
+
+  <div class="section" id="secObs" style="display:none">
+    <div class="section-title">Observaciones</div>
+    <div class="obs-box" id="obsContent"></div>
+  </div>
+
+  <div class="section" id="secObsOper" style="display:none">
+    <div class="section-title">Observaciones operativas</div>
+    <div class="obs-box" id="obsOperContent" style="white-space:pre-line"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Condiciones Comerciales</div>
+    <div class="obs-box">
+      - Esta cotización tiene una vigencia de <strong>15 días calendario</strong> a partir de la fecha de emisión.<br>
+      - Los precios <strong>incluyen IVA</strong> según el desglose indicado.<br>
+      - Valor <strong>estimado</strong> sujeto a confirmación de disponibilidad por el equipo comercial.<br>
+      - El equipo queda reservado únicamente al confirmar por escrito.
+    </div>
+  </div>
+
+  <div class="firma-grid">
+    <div class="firma-box"><div class="firma-nombre">UP Equipos S.A.S.</div><div>Emisor</div></div>
+    <div class="firma-box"><div class="firma-nombre" id="firmaCliente">—</div><div>Cliente</div></div>
+  </div>
+
+  <div class="doc-footer">Documento generado el <span id="footerFecha"></span> · Medellín · Bogotá · Barranquilla</div>
+</div>
+
+<script>
+const SB_URL = 'https://oguxdohmutqgacahcwop.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndXhkb2htdXRxZ2FjYWhjd29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjc0NzcsImV4cCI6MjA4ODMwMzQ3N30.RRruTo8B7k4R97Igq7_KV1PV58FqrpIzEu0R_MXIwR8';
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+const money = v => '$ ' + Number(v || 0).toLocaleString('es-CO');
+const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = (val ?? '') === '' ? '—' : val; };
+const fmt = d => { if (!d) return '—'; const [y,m,dd] = String(d).split('-'); return `${dd}/${m}/${y}`; };
+
+const params = new URLSearchParams(window.location.search);
+const COT_ID = params.get('id');
+const COT_NRO = params.get('nro');
+const AUTO_PRINT = params.get('print') === '1';
+
+if (!COT_ID && !COT_NRO) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('error').style.display = 'flex';
+  document.getElementById('errMsg').textContent = 'No se especificó la cotización (?id=XXX o ?nro=COT-WXXXX)';
+} else {
+  load();
+}
+
+async function load() {
+  try {
+    // Lee SOLO de cotizaciones_web (aislada del ERP Alcon OPS). Por id o por N°.
+    let query = sb.from('cotizaciones_web').select('*');
+    query = COT_ID ? query.eq('id', COT_ID) : query.eq('nro', COT_NRO);
+    const { data: c, error } = await query.maybeSingle();
+    if (error || !c) throw new Error('Cotización no encontrada');
+
+    set('docNro', c.nro || COT_ID);
+    set('docFecha', fmt(c.fecha));
+    set('docEstado', c.estado || 'nueva');
+    document.title = `Cotización ${c.nro || ''} — UP Equipos`;
+
+    set('cliNombre', c.cliente);
+    set('cliContacto', c.contacto);
+    set('cliTelefono', c.telefono);
+    set('cliCorreo', c.correo);
+    set('cliCiudad', c.ciudad);
+    set('firmaCliente', c.cliente);
+
+    set('svcTipo', c.tipo);
+    set('svcAltura', c.altura);
+    set('svcDias', c.dias);
+    set('svcPrecio', money(c.precio));
+
+    set('totSubtotal', money(c.subtotal));
+    set('ivaPct', c.iva_pct ?? 19);
+    set('totIva', money(c.total_iva));
+    set('totFinal', money(c.total_con_iva));
+
+    if (c.obs) { document.getElementById('obsContent').textContent = c.obs; document.getElementById('secObs').style.display = ''; }
+    if (c.observaciones) { document.getElementById('obsOperContent').textContent = c.observaciones; document.getElementById('secObsOper').style.display = ''; }
+
+    set('footerFecha', new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' }));
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('docContent').style.display = '';
+    if (AUTO_PRINT) setTimeout(() => window.print(), 600);
+  } catch (err) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = 'flex';
+    document.getElementById('errMsg').textContent = err.message || 'Error al cargar datos';
+  }
+}
+</script>
+</body>
+</html>
