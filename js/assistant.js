@@ -262,10 +262,10 @@ const UPAssistant = (() => {
       return;
     }
 
-    // ---- Control de tokens lado cliente ----
+    // ---- Control de tokens lado cliente (solo modo asistido, que usa IA) ----
     const estimatedTokens = conversationHistory.reduce((acc, m) =>
       acc + m.content.split(' ').length * 1.3, 0);
-    if (estimatedTokens > 1200) {
+    if (assistedMode && estimatedTokens > 1200) {
       hideTyping();
       renderMessage('Esta sesión llegó a su límite. Si quieres continuar, el equipo comercial te puede atender directamente. ¿Dejaste tus datos?', 'bot');
       isTyping = false;
@@ -277,19 +277,26 @@ const UPAssistant = (() => {
     const delay = 1000 + Math.random() * 1000;
 
     try {
-      /* ============================================
-      // MODO SIMULADO (activo por defecto)
       // ============================================
-      await new Promise(r => setTimeout(r, delay));
-      const intent = detectIntent(userText);
-      const botResponse = getResponse(intent);
-      hideTyping();
-      renderMessage(botResponse, 'bot');
-      conversationHistory.push({ role: 'assistant', content: botResponse });
-      */
+      // MODO DIRECTO — respuesta local sin IA (0 tokens)
+      // El cliente con experiencia usa el cotizador determinista;
+      // el texto libre se responde con el motor por palabras clave.
+      // ============================================
+      if (!assistedMode) {
+        await new Promise(r => setTimeout(r, Math.min(delay, 900)));
+        const intent = detectIntent(userText);
+        const botResponse = getResponse(intent);
+        hideTyping();
+        renderMessage(botResponse, 'bot');
+        conversationHistory.push({ role: 'assistant', content: botResponse });
+        maybeOfferQuote(userText, botResponse);
+        isTyping = false;
+        if (sendBtn) sendBtn.disabled = false;
+        return;
+      }
 
       // ============================================
-      // MODO API — conectado con Claude via Supabase
+      // MODO ASISTIDO — Claude vía Supabase (con reglas inyectadas)
       // ============================================
       const response = await fetch(window.UP_CONFIG.edgeFunctionUrl, {
         method: 'POST',
@@ -298,18 +305,15 @@ const UPAssistant = (() => {
           'Authorization': `Bearer ${window.UP_CONFIG.anonKey}`
         },
         body: JSON.stringify({
-          // En modo asistido inyectamos las reglas de Liam en el primer turno
-          // (sin mostrarlas en pantalla), para activar el comportamiento mejorado
-          // aunque la función up-asesor no esté redesplegada.
-          message: (assistedMode && !assistedPrimerSent)
+          message: (!assistedPrimerSent)
             ? (ASSISTED_GUIDE + '\n\nMensaje del cliente: ' + userText)
             : userText,
           history: conversationHistory.slice(-6),
-          mode: assistedMode ? 'asistido' : 'directo'
+          mode: 'asistido'
         })
       });
 
-      if (assistedMode) assistedPrimerSent = true;
+      assistedPrimerSent = true;
       if (!response.ok) throw new Error('Error conexión');
       const data = await response.json();
       hideTyping();
