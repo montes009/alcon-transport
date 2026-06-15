@@ -99,8 +99,23 @@ Flujo (todo en el chat):
 `cotizarUrl` (up-cotizar), `clienteUrl` (up-cliente, ya no se usa: se reemplazó por la RPC),
 `whatsappComercial` (número del comercial para los botones de WhatsApp, formato 57XXXXXXXXXX).
 
-## Pendientes / notas
-- Ajustar `whatsappComercial` si cambia el número comercial.
+## Panel de leads (`panel.html`)
+- Panel interno para el comercial: lista `clientes_web` y `cotizaciones_web` con KPIs,
+  links a WhatsApp y al PDF, y cambio de estado de cotizaciones. `noindex`, no enlazado.
+- Protegido por **clave** (no expone datos sensibles): RPCs SECURITY DEFINER
+  **`panel_web(p_clave)`** (devuelve clientes+cotizaciones) y
+  **`panel_web_set_estado(p_clave,p_id,p_estado)`**. La clave vive en la tabla
+  **`web_panel_config`** (editable desde Studio). Clave por defecto: `UP-leads-2026`.
+
+## Chat: dos modos (selector al iniciar)
+- **Directo** (cliente con experiencia): NO usa IA (0 tokens). Responde con el motor local
+  por palabras clave (`responses`/`detectIntent` en `assistant.js`) + el cotizador determinista.
+- **Asistido** (cliente primerizo): usa Claude (`up-asesor`). Liam guía y recomienda equipo.
+  Las reglas/catálogo se **inyectan desde el frontend** (`ASSISTED_GUIDE` en `assistant.js`)
+  en el primer turno, para funcionar aunque `up-asesor` no esté redesplegado.
+  Ej. de regla: una unipersonal NO sirve en exteriores.
+
+## Pendientes / notas- Ajustar `whatsappComercial` si cambia el número comercial.
 - Editar tarifas → tabla `tarifas_web` en Studio (no requiere código).
 - Hay una cotización de prueba real: **COT-W0001** (cliente "ORLANDO ABAD MONTES").
   Borrarla si se quiere dejar limpio.
