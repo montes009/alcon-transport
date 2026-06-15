@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Panel de leads — UP Equipos</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#0f1115;color:#e8eaed;font-size:14px}
+    header{background:#1a1d24;border-bottom:3px solid #C0001F;padding:14px 20px;display:flex;
+      justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+    header .brand{font-size:1.2rem;font-weight:900;color:#fff}
+    header .brand span{color:#C0001F}
+    header .actions{display:flex;gap:8px;align-items:center}
+    button,select{font-family:inherit}
+    .btn{padding:7px 14px;border:none;border-radius:8px;background:#C0001F;color:#fff;
+      font-weight:700;cursor:pointer;font-size:.85rem}
+    .btn.ghost{background:#2a2e37;color:#cbd5e1}
+    .wrap{max-width:1200px;margin:0 auto;padding:18px 20px 60px}
+    .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px}
+    .kpi{background:#1a1d24;border:1px solid #2a2e37;border-radius:12px;padding:14px}
+    .kpi .v{font-size:1.7rem;font-weight:900;color:#fff}
+    .kpi .v.green{color:#16a34a}
+    .kpi .l{font-size:.74rem;color:#9aa3af;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+    h2{font-size:1rem;margin:22px 0 10px;color:#fff;display:flex;align-items:center;gap:8px}
+    h2 .count{font-size:.75rem;background:#2a2e37;color:#cbd5e1;padding:2px 8px;border-radius:10px}
+    .tablewrap{overflow-x:auto;background:#1a1d24;border:1px solid #2a2e37;border-radius:12px}
+    table{width:100%;border-collapse:collapse;min-width:760px}
+    th,td{padding:9px 12px;text-align:left;border-bottom:1px solid #23272f;white-space:nowrap}
+    th{font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:#9aa3af;background:#15181e;position:sticky;top:0}
+    td.money{font-weight:800;color:#16a34a}
+    .nro{font-family:'Courier New',monospace;font-weight:800;color:#ff5a6e}
+    .estado{padding:4px 8px;border-radius:8px;border:1px solid #2a2e37;background:#0f1115;color:#e8eaed;font-size:.78rem}
+    .lnk{color:#7cc0ff;text-decoration:none;font-weight:700}
+    .lnk:hover{text-decoration:underline}
+    .wa{color:#25D366}
+    #login{position:fixed;inset:0;background:#0f1115;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:14px;z-index:50;padding:20px;text-align:center}
+    #login h1{font-size:1.4rem;color:#fff}
+    #login input{padding:11px 14px;border:1px solid #2a2e37;border-radius:10px;background:#1a1d24;
+      color:#fff;font-size:1rem;width:min(320px,90vw)}
+    #login .err{color:#ff5a6e;font-size:.85rem;min-height:1em}
+    .muted{color:#9aa3af}
+    @media(max-width:560px){.wrap{padding:14px}}
+  </style>
+</head>
+<body>
+  <div id="login">
+    <h1>🔒 Panel de leads — UP Equipos</h1>
+    <p class="muted">Ingresa la clave del equipo comercial</p>
+    <input id="clave" type="password" placeholder="Clave" autocomplete="off" />
+    <button class="btn" onclick="entrar()">Entrar</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+
+  <header style="display:none" id="topbar">
+    <div class="brand">UP <span>Equipos</span> · Leads web</div>
+    <div class="actions">
+      <button class="btn ghost" onclick="cargar()">↻ Actualizar</button>
+      <button class="btn ghost" onclick="salir()">Salir</button>
+    </div>
+  </header>
+
+  <div class="wrap" id="contenido" style="display:none">
+    <div class="kpis" id="kpis"></div>
+
+    <h2>📄 Cotizaciones <span class="count" id="cCount">0</span></h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>N°</th><th>Fecha</th><th>Cliente</th><th>Tel</th><th>NIT</th>
+          <th>Equipo</th><th>Días</th><th>Total c/IVA</th><th>Estado</th><th>PDF</th>
+        </tr></thead>
+        <tbody id="cotizBody"></tbody>
+      </table>
+    </div>
+
+    <h2>👤 Clientes <span class="count" id="clCount">0</span></h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>Nombre</th><th>Teléfono</th><th>NIT</th><th>Empresa</th>
+          <th>Ciudad</th><th>Correo</th><th>Cotiz.</th><th>Última</th>
+        </tr></thead>
+        <tbody id="cliBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+const SB_URL = 'https://oguxdohmutqgacahcwop.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndXhkb2htdXRxZ2FjYWhjd29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjc0NzcsImV4cCI6MjA4ODMwMzQ3N30.RRruTo8B7k4R97Igq7_KV1PV58FqrpIzEu0R_MXIwR8';
+const ESTADOS = ['nueva','contactada','cotizada','cerrada','descartada'];
+
+const money = v => '$ ' + Number(v||0).toLocaleString('es-CO');
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const fmtDate = d => { if(!d) return '—'; const x=new Date(d); return isNaN(x)? String(d).slice(0,10) : x.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'}); };
+const waNum = t => '57' + String(t||'').replace(/\D/g,'').replace(/^57/,'');
+
+function getClave(){ return sessionStorage.getItem('panel_clave') || ''; }
+
+async function rpc(fn, body){
+  const res = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`},
+    body:JSON.stringify(body)
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error((data && data.message) || 'Error');
+  return data;
+}
+
+async function entrar(){
+  const clave = document.getElementById('clave').value.trim();
+  const err = document.getElementById('loginErr');
+  err.textContent = '';
+  if(!clave){ err.textContent='Ingresa la clave'; return; }
+  sessionStorage.setItem('panel_clave', clave);
+  try { await cargar(); }
+  catch(e){ err.textContent = 'Clave incorrecta'; sessionStorage.removeItem('panel_clave'); }
+}
+
+function salir(){ sessionStorage.removeItem('panel_clave'); location.reload(); }
+
+async function cargar(){
+  const data = await rpc('panel_web', { p_clave: getClave() });
+  document.getElementById('login').style.display='none';
+  document.getElementById('topbar').style.display='flex';
+  document.getElementById('contenido').style.display='block';
+  render(data);
+}
+
+function render(data){
+  const cots = data.cotizaciones || [];
+  const clis = data.clientes || [];
+
+  const totalValor = cots.reduce((s,c)=>s+Number(c.total_con_iva||0),0);
+  const nuevas = cots.filter(c=>c.estado==='nueva').length;
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi"><div class="v">${clis.length}</div><div class="l">Clientes</div></div>
+    <div class="kpi"><div class="v">${cots.length}</div><div class="l">Cotizaciones</div></div>
+    <div class="kpi"><div class="v" style="color:#ff5a6e">${nuevas}</div><div class="l">Nuevas sin gestionar</div></div>
+    <div class="kpi"><div class="v green">${money(totalValor)}</div><div class="l">Valor total cotizado</div></div>`;
+
+  document.getElementById('cCount').textContent = cots.length;
+  document.getElementById('clCount').textContent = clis.length;
+
+  document.getElementById('cotizBody').innerHTML = cots.map(c=>{
+    const opts = ESTADOS.map(e=>`<option ${e===c.estado?'selected':''}>${e}</option>`).join('');
+    return `<tr>
+      <td class="nro">${esc(c.nro)}</td>
+      <td>${fmtDate(c.fecha||c.created_at)}</td>
+      <td>${esc(c.cliente||c.contacto||'—')}</td>
+      <td>${c.telefono?`<a class="lnk wa" target="_blank" href="https://wa.me/${waNum(c.telefono)}">${esc(c.telefono)}</a>`:'—'}</td>
+      <td>${esc(c.nit||'—')}</td>
+      <td>${esc(c.tipo||'—')}</td>
+      <td>${c.dias??'—'}</td>
+      <td class="money">${money(c.total_con_iva)}</td>
+      <td><select class="estado" onchange="setEstado('${c.id}',this.value)">${opts}</select></td>
+      <td><a class="lnk" target="_blank" href="print_cotizacion.html?id=${encodeURIComponent(c.id)}">Ver</a></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="10" class="muted" style="text-align:center;padding:20px">Sin cotizaciones aún</td></tr>`;
+
+  document.getElementById('cliBody').innerHTML = clis.map(c=>`
+    <tr>
+      <td>${esc(c.nombre||'—')}</td>
+      <td>${c.telefono?`<a class="lnk wa" target="_blank" href="https://wa.me/${waNum(c.telefono)}">${esc(c.telefono)}</a>`:'—'}</td>
+      <td>${esc(c.nit||'—')}</td>
+      <td>${esc(c.empresa||'—')}</td>
+      <td>${esc(c.ciudad||'—')}</td>
+      <td>${esc(c.correo||'—')}</td>
+      <td style="text-align:center">${c.total_cotizaciones??0}</td>
+      <td>${fmtDate(c.ultima_cotizacion)}</td>
+    </tr>`).join('') || `<tr><td colspan="8" class="muted" style="text-align:center;padding:20px">Sin clientes aún</td></tr>`;
+}
+
+async function setEstado(id, estado){
+  try { await rpc('panel_web_set_estado', { p_clave:getClave(), p_id:id, p_estado:estado }); }
+  catch(e){ alert('No se pudo actualizar el estado'); }
+}
+
+// Enter para login + auto-entrar si ya hay clave en sesión
+document.getElementById('clave').addEventListener('keydown', e=>{ if(e.key==='Enter') entrar(); });
+if(getClave()){ cargar().catch(()=>{ sessionStorage.removeItem('panel_clave'); }); }
+</script>
+</body>
+</html>
