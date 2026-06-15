@@ -237,6 +237,13 @@ const UPAssistant = (() => {
       return;
     }
 
+    // ---- Si la persona escribe sin elegir modo, la atendemos como ASISTIDA (IA)
+    //      para que la conversación sea natural y no una respuesta enlatada. ----
+    if (!modeChosen) {
+      modeChosen = true;
+      assistedMode = true;
+    }
+
     // Mostrar typing
     showTyping();
 
