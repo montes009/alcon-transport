@@ -375,12 +375,19 @@ const UPAssistant = (() => {
       const st = document.createElement('style');
       st.id = 'chat-mode-styles';
       st.textContent =
-        '.chat-mode-wrap{display:flex;flex-direction:column;gap:8px;margin:2px 0}' +
-        '.chat-mode-btn{display:flex;flex-direction:column;gap:2px;text-align:left;padding:11px 14px;' +
-        'border:1px solid #C0001F;background:#fff;border-radius:12px;cursor:pointer;font-family:inherit;width:100%}' +
-        '.chat-mode-btn:hover{background:#fff5f6}' +
-        '.chat-mode-btn b{color:#C0001F;font-size:.9rem;font-weight:800}' +
-        '.chat-mode-btn span{color:#6b7280;font-size:.78rem;line-height:1.3}';
+        '.chat-mode-wrap{display:flex;flex-direction:column;gap:10px;margin:4px 0}' +
+        '.chat-mode-btn{display:flex;align-items:center;gap:12px;text-align:left;padding:13px 14px;' +
+        'border:2px solid #C0001F;background:#fff;border-radius:14px;cursor:pointer;font-family:inherit;' +
+        'width:100%;box-shadow:0 2px 8px rgba(192,0,31,.15);transition:transform .12s,background .15s,box-shadow .15s}' +
+        '.chat-mode-btn:hover{background:#C0001F;box-shadow:0 4px 14px rgba(192,0,31,.35)}' +
+        '.chat-mode-btn:hover b,.chat-mode-btn:hover span{color:#fff}' +
+        '.chat-mode-btn:hover .chat-mode-arrow{background:#fff;color:#C0001F}' +
+        '.chat-mode-btn:active{transform:scale(.98)}' +
+        '.chat-mode-txt{flex:1;display:flex;flex-direction:column;gap:2px}' +
+        '.chat-mode-btn b{color:#C0001F;font-size:.92rem;font-weight:800}' +
+        '.chat-mode-btn span{color:#6b7280;font-size:.78rem;line-height:1.3}' +
+        '.chat-mode-arrow{flex:none;width:30px;height:30px;border-radius:50%;background:#C0001F;color:#fff;' +
+        'display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:800}';
       document.head.appendChild(st);
     }
 
@@ -396,9 +403,13 @@ const UPAssistant = (() => {
     cont.className = 'chat-mode-wrap';
     cont.innerHTML =
       '<button class="chat-mode-btn" data-mode="asistido">' +
-        '<b>🧭 Asesórame</b><span>No sé qué equipo necesito. Que Liam me guíe según mi obra.</span></button>' +
+        '<span class="chat-mode-txt"><b>🧭 Asesórame</b>' +
+        '<span>No sé qué equipo necesito. Que Liam me guíe según mi obra.</span></span>' +
+        '<span class="chat-mode-arrow">›</span></button>' +
       '<button class="chat-mode-btn" data-mode="directo">' +
-        '<b>⚡ Ya sé qué cotizar</b><span>Conozco el equipo. Ir directo a la cotización.</span></button>';
+        '<span class="chat-mode-txt"><b>⚡ Ya sé qué cotizar</b>' +
+        '<span>Conozco el equipo. Ir directo a la cotización.</span></span>' +
+        '<span class="chat-mode-arrow">›</span></button>';
     bubble.appendChild(cont);
     wrap.appendChild(bubble);
     messages.appendChild(wrap);
@@ -442,7 +453,7 @@ const UPAssistant = (() => {
     // Bienvenida + selector de modo (asistido vs directo)
     setTimeout(() => {
       renderMessage(
-        '¡Hola! Soy Liam, tu asesor de UP Equipos 👷. ¿Cómo prefieres avanzar?',
+        '¡Hola! Soy Liam, tu asesor de UP Equipos 👷.\n👇 Toca una de estas opciones para empezar:',
         'bot'
       );
       showModeSelector();
