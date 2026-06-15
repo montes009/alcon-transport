@@ -57,6 +57,7 @@
   <header style="display:none" id="topbar">
     <div class="brand">UP <span>Equipos</span> · Leads web</div>
     <div class="actions">
+      <span class="muted" style="font-size:.74rem">🔄 Auto-actualiza cada 20s</span>
       <button class="btn ghost" onclick="cargar()">↻ Actualizar</button>
       <button class="btn ghost" onclick="salir()">Salir</button>
     </div>
@@ -121,14 +122,29 @@ async function entrar(){
   catch(e){ err.textContent = 'Clave incorrecta'; sessionStorage.removeItem('panel_clave'); }
 }
 
-function salir(){ sessionStorage.removeItem('panel_clave'); location.reload(); }
+function salir(){ if(pollTimer){ clearInterval(pollTimer); pollTimer=null; } sessionStorage.removeItem('panel_clave'); location.reload(); }
 
+let pollTimer = null;
 async function cargar(){
   const data = await rpc('panel_web', { p_clave: getClave() });
   document.getElementById('login').style.display='none';
   document.getElementById('topbar').style.display='flex';
   document.getElementById('contenido').style.display='block';
   render(data);
+  startPolling();
+}
+
+// Auto-refresh cada 20s (sin tocar F5). No refresca si estás editando un estado
+// o si la pestaña está en segundo plano.
+function startPolling(){
+  if(pollTimer) return;
+  pollTimer = setInterval(async ()=>{
+    if(!getClave()) return;
+    if(document.hidden) return;
+    if(document.activeElement && document.activeElement.tagName === 'SELECT') return;
+    try { const data = await rpc('panel_web', { p_clave: getClave() }); render(data); }
+    catch(e){ /* silencioso */ }
+  }, 20000);
 }
 
 function render(data){
