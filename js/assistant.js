@@ -237,16 +237,6 @@ const UPAssistant = (() => {
       return;
     }
 
-    // ---- El cliente pide una cotización: arrancar el flujo guiado (sin pasar por la API) ----
-    if (typeof UPCotizador !== 'undefined' && !quoteStarted &&
-        UPCotizador.isQuoteRequest && UPCotizador.isQuoteRequest(userText)) {
-      quoteStarted = true;
-      isTyping = false;
-      if (sendBtn) sendBtn.disabled = false;
-      UPCotizador.start();
-      return;
-    }
-
     // Mostrar typing
     showTyping();
 
@@ -334,15 +324,38 @@ const UPAssistant = (() => {
     if (sendBtn) sendBtn.disabled = false;
   }
 
-  // ---- Fallback: si Liam ofrece generar la cotización, arrancar el flujo ----
-  let quoteStarted = false;
+  // ---- Tras la respuesta de Liam, ofrecer un botón para iniciar la cotización ----
+  let quoteOffered = false;
   function maybeOfferQuote(userText, botResponse) {
-    if (quoteStarted || typeof UPCotizador === 'undefined' || UPCotizador.active) return;
+    if (quoteOffered || typeof UPCotizador === 'undefined' || UPCotizador.active) return;
     const botWants = /genera(r|ndo)?\s+(tu|la|una)\s+cotiz|te armo la cotiz|voy a generar.*cotiz|prepar\w*\s+(tu|la)\s+cotiz/i.test(botResponse || '');
     const userWants = UPCotizador.isQuoteRequest && UPCotizador.isQuoteRequest(userText);
     if (!botWants && !userWants) return;
-    quoteStarted = true;
-    setTimeout(() => UPCotizador.start(), 400);
+    quoteOffered = true;
+
+    const messages = document.getElementById('chat-messages');
+    if (!messages) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'msg bot';
+    wrap.innerHTML = '<div class="msg-avatar">🔧</div>';
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.style.background = 'transparent';
+    bubble.style.padding = '0';
+
+    const btn = document.createElement('button');
+    btn.textContent = '📋 Cotizar ahora';
+    btn.style.cssText = 'padding:10px 18px;border:none;border-radius:22px;background:#C0001F;' +
+      'color:#fff;font-weight:700;font-size:.88rem;cursor:pointer';
+    btn.addEventListener('click', () => {
+      btn.disabled = true;
+      btn.style.opacity = '.5';
+      UPCotizador.start();
+    });
+    bubble.appendChild(btn);
+    wrap.appendChild(bubble);
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
   }
 
   // ---- Selector de modo al iniciar el chat ----
@@ -393,7 +406,7 @@ const UPAssistant = (() => {
         if (mode === 'directo') {
           renderMessage('Perfecto, vamos directo a tu cotización. ⚡', 'bot');
           if (typeof UPCotizador !== 'undefined') {
-            quoteStarted = true;       // evita doble arranque
+            quoteOffered = true;       // evita ofrecer botón duplicado
             setTimeout(() => UPCotizador.start(), 400);
           }
         } else {
