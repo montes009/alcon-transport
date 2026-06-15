@@ -159,13 +159,103 @@ const UPCotizador = (() => {
   async function start(restart) {
     if (active && !restart) return;
     active = true;
-    step = 'form';
+    step = 'inicio';
     data = {};
     injectStyles();
     const bar = document.getElementById('cotz-bottombar');
     if (bar) bar.style.display = 'none';
-    renderBubble('¡Con gusto! Para tu cotización primero te registro como cliente. Completa estos datos 👇');
-    renderClienteForm();
+    renderBubble('¡Con gusto te armo la cotización! ¿Ya eres cliente de UP Equipos?');
+    const cont = document.createElement('div');
+    cont.className = 'cotz-chips';
+    const nuevo = document.createElement('button');
+    nuevo.className = 'cotz-chip';
+    nuevo.textContent = '🆕 Soy cliente nuevo';
+    nuevo.addEventListener('click', () => {
+      cont.querySelectorAll('button').forEach(b => b.disabled = true);
+      echoUser('Soy cliente nuevo');
+      renderBubble('Perfecto, te registro rápido. Completa estos datos 👇');
+      renderClienteForm();
+    });
+    const ya = document.createElement('button');
+    ya.className = 'cotz-chip';
+    ya.textContent = '✅ Ya soy cliente';
+    ya.addEventListener('click', () => {
+      cont.querySelectorAll('button').forEach(b => b.disabled = true);
+      echoUser('Ya soy cliente');
+      renderLookup();
+    });
+    cont.appendChild(nuevo);
+    cont.appendChild(ya);
+    appendNode(cont);
+  }
+
+  // 0) ATAJO: buscar cliente existente por teléfono o NIT
+  function renderLookup() {
+    step = 'lookup';
+    const card = document.createElement('div');
+    card.className = 'cotz-card';
+    card.innerHTML = `
+      <h4>✅ Identifícate</h4>
+      <div class="cotz-frow">
+        <label>Teléfono o NIT con el que estás registrado</label>
+        <input id="lk-val" type="text" placeholder="Ej: 3001234567 o 900123456">
+      </div>
+      <button class="cotz-submit" id="lk-go">Continuar</button>
+    `;
+    appendNode(card);
+    card.querySelector('#lk-go').addEventListener('click', () => submitLookup(card));
+  }
+
+  async function submitLookup(card) {
+    const btn = card.querySelector('#lk-go');
+    const val = (card.querySelector('#lk-val')?.value || '').trim();
+    if (!val) { alert('Escribe tu teléfono o NIT.'); return; }
+    btn.disabled = true;
+    btn.textContent = 'Buscando...';
+    try {
+      const out = await rpc('buscar_cliente_web', { p_telefono: val, p_nit: val });
+      if (out && out.id) {
+        card.querySelectorAll('input,button').forEach(el => el.disabled = true);
+        echoUser(val);
+        data.cliente_web_id = out.id;
+        data.nombre = out.nombre;
+        data.telefono = out.telefono;
+        data.correo = out.correo;
+        data.ciudad = out.ciudad;
+        data.empresa = out.empresa;
+        data.nit = out.nit;
+        renderBubble(`¡Hola de nuevo, ${out.nombre || 'cliente'}! 👋 Ya te tengo registrado. Vamos directo al equipo.`);
+        askEquipo();
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Continuar';
+        renderBubble('No te encontré con ese dato. Te registro rápido y seguimos 👇');
+        card.querySelectorAll('input,button').forEach(el => el.disabled = true);
+        renderClienteForm();
+      }
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = 'Continuar';
+      renderBubble('No pude verificar ahora. Te registro rápido y seguimos 👇');
+      renderClienteForm();
+      console.error('[UPCotizador] lookup', e);
+    }
+  }
+
+  // Llamada genérica a una RPC de Supabase
+  async function rpc(fn, body) {
+    const res = await fetch(`${window.UP_CONFIG.supabaseUrl}/rest/v1/rpc/${fn}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': window.UP_CONFIG.anonKey,
+        'Authorization': `Bearer ${window.UP_CONFIG.anonKey}`
+      },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error((data && data.message) || 'Error');
+    return data;
   }
 
   // 1) FORMULARIO DE CLIENTE
@@ -229,22 +319,12 @@ const UPCotizador = (() => {
     const nit = get('#cl-nit');
 
     try {
-      // Crea/actualiza el cliente vía RPC (incluye NIT), sin depender de Edge Function.
-      const res = await fetch(`${window.UP_CONFIG.supabaseUrl}/rest/v1/rpc/crear_cliente_web`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': window.UP_CONFIG.anonKey,
-          'Authorization': `Bearer ${window.UP_CONFIG.anonKey}`
-        },
-        body: JSON.stringify({
-          p_nombre: nombre, p_telefono: tel, p_correo: correo,
-          p_ciudad: ciudad, p_empresa: empresa, p_nit: nit
-        })
+      // Crea/actualiza el cliente vía RPC (dedup por teléfono O NIT, incluye NIT).
+      const out = await rpc('crear_cliente_web', {
+        p_nombre: nombre, p_telefono: tel, p_correo: correo,
+        p_ciudad: ciudad, p_empresa: empresa, p_nit: nit
       });
-      const out = await res.json();
-      if (!res.ok) throw new Error((out && out.message) || 'Error');
-      const clienteId = typeof out === 'string' ? out : ((out && out.id) || out);
+      const clienteId = (out && out.id) || (typeof out === 'string' ? out : null);
       if (!clienteId) throw new Error('Sin id de cliente');
 
       data.cliente_web_id = clienteId;
@@ -257,7 +337,9 @@ const UPCotizador = (() => {
 
       card.querySelectorAll('input,select,button').forEach(el => el.disabled = true);
       echoUser(`${nombre} · ${tel}`);
-      renderBubble('✅ ¡Cliente registrado! Ahora elige el equipo.');
+      renderBubble((out && out.creado === false)
+        ? '✅ ¡Ya estabas registrado! Actualicé tus datos. Ahora elige el equipo.'
+        : '✅ ¡Cliente registrado! Ahora elige el equipo.');
       askEquipo();
     } catch (e) {
       btn.disabled = false;
@@ -300,6 +382,8 @@ const UPCotizador = (() => {
   function handleAnswer(text) {
     const t = (text || '').trim();
     if (!active) return;
+    if (step === 'inicio') { renderBubble('Elige una opción de arriba: nuevo o ya soy cliente 👆'); return; }
+    if (step === 'lookup') { renderBubble('Escribe tu teléfono o NIT en el campo de arriba y toca Continuar 👆'); return; }
     if (step === 'form') { renderBubble('Completa el formulario de arriba para crear el cliente 👆'); return; }
     if (step === 'equipo') { renderBubble('Toca uno de los botones de equipo de arriba 👆'); return; }
     if (step === 'dias') {
