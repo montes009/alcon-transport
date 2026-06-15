@@ -225,7 +225,7 @@ const UPCotizador = (() => {
         data.empresa = out.empresa;
         data.nit = out.nit;
         renderBubble(`¡Hola de nuevo, ${out.nombre || 'cliente'}! 👋 Ya te tengo registrado. Vamos directo al equipo.`);
-        askEquipo();
+        if (!data.correo) { pedirCorreo(); } else { askEquipo(); }
       } else {
         btn.disabled = false;
         btn.textContent = 'Continuar';
@@ -240,6 +240,47 @@ const UPCotizador = (() => {
       renderClienteForm();
       console.error('[UPCotizador] lookup', e);
     }
+  }
+
+  // Pedir el correo (opcional) cuando el cliente identificado no lo tiene
+  function pedirCorreo() {
+    step = 'correo';
+    const card = document.createElement('div');
+    card.className = 'cotz-card';
+    card.innerHTML = `
+      <h4>✉️ Tu correo (opcional)</h4>
+      <div class="cotz-frow">
+        <label>Para enviarte la cotización</label>
+        <input id="co-val" type="email" placeholder="tu@correo.com">
+      </div>
+      <button class="cotz-submit" id="co-go">Continuar</button>
+      <div style="text-align:center;margin-top:8px">
+        <a id="co-skip" href="#" style="color:#9ca3af;font-size:.8rem">Omitir</a>
+      </div>
+    `;
+    appendNode(card);
+    const cont = async (correo) => {
+      card.querySelectorAll('input,button,a').forEach(el => el.disabled = true);
+      if (correo) {
+        data.correo = correo;
+        echoUser(correo);
+        // Actualiza la ficha del cliente con el correo (dedup por tel/NIT)
+        try {
+          await rpc('crear_cliente_web', {
+            p_nombre: data.nombre || 'Cliente', p_telefono: data.telefono || '',
+            p_correo: correo, p_ciudad: data.ciudad || '', p_empresa: data.empresa || '', p_nit: data.nit || ''
+          });
+        } catch (e) { console.error('[UPCotizador] correo', e); }
+      }
+      askEquipo();
+    };
+    card.querySelector('#co-go').addEventListener('click', () => {
+      const v = (card.querySelector('#co-val')?.value || '').trim();
+      if (v && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { alert('Ingresa un correo válido o toca Omitir.');
+        card.querySelectorAll('input,button,a').forEach(el => el.disabled = false); return; }
+      cont(v);
+    });
+    card.querySelector('#co-skip').addEventListener('click', (e) => { e.preventDefault(); cont(''); });
   }
 
   // Llamada genérica a una RPC de Supabase
@@ -384,6 +425,7 @@ const UPCotizador = (() => {
     if (!active) return;
     if (step === 'inicio') { renderBubble('Elige una opción de arriba: nuevo o ya soy cliente 👆'); return; }
     if (step === 'lookup') { renderBubble('Escribe tu teléfono o NIT en el campo de arriba y toca Continuar 👆'); return; }
+    if (step === 'correo') { renderBubble('Escribe tu correo en el campo de arriba (o toca Omitir) 👆'); return; }
     if (step === 'form') { renderBubble('Completa el formulario de arriba para crear el cliente 👆'); return; }
     if (step === 'equipo') { renderBubble('Toca uno de los botones de equipo de arriba 👆'); return; }
     if (step === 'dias') {
