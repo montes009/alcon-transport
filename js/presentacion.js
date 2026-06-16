@@ -205,12 +205,14 @@
   }
 
   function boot() {
+    // Modo presentación DESACTIVADO por defecto: la página queda solo consulta.
+    // Se activa solo si la URL trae ?demo=1 (para mostrarla en reuniones).
+    const params = new URLSearchParams(location.search);
+    if (params.get('demo') !== '1') return;
+
     initLauncher();
     initTips();
-    // Auto-inicia la presentación si la URL trae ?demo=1 (ideal para la reunión)
-    const params = new URLSearchParams(location.search);
-    if (params.get('demo') === '1') setTimeout(start, 1200);
-    // Reabrir con la tecla "?"
+    setTimeout(start, 1200);
     document.addEventListener('keydown', e => { if (e.key === '?') start(); });
   }
 
