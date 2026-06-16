@@ -26,6 +26,8 @@
       text: 'Evolucionará a <b>vender de forma autónoma</b>: cerrar negociaciones, dar seguimiento a cada lead y <b>coordinar con el comercial en tiempo real</b>.' },
     { sel: '.chat-widget', title: '📊 Todo queda registrado',
       text: 'Cada conversación y cotización alimenta un <b>panel comercial en vivo</b>: la empresa ve y gestiona sus clientes al instante, sin perder ni una oportunidad.' },
+    { sel: '.sedes-mapa-wrapper', title: '📍 Sedes con mapas actualizados',
+      text: 'Presencia nacional: <b>Medellín, Bogotá y Barranquilla</b>. Cada sede con su <b>mapa interactivo</b> y ubicación actualizada, dirección, teléfono y botón <b>"Cómo llegar"</b>. Genera confianza y cercanía.' },
     { sel: null, title: '¿Listos para un vendedor que nunca duerme?',
       text: 'Todo esto <b>ya está funcionando</b>. UP Equipos + Liam: tecnología que trabaja por ti.' }
   ];
@@ -36,6 +38,7 @@
     { sel: '.nav-cta', tip: '⚡ Cotizar ahora: en horario laboral conecta con el asesor; fuera de horario, con Liam (IA) 24/7.' },
     { sel: '.wa-float', tip: '💬 WhatsApp directo al comercial.' },
     { sel: 'nav .nav-links', tip: '🧭 Secciones con títulos optimizados para SEO.' },
+    { sel: '.sedes-mapa-wrapper', tip: '📍 Mapas actualizados de las 3 sedes, con "Cómo llegar".' },
     { sel: '#hero-chat-btn', tip: '💬 Abre el chat con Liam.' }
   ];
 
