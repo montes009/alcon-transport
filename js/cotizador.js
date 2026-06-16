@@ -180,6 +180,20 @@ const UPCotizador = (() => {
     data.prefillNit = numEsNit ? (num || '') : '';
     data.prefillTel = (!numEsNit && num) ? num : '';
 
+    // Extraer días y cantidad del chat (para no volver a preguntarlos)
+    const dm = ctx.match(/(\d{1,3})\s*d[ií]as?/);
+    data.ctxDias = dm ? parseInt(dm[1]) : null;
+    const wordNum = { un: 1, una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9, diez: 10 };
+    const eq = '(tijera|brazo|equipo|unidad|plataforma|unipersonal|manlift|gen)';
+    let cant = null;
+    let cm = ctx.match(new RegExp('(\\d{1,2})\\s*' + eq));
+    if (cm) cant = parseInt(cm[1]);
+    else {
+      const wm = ctx.match(new RegExp('\\b(un|una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\\s+' + eq));
+      if (wm) cant = wordNum[wm[1]];
+    }
+    data.ctxCantidad = cant;
+
     if (nuevoCliente) {
       renderBubble('¡Bienvenido! Te registro en un momento. Completa estos datos 👇');
       renderClienteForm();
@@ -478,7 +492,18 @@ const UPCotizador = (() => {
 
   function elegirTarifa(t) {
     data.current = { tarifa_id: t.id, ref: t.ref, tipo: t.tipo, altura_m: t.altura_m, descripcion: t.descripcion };
-    askCantidad();
+    // Usa cantidad/días que el cliente ya dijo en el chat (solo para el primer equipo)
+    data.current.cantidad = data.ctxCantidad || null;
+    data.current.dias = data.ctxDias || null;
+    data.ctxCantidad = null; data.ctxDias = null;
+    proceedAfterEquipo();
+  }
+
+  // Pide lo que falte (cantidad / días) o agrega el equipo si ya está todo
+  function proceedAfterEquipo() {
+    if (!data.current.cantidad) { askCantidad(); return; }
+    if (!data.current.dias) { askDias(); return; }
+    addItemYAskMas();
   }
 
   // Cantidad de unidades de este equipo
@@ -597,14 +622,14 @@ const UPCotizador = (() => {
       const cant = parseInt(t.replace(/\D/g, ''));
       if (!cant || cant < 1) { renderBubble('Dime cuántas unidades, por ejemplo: 1'); return; }
       data.current.cantidad = cant;
-      askDias();
+      proceedAfterEquipo();
       return;
     }
     if (step === 'dias') {
       const dias = parseInt(t.replace(/\D/g, ''));
       if (!dias || dias < 1) { renderBubble('Dime un número de días, por ejemplo: 5'); return; }
       data.current.dias = dias;
-      addItemYAskMas();
+      proceedAfterEquipo();
     }
   }
 
