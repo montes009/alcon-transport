@@ -30,7 +30,7 @@
 
   // ---------- Tooltips (hover) ----------
   const TIPS = [
-    { sel: '.chat-widget', tip: '🤖 Soy Liam, el asesor con IA. Te recomiendo equipo y te cotizo al instante, 24/7.' },
+    { sel: '.chat-header', tip: '🤖 Soy Liam, el asesor con IA. Te recomiendo equipo y te cotizo al instante, 24/7.' },
     { sel: '.nav-cta', tip: '⚡ Cotiza con Liam en segundos.' },
     { sel: 'nav .nav-links', tip: '🧭 Secciones con títulos optimizados para SEO.' },
     { sel: '#hero-chat-btn', tip: '💬 Abre el chat con Liam.' }
@@ -167,7 +167,7 @@
   }
 
   // ---------- Tooltips hover ----------
-  let tipEl;
+  let tipEl, tipTimer;
   function initTips() {
     tipEl = document.createElement('div'); tipEl.id = 'pres-tip';
     document.body.appendChild(tipEl);
@@ -176,13 +176,21 @@
       if (!el) return;
       el.addEventListener('mouseenter', () => {
         if (overlay && overlay.style.display === 'block') return; // no estorbar el tour
+        clearTimeout(tipTimer);
         tipEl.textContent = t.tip;
         const r = el.getBoundingClientRect();
-        tipEl.style.top = Math.max(8, r.top - 8) + 'px';
-        tipEl.style.left = Math.min(r.left, window.innerWidth - 270) + 'px';
+        const tw = 260;
+        // Colocar el globo ARRIBA del elemento; si no cabe, debajo. Nunca encima del chat.
+        let top = r.top - 46;
+        if (top < 8) top = r.bottom + 8;
+        let left = Math.min(Math.max(8, r.left), window.innerWidth - tw - 8);
+        tipEl.style.top = top + 'px';
+        tipEl.style.left = left + 'px';
         tipEl.style.opacity = '1';
+        // Auto-ocultar aunque el mouse siga dentro (no tapa el chat)
+        tipTimer = setTimeout(() => { tipEl.style.opacity = '0'; }, 3500);
       });
-      el.addEventListener('mouseleave', () => { tipEl.style.opacity = '0'; });
+      el.addEventListener('mouseleave', () => { clearTimeout(tipTimer); tipEl.style.opacity = '0'; });
     });
   }
 
