@@ -166,6 +166,22 @@ const UPCotizador = (() => {
     injectStyles();
     const bar = document.getElementById('cotz-bottombar');
     if (bar) bar.style.display = 'none';
+
+    // Si el cliente ya dijo en el chat si es cliente o no, no se lo preguntamos otra vez
+    const ctx = (data.preContext || '').toLowerCase();
+    const yaCliente = /ya soy cliente|ya estoy registrad|soy cliente (de|desde|hace|con|y)|cliente recurrente|ya soy cl/.test(ctx);
+    const nuevoCliente = /cliente nuevo|no soy cliente|primera vez|nunca he|no estoy registrad/.test(ctx);
+    if (yaCliente && !nuevoCliente) {
+      renderBubble('¡Perfecto! Para ubicarte rápido, dime tu teléfono o NIT 👇');
+      renderLookup();
+      return;
+    }
+    if (nuevoCliente) {
+      renderBubble('¡Bienvenido! Te registro en un momento. Completa estos datos 👇');
+      renderClienteForm();
+      return;
+    }
+
     renderBubble('¡Con gusto te armo la cotización! ¿Ya eres cliente de UP Equipos?');
     const cont = document.createElement('div');
     cont.className = 'cotz-chips';
