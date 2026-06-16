@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /seo/
 
-Sitemap: https://equiposup.com/sitemap.xml
+Sitemap: https://pagina-up.onrender.com/sitemap.xml
