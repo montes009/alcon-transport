@@ -115,7 +115,43 @@ Flujo (todo en el chat):
   en el primer turno, para funcionar aunque `up-asesor` no esté redesplegado.
   Ej. de regla: una unipersonal NO sirve en exteriores.
 
-## Pendientes / notas- Ajustar `whatsappComercial` si cambia el número comercial.
+## Cotizador: detección inteligente y multiequipo
+- El cotizador (`js/cotizador.js`, `UPCotizador`) recibe el **contexto del chat** (`start(restart, contextText)`)
+  y NO vuelve a preguntar lo que el cliente ya dijo:
+  - **Cliente**: si en el chat dio un **NIT/teléfono** (7-12 dígitos) o "ya soy cliente", lo busca con la
+    RPC **`buscar_cliente_web(p_telefono,p_nit)`** y salta el "¿ya eres cliente?" y el formulario.
+    Si no lo encuentra, abre el formulario **prellenando** el NIT/teléfono.
+  - **Equipo**: detecta modelo ("3246","Z45") o tipo+altura ("tijera de 12 m" → GENIE 3246) y confirma
+    "¿la uso?" en vez de mostrar toda la lista (`matchTarifa`).
+  - **Cantidad y días**: los extrae del chat ("2 tijeras", "por 4 días") y no los repregunta.
+- **Multiequipo**: una cotización puede tener varios equipos. Flujo: equipo → cantidad → días →
+  "➕ otro equipo / ✅ generar". Se genera con la RPC **`cotizar_web(p_cliente_web_id, p_items jsonb, p_ciudad, p_mensaje)`**
+  (calcula cada línea por tramo + IVA, guarda el detalle en `cotizaciones_web.items_json`).
+  - El PDF (`print_cotizacion.html`) muestra **tabla** de equipos cuando hay `items_json`.
+  - `cotizar_web` reemplazó en la práctica a la Edge Function `up-cotizar` para generar (evita el deploy bloqueado).
+- El chat **renderiza markdown** de Claude (negritas, viñetas) en `assistant.js` (`formatMarkdown`).
+- **Capacidad de carga**: 227 kg todos los equipos, 159 kg las unipersonales (regla en `ASSISTED_GUIDE` +
+  recordatorio `CAP_NOTE` por turno, porque el `up-asesor` desplegado traía 454 kg).
+- Liam (asistido) **no interroga si la solicitud ya es clara**; solo pregunta cuando falta info.
+
+## Modo presentación (`js/presentacion.js`) — la página se presenta sola
+- Globos flotantes (tour guiado) + tooltips al pasar el mouse. Enfocado en Liam, el botón "Cotizar ahora"
+  (concepto: en horario laboral → asesor humano; fuera de horario → Liam IA), WhatsApp, **panel comercial**
+  (con botón "Abrir el panel"), **sedes/mapas** y la visión a futuro. Es **solo presentación/demo**, no cambia funciones.
+- **DESACTIVADO por defecto**: la página normal queda limpia (solo consulta/cotización).
+  Se activa **únicamente** abriendo el sitio con **`?demo=1`** (ej. `pagina-up.onrender.com/?demo=1`).
+  Con `?demo=1` aparece el botón "👋 ¿Cómo funciona?", auto-arranca el tour, y la tecla `?` lo reabre.
+
+### CÓMO QUITAR EL MODO PRESENTACIÓN (para el futuro)
+- **Quitarlo por completo**: borrar UNA línea en `index.html`:
+  `<script src="js/presentacion.js"></script>` (queda justo después de `js/main.js`).
+  Con eso desaparece todo (botón, globos, tooltips), incluso con `?demo=1`. El archivo `js/presentacion.js`
+  queda en el repo por si se quiere reactivar (volver a poner la línea).
+- **Solo ocultarlo a clientes** (estado actual): ya está oculto por defecto; solo se ve con `?demo=1`.
+- No afecta nada del chat, cotizador ni panel (es 100% independiente).
+
+## Pendientes / notas
+- Ajustar `whatsappComercial` si cambia el número comercial.
 - Editar tarifas → tabla `tarifas_web` en Studio (no requiere código).
 - Hay una cotización de prueba real: **COT-W0001** (cliente "ORLANDO ABAD MONTES").
   Borrarla si se quiere dejar limpio.
