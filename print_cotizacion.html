@@ -86,7 +86,21 @@
     </div>
   </div>
 
-  <div class="section">
+  <div class="section" id="secItems" style="display:none">
+    <div class="section-title">Detalle del Servicio</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:#1a1a1a;color:#fff">
+        <th style="padding:7px 10px;text-align:left;font-size:8pt">Equipo</th>
+        <th style="padding:7px 10px;text-align:center;font-size:8pt">Cant.</th>
+        <th style="padding:7px 10px;text-align:center;font-size:8pt">Días</th>
+        <th style="padding:7px 10px;text-align:right;font-size:8pt">Tarifa/día</th>
+        <th style="padding:7px 10px;text-align:right;font-size:8pt">Subtotal</th>
+      </tr></thead>
+      <tbody id="itemsBody"></tbody>
+    </table>
+  </div>
+
+  <div class="section" id="secServicioSingle">
     <div class="section-title">Detalle del Servicio</div>
     <div class="data-grid">
       <div class="data-field"><label>Tipo de equipo</label><div class="val" id="svcTipo">—</div></div>
@@ -140,6 +154,7 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
 const money = v => '$ ' + Number(v || 0).toLocaleString('es-CO');
+const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = (val ?? '') === '' ? '—' : val; };
 const fmt = d => { if (!d) return '—'; const [y,m,dd] = String(d).split('-'); return `${dd}/${m}/${y}`; };
 
@@ -177,10 +192,26 @@ async function load() {
     set('cliCiudad', c.ciudad);
     set('firmaCliente', c.cliente);
 
-    set('svcTipo', c.tipo);
-    set('svcAltura', c.altura);
-    set('svcDias', c.dias);
-    set('svcPrecio', money(c.precio));
+    // Detalle: tabla de varios equipos (items_json) o ficha simple
+    let items = [];
+    try { if (c.items_json) items = JSON.parse(c.items_json); } catch (e) {}
+    if (items && items.length) {
+      document.getElementById('secItems').style.display = '';
+      document.getElementById('secServicioSingle').style.display = 'none';
+      document.getElementById('itemsBody').innerHTML = items.map(it => `
+        <tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:7px 10px;font-size:10pt">${esc(it.ref)} · ${esc(it.tipo)} ${esc(it.altura_m)}m (${esc(it.descripcion || '')})</td>
+          <td style="padding:7px 10px;text-align:center">${it.cantidad}</td>
+          <td style="padding:7px 10px;text-align:center">${it.dias}</td>
+          <td style="padding:7px 10px;text-align:right">${money(it.precio_dia)}</td>
+          <td style="padding:7px 10px;text-align:right;font-weight:700">${money(it.subtotal)}</td>
+        </tr>`).join('');
+    } else {
+      set('svcTipo', c.tipo);
+      set('svcAltura', c.altura);
+      set('svcDias', c.dias);
+      set('svcPrecio', money(c.precio));
+    }
 
     set('totSubtotal', money(c.subtotal));
     set('ivaPct', c.iva_pct ?? 19);
