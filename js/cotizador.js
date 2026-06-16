@@ -553,7 +553,7 @@ const UPCotizador = (() => {
       active = false;
       renderBubble(
         `✅ ¡Listo! Tu cotización es ${result.nro}.\n` +
-        `Equipo: ${result.tipo}\nDías: ${result.dias} (${result.tramo})\n` +
+        `Equipo: ${result.tipo}\nDías: ${result.dias}\n` +
         `Total estimado: ${money(result.total)} (IVA incluido).\n\n` +
         `📌 Guarda tu número ${result.nro}: con él puedes volver a consultarla.\n` +
         `Usa el botón verde de abajo para descargar tu cotización en PDF.`
@@ -575,7 +575,7 @@ const UPCotizador = (() => {
     card.innerHTML = `
       <div>Cotización <span class="cotz-nro">${result.nro}</span></div>
       <div class="cotz-line"><span>Equipo</span><span style="text-align:right">${result.tipo}</span></div>
-      <div class="cotz-line"><span>Días (${result.tramo})</span><span>${result.dias}</span></div>
+      <div class="cotz-line"><span>Días</span><span>${result.dias}</span></div>
       <div class="cotz-line"><span>Tarifa / día</span><span>${money(result.precio_dia)}</span></div>
       <div class="cotz-line"><span>Subtotal</span><span>${money(result.subtotal)}</span></div>
       <div class="cotz-line"><span>IVA (19%)</span><span>${money(result.iva)}</span></div>
