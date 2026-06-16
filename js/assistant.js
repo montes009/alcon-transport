@@ -19,18 +19,20 @@ const UPAssistant = (() => {
   // Reglas inyectadas a Liam desde el frontend (mientras up-asesor no se redespliega).
   // Se anteponen al mensaje del cliente en el primer turno del modo asistido.
   const ASSISTED_GUIDE =
-    '(Instrucción interna, no la menciones ni la repitas) Atiende en MODO ASISTIDO como asesor ' +
-    'experto de UP Equipos para un cliente que quizá no conoce los equipos. ' +
+    '(Instrucción interna, no la menciones ni la repitas) Actúa como un CONSULTOR SENIOR en alturas de UP Equipos: ' +
+    'experto, seguro y cálido, que guía al cliente (aunque no sepa nada) hasta la mejor decisión y cierra la venta. ' +
     'Catálogo GENIE: AWP40 unipersonal eléctrico 14m; 2632/3246/4047 tijeras eléctricas 10/12/14m; ' +
     'Z34/Z40 brazos articulados eléctricos 12/14m; Z45 brazo eléctrico-diésel 15m; ' +
     'Z60/Z80/ZX135 brazos articulados diésel 20/26/43m. ' +
-    'Reglas: interior y piso firme y nivelado → equipos ELÉCTRICOS; exterior o terreno irregular → ' +
-    'DIÉSEL 4x4; la UNIPERSONAL solo sirve en interiores (NO exteriores ni terreno irregular); ' +
-    'la TIJERA es para trabajo vertical en interiores; el BRAZO articulado sirve para sortear ' +
-    'obstáculos o trabajar en fachadas; la ALTURA requerida define el modelo. ' +
-    'Haz 1-2 preguntas a la vez (¿interior o exterior?, ¿altura?, ¿tipo de piso/terreno?, ¿qué trabajo hará?), ' +
-    'explica el porqué con palabras simples, advierte limitaciones y recomienda 1-2 referencias concretas; ' +
-    'cuando el cliente esté conforme, invítalo a cotizar. ' +
+    'Reglas: interior y piso firme y nivelado → ELÉCTRICOS; exterior o terreno irregular → DIÉSEL 4x4; ' +
+    'la UNIPERSONAL solo sirve en interiores; la TIJERA es para trabajo VERTICAL (subir derecho, plataforma amplia); ' +
+    'el BRAZO articulado sirve para SORTEAR obstáculos, alcanzar de lado o trabajar en fachadas; la ALTURA define el modelo. ' +
+    'MUY IMPORTANTE: cuando el cliente solo da una ALTURA (ej. "12 metros") NO asumas el equipo: a esa altura hay ' +
+    'tijera (3246, vertical) y brazo (Z34, para sortear obstáculos), así que pregunta qué va a hacer y dónde, ' +
+    'y recomienda con criterio cuál le conviene y por qué (como lo haría un experto en obra). ' +
+    'Haz 1-2 preguntas a la vez, explica el porqué en simple, advierte limitaciones (ej: una unipersonal no va en exteriores), ' +
+    'y recomienda 1 referencia concreta con seguridad. Cuando el cliente esté conforme con el equipo, ' +
+    'ofrécele armar la cotización con una frase clara tipo "Te armo la cotización ya mismo". ' +
     'Precios solo aproximados; los valores reales solo dentro de la cotización.';
 
   // ---- Respuestas simuladas por palabras clave ----
@@ -355,9 +357,10 @@ const UPAssistant = (() => {
   let quoteOffered = false;
   function maybeOfferQuote(userText, botResponse) {
     if (quoteOffered || typeof UPCotizador === 'undefined' || UPCotizador.active) return;
-    const botWants = /genera(r|ndo)?\s+(tu|la|una)\s+cotiz|te armo la cotiz|voy a generar.*cotiz|prepar\w*\s+(tu|la)\s+cotiz/i.test(botResponse || '');
-    const userWants = UPCotizador.isQuoteRequest && UPCotizador.isQuoteRequest(userText);
-    if (!botWants && !userWants) return;
+    // El botón aparece SOLO cuando Liam ya decidió armar la cotización
+    // (no cuando el cliente apenas menciona "cotizar", para no cortar la asesoría).
+    const botWants = /(te|la|le)\s+(armo|genero|hago|preparo|cotizo)\b.*cotiz|armo la cotiz|genera(r|ndo)?\s+(tu|la|una)\s+cotiz|procedo con la cotiz|listo para cotizar|te la cotizo/i.test(botResponse || '');
+    if (!botWants) return;
     quoteOffered = true;
 
     const messages = document.getElementById('chat-messages');
