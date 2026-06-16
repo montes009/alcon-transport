@@ -26,6 +26,13 @@
       text: 'Evolucionará a <b>vender de forma autónoma</b>: cerrar negociaciones, dar seguimiento a cada lead y <b>coordinar con el comercial en tiempo real</b>.' },
     { sel: '.chat-widget', title: '📊 Todo queda registrado',
       text: 'Cada conversación y cotización alimenta un <b>panel comercial en vivo</b>: la empresa ve y gestiona sus clientes al instante, sin perder ni una oportunidad.' },
+    { sel: null, title: '🖥️ Panel comercial de leads (en vivo)',
+      text: 'Una página interna para el equipo de ventas que muestra <b>en tiempo real</b> todo lo que entra desde la web:<br>' +
+        '• <b>KPIs</b>: clientes, cotizaciones, <b>nuevas sin gestionar</b> y <b>valor total cotizado</b>.<br>' +
+        '• Cada <b>cotización</b> con su <b>estado</b> editable (nueva → contactada → cerrada), link de <b>WhatsApp</b> al cliente y a su <b>PDF</b>.<br>' +
+        '• El <b>CRM de clientes</b> (nombre, teléfono, NIT, ciudad, # cotizaciones).<br>' +
+        '• <b>Se actualiza solo cada 20s</b> y está <b>protegido por clave</b>.<br>' +
+        '<a href="panel.html" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;padding:8px 14px;background:#C0001F;color:#fff;border-radius:9px;text-decoration:none;font-weight:800">🔓 Abrir el panel</a>' },
     { sel: '.sedes-mapa-wrapper', title: '📍 Sedes con mapas actualizados',
       text: 'Presencia nacional: <b>Medellín, Bogotá y Barranquilla</b>. Cada sede con su <b>mapa interactivo</b> y ubicación actualizada, dirección, teléfono y botón <b>"Cómo llegar"</b>. Genera confianza y cercanía.' },
     { sel: null, title: '¿Listos para un vendedor que nunca duerme?',
