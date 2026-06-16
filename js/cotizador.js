@@ -169,17 +169,46 @@ const UPCotizador = (() => {
     if (bar) bar.style.display = 'none';
 
     // Si el cliente ya dijo en el chat si es cliente o no, no se lo preguntamos otra vez
-    const ctx = (data.preContext || '').toLowerCase();
-    const yaCliente = /ya soy cliente|ya estoy registrad|soy cliente (de|desde|hace|con|y)|cliente recurrente|ya soy cl/.test(ctx);
-    const nuevoCliente = /cliente nuevo|no soy cliente|primera vez|nunca he|no estoy registrad/.test(ctx);
-    if (yaCliente && !nuevoCliente) {
-      renderBubble('¡Perfecto! Para ubicarte rápido, dime tu teléfono o NIT 👇');
-      renderLookup();
-      return;
-    }
+    const raw = data.preContext || '';
+    const ctx = raw.toLowerCase();
+    const yaCliente = /\bya soy cliente|\bsoy cliente\b|ya estoy registrad|cliente recurrente|cliente de up|mi nit es|\bnit\b/.test(ctx);
+    const nuevoCliente = /cliente nuevo|no soy cliente|primera vez|nunca he sido|no estoy registrad/.test(ctx);
+    // ¿Dió un NIT o teléfono en el chat? (7 a 12 dígitos)
+    const numMatch = raw.match(/\b(\d{7,12})\b/);
+    const num = numMatch ? numMatch[1] : null;
+    const numEsNit = /nit/i.test(raw);
+    data.prefillNit = numEsNit ? (num || '') : '';
+    data.prefillTel = (!numEsNit && num) ? num : '';
+
     if (nuevoCliente) {
       renderBubble('¡Bienvenido! Te registro en un momento. Completa estos datos 👇');
       renderClienteForm();
+      return;
+    }
+
+    // Si dio un número (NIT/teléfono), intentamos identificarlo directo
+    if (num) {
+      renderBubble('Dame un segundo, te ubico con ese dato... 🔎');
+      try {
+        const out = await rpc('buscar_cliente_web', { p_telefono: num, p_nit: num });
+        if (out && out.id) {
+          data.cliente_web_id = out.id;
+          data.nombre = out.nombre; data.telefono = out.telefono; data.correo = out.correo;
+          data.ciudad = out.ciudad; data.empresa = out.empresa; data.nit = out.nit;
+          renderBubble(`¡Listo ${out.nombre || ''}! Ya te tengo registrado. Vamos directo al equipo.`);
+          if (!data.correo) { pedirCorreo(); } else { askEquipo(); }
+          return;
+        }
+        // No encontrado: lo registramos rápido (prellenando lo que dio)
+        renderBubble('No te encontré con ese dato, te registro rápido y seguimos 👇');
+        renderClienteForm();
+        return;
+      } catch (e) { console.error('[UPCotizador] lookup auto', e); }
+    }
+
+    if (yaCliente) {
+      renderBubble('¡Perfecto! Para ubicarte rápido, dime tu teléfono o NIT 👇');
+      renderLookup();
       return;
     }
 
@@ -359,6 +388,9 @@ const UPCotizador = (() => {
       <button class="cotz-submit" id="cl-go">Crear cliente y continuar</button>
     `;
     appendNode(card);
+    // Prellenar NIT/teléfono si el cliente ya los dio en el chat
+    if (data.prefillNit) { const e = card.querySelector('#cl-nit'); if (e) e.value = data.prefillNit; }
+    if (data.prefillTel) { const e = card.querySelector('#cl-tel'); if (e) e.value = data.prefillTel; }
     card.querySelector('#cl-go').addEventListener('click', () => submitCliente(card));
   }
 
