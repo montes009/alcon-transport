@@ -156,11 +156,13 @@ const UPCotizador = (() => {
   }
 
   // ---------- flujo ----------
-  async function start(restart) {
+  async function start(restart, contextText) {
     if (active && !restart) return;
     active = true;
     step = 'inicio';
+    const prevContext = data.preContext;
     data = {};
+    data.preContext = contextText || prevContext || '';
     injectStyles();
     const bar = document.getElementById('cotz-bottombar');
     if (bar) bar.style.display = 'none';
@@ -390,12 +392,41 @@ const UPCotizador = (() => {
     }
   }
 
-  // 2) EQUIPO
-  async function askEquipo() {
+  // Detecta el equipo a partir de lo que ya se habló en el chat
+  function matchTarifa(text, tarifas) {
+    const t = (text || '').toLowerCase();
+    if (!t || !tarifas || !tarifas.length) return null;
+    // 1) por referencia/modelo explícito (ej: "3246", "z45", "awp40")
+    for (const tf of tarifas) {
+      const token = String(tf.ref).toLowerCase().replace('genie', '').replace(/\s+/g, '');
+      if (token && token.length >= 3 && t.replace(/\s|-/g, '').includes(token)) return tf;
+    }
+    // 2) por tipo + altura
+    let tipo = null;
+    if (/unipersonal/.test(t)) tipo = 'unipersonal';
+    else if (/tijera|scissor/.test(t)) tipo = 'tijera';
+    else if (/brazo|articulad|telesc|boom/.test(t)) tipo = 'brazo';
+    const hm = t.match(/(\d{1,2})\s*(m\b|mts|mt\b|metro)/);
+    const h = hm ? parseInt(hm[1]) : null;
+    if (tipo && h) {
+      const cands = tarifas.filter(x => x.tipo === tipo);
+      if (cands.length) {
+        const ge = cands.filter(x => Number(x.altura_m) >= h).sort((a, b) => a.altura_m - b.altura_m);
+        return ge[0] || cands.sort((a, b) => b.altura_m - a.altura_m)[0];
+      }
+    }
+    return null;
+  }
+
+  function elegirTarifa(t) {
+    data.tarifa_id = t.id;
+    data.tarifaLabel = `${t.ref} · ${t.tipo} ${t.altura_m}m (${t.descripcion})`;
+    askDias();
+  }
+
+  function showEquipoChips(tarifas, titulo) {
     step = 'equipo';
-    let tarifas = [];
-    try { tarifas = await loadTarifas(); } catch (e) { console.error('[UPCotizador] tarifas', e); }
-    renderBubble('¿Qué equipo necesitas? Toca una opción:');
+    renderBubble(titulo || '¿Qué equipo necesitas? Toca una opción:');
     const cont = document.createElement('div');
     cont.className = 'cotz-chips';
     (tarifas || []).forEach(t => {
@@ -403,15 +434,51 @@ const UPCotizador = (() => {
       chip.className = 'cotz-chip';
       chip.textContent = `${t.ref} · ${t.tipo} ${t.altura_m}m`;
       chip.addEventListener('click', () => {
-        data.tarifa_id = t.id;
-        data.tarifaLabel = `${t.ref} · ${t.tipo} ${t.altura_m}m (${t.descripcion})`;
         cont.querySelectorAll('button').forEach(b => b.disabled = true);
         echoUser(`${t.ref} (${t.altura_m}m)`);
-        askDias();
+        elegirTarifa(t);
       });
       cont.appendChild(chip);
     });
     appendNode(cont);
+  }
+
+  // 2) EQUIPO
+  async function askEquipo() {
+    step = 'equipo';
+    let tarifas = [];
+    try { tarifas = await loadTarifas(); } catch (e) { console.error('[UPCotizador] tarifas', e); }
+
+    // Si en el chat ya se habló del equipo, lo confirmamos (no preguntar de nuevo)
+    const pre = data.preContext ? matchTarifa(data.preContext, tarifas) : null;
+    if (pre) {
+      step = 'equipo';
+      renderBubble(`Según lo que conversamos, te sirve la ${pre.ref} (${pre.tipo} ${pre.altura_m}m). ¿La uso para tu cotización?`);
+      const cont = document.createElement('div');
+      cont.className = 'cotz-chips';
+      const si = document.createElement('button');
+      si.className = 'cotz-chip';
+      si.textContent = `✅ Sí, la ${pre.ref}`;
+      si.addEventListener('click', () => {
+        cont.querySelectorAll('button').forEach(b => b.disabled = true);
+        echoUser(`Sí, la ${pre.ref}`);
+        elegirTarifa(pre);
+      });
+      const otra = document.createElement('button');
+      otra.className = 'cotz-chip';
+      otra.textContent = '🔁 Elegir otra';
+      otra.addEventListener('click', () => {
+        cont.querySelectorAll('button').forEach(b => b.disabled = true);
+        echoUser('Elegir otra');
+        showEquipoChips(tarifas);
+      });
+      cont.appendChild(si);
+      cont.appendChild(otra);
+      appendNode(cont);
+      return;
+    }
+
+    showEquipoChips(tarifas);
   }
 
   // 3) DÍAS (escrito)
