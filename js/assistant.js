@@ -331,6 +331,11 @@ const UPAssistant = (() => {
     if (sendBtn) sendBtn.disabled = false;
   }
 
+  // Texto reciente de la conversación, para que el cotizador detecte el equipo ya hablado
+  function chatContext() {
+    return conversationHistory.slice(-10).map(m => m.content).join('  ');
+  }
+
   // ---- Tras la respuesta de Liam, ofrecer un botón para iniciar la cotización ----
   let quoteOffered = false;
   function maybeOfferQuote(userText, botResponse) {
@@ -357,7 +362,7 @@ const UPAssistant = (() => {
     btn.addEventListener('click', () => {
       btn.disabled = true;
       btn.style.opacity = '.5';
-      UPCotizador.start();
+      UPCotizador.start(false, chatContext());
     });
     bubble.appendChild(btn);
     wrap.appendChild(bubble);
@@ -425,7 +430,7 @@ const UPAssistant = (() => {
           renderMessage('Perfecto, vamos directo a tu cotización. ⚡', 'bot');
           if (typeof UPCotizador !== 'undefined') {
             quoteOffered = true;       // evita ofrecer botón duplicado
-            setTimeout(() => UPCotizador.start(), 400);
+            setTimeout(() => UPCotizador.start(false, chatContext()), 400);
           }
         } else {
           assistedMode = true;
