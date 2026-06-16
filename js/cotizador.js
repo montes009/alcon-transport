@@ -162,6 +162,7 @@ const UPCotizador = (() => {
     step = 'inicio';
     const prevContext = data.preContext;
     data = {};
+    data.items = [];
     data.preContext = contextText || prevContext || '';
     injectStyles();
     const bar = document.getElementById('cotz-bottombar');
@@ -444,9 +445,14 @@ const UPCotizador = (() => {
   }
 
   function elegirTarifa(t) {
-    data.tarifa_id = t.id;
-    data.tarifaLabel = `${t.ref} · ${t.tipo} ${t.altura_m}m (${t.descripcion})`;
-    askDias();
+    data.current = { tarifa_id: t.id, ref: t.ref, tipo: t.tipo, altura_m: t.altura_m, descripcion: t.descripcion };
+    askCantidad();
+  }
+
+  // Cantidad de unidades de este equipo
+  function askCantidad() {
+    step = 'cantidad';
+    renderBubble(`¿Cuántas unidades de ${data.current.ref} necesitas? (escribe un número, ej: 1)`);
   }
 
   function showEquipoChips(tarifas, titulo) {
@@ -509,7 +515,41 @@ const UPCotizador = (() => {
   // 3) DÍAS (escrito)
   function askDias() {
     step = 'dias';
-    renderBubble('¿Por cuántos días necesitas el equipo?');
+    renderBubble(`¿Por cuántos días necesitas ${data.current.ref}?`);
+  }
+
+  // Agrega el equipo actual a la lista y pregunta si quiere otro
+  function addItemYAskMas() {
+    data.items = data.items || [];
+    data.items.push({ ...data.current });
+    const last = data.items[data.items.length - 1];
+    echoUser(`${last.cantidad} × ${last.ref} · ${last.dias} días`);
+
+    step = 'mas';
+    renderBubble('¿Deseas agregar otro equipo a esta misma cotización?');
+    const cont = document.createElement('div');
+    cont.className = 'cotz-chips';
+    const otro = document.createElement('button');
+    otro.className = 'cotz-chip';
+    otro.textContent = '➕ Sí, otro equipo';
+    otro.addEventListener('click', async () => {
+      cont.querySelectorAll('button').forEach(b => b.disabled = true);
+      echoUser('Agregar otro equipo');
+      let tarifas = [];
+      try { tarifas = await loadTarifas(); } catch (e) {}
+      showEquipoChips(tarifas, '¿Qué otro equipo agregamos?');
+    });
+    const fin = document.createElement('button');
+    fin.className = 'cotz-chip';
+    fin.textContent = '✅ Generar cotización';
+    fin.addEventListener('click', () => {
+      cont.querySelectorAll('button').forEach(b => b.disabled = true);
+      echoUser('Generar cotización');
+      finish();
+    });
+    cont.appendChild(otro);
+    cont.appendChild(fin);
+    appendNode(cont);
   }
 
   function handleAnswer(text) {
@@ -520,49 +560,45 @@ const UPCotizador = (() => {
     if (step === 'correo') { renderBubble('Escribe tu correo en el campo de arriba (o toca Omitir) 👆'); return; }
     if (step === 'form') { renderBubble('Completa el formulario de arriba para crear el cliente 👆'); return; }
     if (step === 'equipo') { renderBubble('Toca uno de los botones de equipo de arriba 👆'); return; }
+    if (step === 'mas') { renderBubble('Toca una opción de arriba: agregar otro o generar 👆'); return; }
+    if (step === 'cantidad') {
+      const cant = parseInt(t.replace(/\D/g, ''));
+      if (!cant || cant < 1) { renderBubble('Dime cuántas unidades, por ejemplo: 1'); return; }
+      data.current.cantidad = cant;
+      askDias();
+      return;
+    }
     if (step === 'dias') {
       const dias = parseInt(t.replace(/\D/g, ''));
       if (!dias || dias < 1) { renderBubble('Dime un número de días, por ejemplo: 5'); return; }
-      data.dias = dias;
-      finish();
+      data.current.dias = dias;
+      addItemYAskMas();
     }
   }
 
-  // 4) GENERAR
+  // 4) GENERAR (cotización con uno o varios equipos vía RPC cotizar_web)
   async function finish() {
     step = 'done';
+    if (!data.items || !data.items.length) { renderBubble('No agregaste ningún equipo.'); return; }
     renderBubble(`Listo ${data.nombre || ''}, estoy generando tu cotización... ⏳`);
     setBottomGenerating();
 
-    const params = new URLSearchParams(window.location.search);
-    const payload = {
-      cliente_web_id: data.cliente_web_id,
-      tarifa_id: data.tarifa_id,
-      dias: data.dias,
-      ciudad: data.ciudad,
-      nombre: data.nombre,
-      telefono: data.telefono,
-      correo: data.correo,
-      empresa_cliente: data.empresa,
-      nit: data.nit,
-      utm_source: params.get('utm_source') || '',
-      utm_campaign: params.get('utm_campaign') || '',
-      page_url: window.location.href
-    };
+    const items = data.items.map(i => ({ tarifa_id: i.tarifa_id, cantidad: i.cantidad || 1, dias: i.dias }));
 
     try {
-      const res = await fetch(window.UP_CONFIG.cotizarUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${window.UP_CONFIG.anonKey}` },
-        body: JSON.stringify(payload)
+      const result = await rpc('cotizar_web', {
+        p_cliente_web_id: data.cliente_web_id,
+        p_items: items,
+        p_ciudad: data.ciudad || null,
+        p_mensaje: null
       });
-      const result = await res.json();
-      if (!res.ok || !result.ok) throw new Error(result.error || 'Error');
+      if (!result || !result.ok) throw new Error((result && result.error) || 'Error');
 
       active = false;
+      const resumen = (result.items || []).map(it =>
+        `• ${it.cantidad} × ${it.ref} (${it.tipo} ${it.altura_m}m) · ${it.dias} días`).join('\n');
       renderBubble(
-        `✅ ¡Listo! Tu cotización es ${result.nro}.\n` +
-        `Equipo: ${result.tipo}\nDías: ${result.dias}\n` +
+        `✅ ¡Listo! Tu cotización es ${result.nro}.\n${resumen}\n` +
         `Total estimado: ${money(result.total)} (IVA incluido).\n\n` +
         `📌 Guarda tu número ${result.nro}: con él puedes volver a consultarla.\n` +
         `Usa el botón verde de abajo para descargar tu cotización en PDF.`
@@ -579,17 +615,17 @@ const UPCotizador = (() => {
 
   function renderResultCard(result) {
     injectStyles();
+    const lineas = (result.items || []).map(it => `
+      <div class="cotz-line"><span>${it.cantidad} × ${it.ref} (${it.altura_m}m) · ${it.dias}d</span>
+      <span>${money(it.subtotal)}</span></div>`).join('');
     const card = document.createElement('div');
     card.className = 'cotz-card';
     card.innerHTML = `
       <div>Cotización <span class="cotz-nro">${result.nro}</span></div>
-      <div class="cotz-line"><span>Equipo</span><span style="text-align:right">${result.tipo}</span></div>
-      <div class="cotz-line"><span>Días</span><span>${result.dias}</span></div>
-      <div class="cotz-line"><span>Tarifa / día</span><span>${money(result.precio_dia)}</span></div>
+      ${lineas}
       <div class="cotz-line"><span>Subtotal</span><span>${money(result.subtotal)}</span></div>
       <div class="cotz-line"><span>IVA (19%)</span><span>${money(result.iva)}</span></div>
       <div class="cotz-total">${money(result.total)}</div>
-      ${result.observaciones ? `<div class="cotz-obs"><strong>Observaciones:</strong>\n${result.observaciones}</div>` : ''}
     `;
     appendNode(card);
   }
