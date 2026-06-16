@@ -130,7 +130,9 @@
 
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      setTimeout(place, 380);
+      // Reposiciona tras el scroll (dos pasadas por si el scroll tarda)
+      setTimeout(place, 450);
+      setTimeout(place, 900);
     } else {
       place();
     }
@@ -165,14 +167,17 @@
       if (el) {
         const r = el.getBoundingClientRect();
         // debajo si cabe, si no encima; centrado horizontal respecto al elemento
-        if (r.bottom + bh + 18 < window.innerHeight) top = r.bottom + 14;
-        else if (r.top - bh - 18 > 0) top = r.top - bh - 14;
-        else top = Math.max(12, (window.innerHeight - bh) / 2);
+        if (r.bottom + bh + 18 < window.innerHeight && r.bottom > 0) top = r.bottom + 14;
+        else if (r.top - bh - 18 > 0 && r.top < window.innerHeight) top = r.top - bh - 14;
+        else top = (window.innerHeight - bh) / 2;
         left = Math.min(Math.max(12, r.left + r.width / 2 - bw / 2), window.innerWidth - bw - 12);
       } else {
         top = (window.innerHeight - bh) / 2;
         left = (window.innerWidth - bw) / 2;
       }
+      // Garantiza que el globo SIEMPRE quede dentro de la pantalla
+      top = Math.min(Math.max(12, top), window.innerHeight - bh - 12);
+      left = Math.min(Math.max(12, left), window.innerWidth - bw - 12);
       bubble.style.top = top + 'px';
       bubble.style.left = left + 'px';
       bubble.style.visibility = 'visible';
