@@ -14,8 +14,10 @@
       text: 'Esta página no es un folleto: <b>asesora, cotiza y capta clientes sola, 24/7</b>. Su título y textos están optimizados para <b>SEO</b> (aparecer en Google cuando buscan plataformas elevadoras).' },
     { sel: 'nav .nav-links, nav', title: '🧭 Navegación pensada para vender',
       text: 'Cada sección —Alquiler, Venta, Partes, Formación IPAF, Sedes— tiene <b>títulos optimizados para SEO</b> y guía al cliente a lo que busca en segundos.' },
-    { sel: '.nav-cta', title: '⚡ Cotizar en 1 clic',
-      text: 'Botón de acción directo: lleva al cliente a generar su cotización con Liam al instante.' },
+    { sel: '.nav-cta', title: '⚡ Botón "Cotizar ahora" inteligente',
+      text: 'Pensado para <b>no perder ningún cliente</b>:<br>• En <b>horario laboral</b> conecta directo con un <b>asesor humano</b>.<br>• <b>Fuera de horario</b>, lo atiende <b>Liam (IA)</b> que cotiza y captura el lead <b>24/7</b>.' },
+    { sel: '.wa-float', title: '💬 WhatsApp siempre a la mano',
+      text: 'Botón flotante de <b>WhatsApp directo</b> al comercial. El cliente puede escribir cuando quiera y la conversación queda registrada como lead.' },
     { sel: '.chat-widget', title: '🤖 Él es Liam',
       text: 'El <b>asesor virtual con inteligencia artificial</b> de UP Equipos. Conversa en español, entiende al cliente y <b>nunca se cansa: atiende 24/7</b>.' },
     { sel: '.chat-widget', title: '✅ Lo que Liam hace HOY',
@@ -31,7 +33,8 @@
   // ---------- Tooltips (hover) ----------
   const TIPS = [
     { sel: '.chat-header', tip: '🤖 Soy Liam, el asesor con IA. Te recomiendo equipo y te cotizo al instante, 24/7.' },
-    { sel: '.nav-cta', tip: '⚡ Cotiza con Liam en segundos.' },
+    { sel: '.nav-cta', tip: '⚡ Cotizar ahora: en horario laboral conecta con el asesor; fuera de horario, con Liam (IA) 24/7.' },
+    { sel: '.wa-float', tip: '💬 WhatsApp directo al comercial.' },
     { sel: 'nav .nav-links', tip: '🧭 Secciones con títulos optimizados para SEO.' },
     { sel: '#hero-chat-btn', tip: '💬 Abre el chat con Liam.' }
   ];
