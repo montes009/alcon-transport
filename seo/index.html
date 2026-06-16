@@ -925,7 +925,7 @@
           </div>
           <div class="field">
             <label>Canonical URL</label>
-            <input type="url" id="f-canonical" oninput="onFieldChange()" placeholder="https://equiposup.com/">
+            <input type="url" id="f-canonical" oninput="onFieldChange()" placeholder="https://pagina-up.onrender.com/">
           </div>
           <div class="field">
             <label>Robots</label>
@@ -955,7 +955,7 @@
           </div>
           <div class="field span2">
             <label>OG Image URL</label>
-            <input type="url" id="f-og-image" oninput="onFieldChange()" placeholder="https://equiposup.com/imagen.png">
+            <input type="url" id="f-og-image" oninput="onFieldChange()" placeholder="https://pagina-up.onrender.com/imagen.png">
           </div>
           <div class="field">
             <label>OG Locale</label>
@@ -991,7 +991,7 @@
           </div>
           <div class="field span2">
             <label>Twitter Image URL</label>
-            <input type="url" id="f-tw-image" oninput="onFieldChange()" placeholder="https://equiposup.com/imagen.png">
+            <input type="url" id="f-tw-image" oninput="onFieldChange()" placeholder="https://pagina-up.onrender.com/imagen.png">
           </div>
         </div>
       </div>
@@ -1034,7 +1034,7 @@
           <span id="gp-favicon" style="margin-right:6px;">🌐</span>
           <span id="gp-sitename-disp">UP Equipos</span>
         </div>
-        <div class="gp-url" id="gp-url-disp">equiposup.com › inicio</div>
+        <div class="gp-url" id="gp-url-disp">pagina-up.onrender.com › inicio</div>
         <div class="gp-title" id="gp-title-disp">UP Equipos — Plataformas Elevadoras | Distribuidor GENIE Colombia</div>
         <div class="gp-desc" id="gp-desc-disp">Alquiler y venta de plataformas elevadoras certificadas. Distribuidor autorizado GENIE en Colombia. Medellín, Bogotá y Barranquilla.</div>
       </div>
@@ -1108,7 +1108,7 @@
         </div>
         <div class="field">
           <label>URL</label>
-          <input type="url" id="s-url" oninput="generateSchema()" placeholder="https://equiposup.com">
+          <input type="url" id="s-url" oninput="generateSchema()" placeholder="https://pagina-up.onrender.com">
         </div>
         <div class="field span2">
           <label>Descripción</label>
@@ -1144,7 +1144,7 @@
         </div>
         <div class="field">
           <label>Logo URL</label>
-          <input type="url" id="s-logo" oninput="generateSchema()" placeholder="https://equiposup.com/logo.png">
+          <input type="url" id="s-logo" oninput="generateSchema()" placeholder="https://pagina-up.onrender.com/logo.png">
         </div>
       </div>
 
@@ -1337,20 +1337,20 @@
     title: 'UP Equipos — Plataformas Elevadoras | Distribuidor GENIE Colombia',
     desc: 'Alquiler y venta de plataformas elevadoras certificadas. Distribuidor autorizado GENIE en Colombia. Medellín, Bogotá y Barranquilla.',
     keywords: 'manlift, plataformas elevadoras, alquiler, tijera eléctrica, brazo articulado, GENIE, Colombia, IPAF',
-    canonical: 'https://equiposup.com/',
+    canonical: 'https://pagina-up.onrender.com/',
     robots: 'index, follow',
     author: 'UP Equipos S.A.S.',
     ogTitle: 'UP Equipos — Plataformas Elevadoras',
     ogDesc: 'Distribuidor autorizado GENIE en Colombia. Alquiler y venta de plataformas elevadoras certificadas.',
-    ogImage: 'https://equiposup.com/IMAGENES POR INCORPORAR/logo up.png',
+    ogImage: 'https://pagina-up.onrender.com/IMAGENES POR INCORPORAR/logo up.png',
     ogLocale: 'es_CO',
     ogSitename: 'UP Equipos',
     twCard: 'summary_large_image',
     twTitle: 'UP Equipos — Plataformas Elevadoras',
     twDesc: 'Distribuidor autorizado GENIE en Colombia.',
-    twImage: 'https://equiposup.com/IMAGENES POR INCORPORAR/logo up.png',
+    twImage: 'https://pagina-up.onrender.com/IMAGENES POR INCORPORAR/logo up.png',
     sName: 'UP Equipos S.A.S.',
-    sUrl: 'https://equiposup.com',
+    sUrl: 'https://pagina-up.onrender.com',
     sDesc: 'Distribuidor autorizado GENIE en Colombia. Especialistas en alquiler, venta y servicio técnico de plataformas elevadoras.',
     sTelMed: '604 4447178',
     sTelBog: '318 8097240',
@@ -1358,7 +1358,7 @@
     sAddr: 'Calle 30a # 65b - 59',
     sHours: 'Mo-Fr 07:30-17:30',
     sPrice: '$$',
-    sLogo: 'https://equiposup.com/IMAGENES POR INCORPORAR/logo up.png',
+    sLogo: 'https://pagina-up.onrender.com/IMAGENES POR INCORPORAR/logo up.png',
     mKeywords: 'manlift, plataformas elevadoras, GENIE, Colombia'
   };
 
@@ -1477,10 +1477,10 @@
   function updateGooglePreview() {
     const title = g('f-title') || 'Sin título';
     const desc  = g('f-desc')  || 'Sin descripción';
-    const url   = g('f-canonical') || 'https://equiposup.com/';
+    const url   = g('f-canonical') || 'https://pagina-up.onrender.com/';
     let urlDisp = url.replace('https://','').replace('http://','');
     if (urlDisp.endsWith('/')) urlDisp = urlDisp.slice(0,-1);
-    urlDisp = urlDisp.replace('equiposup.com', 'equiposup.com');
+    urlDisp = urlDisp.replace('pagina-up.onrender.com', 'pagina-up.onrender.com');
 
     const sitename = g('f-og-sitename') || 'UP Equipos';
 
@@ -1497,7 +1497,7 @@
     const title  = g('f-og-title') || g('f-title') || 'Sin título';
     const desc   = g('f-og-desc')  || g('f-desc')  || 'Sin descripción';
     const img    = g('f-og-image');
-    const url    = g('f-canonical') || 'https://equiposup.com/';
+    const url    = g('f-canonical') || 'https://pagina-up.onrender.com/';
     let domain   = url.replace('https://','').replace('http://','').split('/')[0].toUpperCase();
 
     setText('social-title-disp', title);
@@ -1691,7 +1691,7 @@
   // ──────────────────────────────────────────
   function generateSchema() {
     const name    = g('s-name')    || 'UP Equipos S.A.S.';
-    const url     = g('s-url')     || 'https://equiposup.com';
+    const url     = g('s-url')     || 'https://pagina-up.onrender.com';
     const desc    = g('s-desc')    || '';
     const telMed  = g('s-tel-med') || '';
     const telBog  = g('s-tel-bog') || '';
@@ -1745,42 +1745,42 @@
     return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://equiposup.com/</loc>
+    <loc>https://pagina-up.onrender.com/</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://equiposup.com/#catalogo</loc>
+    <loc>https://pagina-up.onrender.com/#catalogo</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://equiposup.com/#venta</loc>
+    <loc>https://pagina-up.onrender.com/#venta</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://equiposup.com/#partes</loc>
+    <loc>https://pagina-up.onrender.com/#partes</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://equiposup.com/#ipaf</loc>
+    <loc>https://pagina-up.onrender.com/#ipaf</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://equiposup.com/#nosotros</loc>
+    <loc>https://pagina-up.onrender.com/#nosotros</loc>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://equiposup.com/#sedes</loc>
+    <loc>https://pagina-up.onrender.com/#sedes</loc>
     <priority>0.7</priority>
   </url>
 </urlset>`;
   }
 
   function getRobotsContent() {
-    return `User-agent: *\nAllow: /\nDisallow: /seo/\n\nSitemap: https://equiposup.com/sitemap.xml`;
+    return `User-agent: *\nAllow: /\nDisallow: /seo/\n\nSitemap: https://pagina-up.onrender.com/sitemap.xml`;
   }
 
   function renderSitemapRobots() {
