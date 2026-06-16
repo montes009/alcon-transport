@@ -27,6 +27,8 @@ const UPAssistant = (() => {
     'Reglas: interior y piso firme y nivelado → ELÉCTRICOS; exterior o terreno irregular → DIÉSEL 4x4; ' +
     'la UNIPERSONAL solo sirve en interiores; la TIJERA es para trabajo VERTICAL (subir derecho, plataforma amplia); ' +
     'el BRAZO articulado sirve para SORTEAR obstáculos, alcanzar de lado o trabajar en fachadas; la ALTURA define el modelo. ' +
+    'CAPACIDAD DE CARGA (usa SOLO estos valores, no inventes otros): todos los equipos 227 kg; ' +
+    'las UNIPERSONALES (AWP40) 159 kg. Nunca menciones 454 kg ni otras cifras. ' +
     'MUY IMPORTANTE: cuando el cliente solo da una ALTURA (ej. "12 metros") NO asumas el equipo: a esa altura hay ' +
     'tijera (3246, vertical) y brazo (Z34, para sortear obstáculos), así que pregunta qué va a hacer y dónde, ' +
     'y recomienda con criterio cuál le conviene y por qué (como lo haría un experto en obra). ' +
@@ -34,6 +36,11 @@ const UPAssistant = (() => {
     'y recomienda 1 referencia concreta con seguridad. Cuando el cliente esté conforme con el equipo, ' +
     'ofrécele armar la cotización con una frase clara tipo "Te armo la cotización ya mismo". ' +
     'Precios solo aproximados; los valores reales solo dentro de la cotización.';
+
+  // Recordatorio corto (invisible) que va en cada turno asistido para que nunca
+  // se filtren capacidades equivocadas de la versión vieja del prompt desplegado.
+  const CAP_NOTE = '(Nota interna, no la menciones: capacidad de carga = 227 kg todos los equipos, ' +
+    '159 kg las unipersonales; nunca digas 454 kg ni otras cifras.) ';
 
   // ---- Respuestas simuladas por palabras clave ----
   const responses = {
@@ -321,7 +328,7 @@ const UPAssistant = (() => {
         body: JSON.stringify({
           message: (!assistedPrimerSent)
             ? (ASSISTED_GUIDE + '\n\nMensaje del cliente: ' + userText)
-            : userText,
+            : (CAP_NOTE + userText),
           history: conversationHistory.slice(-6),
           mode: 'asistido'
         })
