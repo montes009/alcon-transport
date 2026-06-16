@@ -412,12 +412,16 @@ const UPCotizador = (() => {
   function matchTarifa(text, tarifas) {
     const t = (text || '').toLowerCase();
     if (!t || !tarifas || !tarifas.length) return null;
-    // 1) por referencia/modelo explícito (ej: "3246", "z45", "awp40")
+    // 1) por referencia/modelo explícito (ej: "3246", "z45", "awp40"), con límites
+    //    para no confundirse con números de teléfono o NIT.
     for (const tf of tarifas) {
       const token = String(tf.ref).toLowerCase().replace('genie', '').replace(/\s+/g, '');
-      if (token && token.length >= 3 && t.replace(/\s|-/g, '').includes(token)) return tf;
+      if (token && token.length >= 3) {
+        const re = new RegExp('(^|[^a-z0-9])' + token.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '([^a-z0-9]|$)');
+        if (re.test(t.replace(/-/g, ''))) return tf;
+      }
     }
-    // 2) por tipo + altura
+    // 2) por tipo + altura (lo más común: "tijera de 12 metros")
     let tipo = null;
     if (/unipersonal/.test(t)) tipo = 'unipersonal';
     else if (/tijera|scissor/.test(t)) tipo = 'tijera';
@@ -430,6 +434,11 @@ const UPCotizador = (() => {
         const ge = cands.filter(x => Number(x.altura_m) >= h).sort((a, b) => a.altura_m - b.altura_m);
         return ge[0] || cands.sort((a, b) => b.altura_m - a.altura_m)[0];
       }
+    }
+    // 3) solo tipo (sin altura clara): elige el de menor altura de ese tipo como punto de partida
+    if (tipo) {
+      const cands = tarifas.filter(x => x.tipo === tipo).sort((a, b) => a.altura_m - b.altura_m);
+      if (cands.length) return cands[0];
     }
     return null;
   }
