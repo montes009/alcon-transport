@@ -361,18 +361,21 @@ const UPAssistant = (() => {
   }
 
   // ---- Tras la respuesta de Liam, ofrecer un botón para iniciar la cotización ----
-  let quoteOffered = false;
   function maybeOfferQuote(userText, botResponse) {
-    if (quoteOffered || typeof UPCotizador === 'undefined' || UPCotizador.active) return;
-    // El botón aparece SOLO cuando Liam ya decidió armar la cotización
+    if (typeof UPCotizador === 'undefined' || UPCotizador.active) return;
+    // El botón aparece cuando Liam decidió armar la cotización
     // (no cuando el cliente apenas menciona "cotizar", para no cortar la asesoría).
-    const botWants = /(te|la|le)\s+(armo|genero|hago|preparo|cotizo)\b.*cotiz|armo la cotiz|genera(r|ndo)?\s+(tu|la|una)\s+cotiz|procedo con la cotiz|listo para cotizar|te la cotizo/i.test(botResponse || '');
+    const botWants = /(te|la|le)\s+(armo|genero|hago|preparo|cotizo|armo)\b.*cotiz|arm(o|amos|e|emos) la cotiz|genera(r|ndo|mos)?\s+(tu|la|una)\s+cotiz|procedo con la cotiz|listo para cotizar|te la cotizo|vamos a (la )?cotiz/i.test(botResponse || '');
     if (!botWants) return;
-    quoteOffered = true;
 
     const messages = document.getElementById('chat-messages');
     if (!messages) return;
+    // Quitar un botón anterior para mostrar uno fresco después del último mensaje
+    const prev = document.getElementById('cotz-offer');
+    if (prev) prev.remove();
+
     const wrap = document.createElement('div');
+    wrap.id = 'cotz-offer';
     wrap.className = 'msg bot';
     wrap.innerHTML = '<div class="msg-avatar">🔧</div>';
     const bubble = document.createElement('div');
@@ -382,8 +385,8 @@ const UPAssistant = (() => {
 
     const btn = document.createElement('button');
     btn.textContent = '📋 Cotizar ahora';
-    btn.style.cssText = 'padding:10px 18px;border:none;border-radius:22px;background:#C0001F;' +
-      'color:#fff;font-weight:700;font-size:.88rem;cursor:pointer';
+    btn.style.cssText = 'padding:11px 20px;border:none;border-radius:22px;background:#C0001F;' +
+      'color:#fff;font-weight:800;font-size:.9rem;cursor:pointer;box-shadow:0 4px 14px rgba(192,0,31,.4)';
     btn.addEventListener('click', () => {
       btn.disabled = true;
       btn.style.opacity = '.5';
@@ -454,7 +457,6 @@ const UPAssistant = (() => {
         if (mode === 'directo') {
           renderMessage('Perfecto, vamos directo a tu cotización. ⚡', 'bot');
           if (typeof UPCotizador !== 'undefined') {
-            quoteOffered = true;       // evita ofrecer botón duplicado
             setTimeout(() => UPCotizador.start(false, chatContext()), 400);
           }
         } else {
