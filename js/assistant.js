@@ -136,6 +136,19 @@ const UPAssistant = (() => {
   }
 
   // ---- Render mensaje ----
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  // Convierte el markdown de Claude (negritas, viñetas, saltos) a HTML legible
+  function formatMarkdown(text) {
+    let h = escapeHtml(text);
+    h = h.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');   // **negrita**
+    h = h.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');             // *cursiva*
+    h = h.replace(/^\s*[-*•]\s+/gm, '• ');                      // viñetas
+    h = h.replace(/\n/g, '<br>');                               // saltos de línea
+    return h;
+  }
+
   function renderMessage(text, type) {
     const messages = document.getElementById('chat-messages');
     if (!messages) return;
@@ -172,6 +185,8 @@ const UPAssistant = (() => {
           bubble.appendChild(span);
         }
       });
+    } else if (type === 'bot') {
+      bubble.innerHTML = formatMarkdown(text);
     } else {
       bubble.textContent = text;
     }
