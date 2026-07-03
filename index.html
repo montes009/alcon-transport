@@ -178,14 +178,7 @@
        HERO
   =========================================== -->
   <section class="hero" id="inicio" aria-label="Sección principal">
-    <div class="hero-bg">
-      <!-- Reemplazar por imagen real: hero-equipo.jpg -->
-      <img
-        src="imagenes/hero-equipo.jpg"
-        alt="Equipo de elevación en obra industrial"
-        onerror="this.style.display='none'"
-      >
-    </div>
+    <div class="hero-bg"></div>
     <div class="hero-accent" aria-hidden="true"></div>
     <div class="hero-fx" aria-hidden="true"></div>
 
@@ -216,13 +209,20 @@
       </div>
     </div>
 
-    <img
-      src="imagenes/hero-equipo.webp"
-      alt="Brazo articulado GENIE en operación industrial"
-      class="hero-image"
-      loading="eager"
-      draggable="false"
-    >
+    <!-- En móvil la imagen del hero está oculta (display:none < 900px);
+         con <picture> solo la descargan los equipos de escritorio.
+         El móvil recibe un pixel transparente (0 KB) y ahorra ~232 KB. -->
+    <picture>
+      <source media="(min-width: 901px)" srcset="imagenes/hero-equipo.webp" type="image/webp">
+      <img
+        src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+        alt="Brazo articulado GENIE en operación industrial"
+        class="hero-image"
+        loading="eager"
+        fetchpriority="high"
+        draggable="false"
+      >
+    </picture>
 
     <div class="hero-scroll" aria-hidden="true">
       <div class="scroll-line"></div>
@@ -825,14 +825,7 @@
        STATEMENT (tipo Apple)
   =========================================== -->
   <section class="statement-section" aria-label="Propuesta de valor">
-    <div class="statement-bg">
-      <!-- Reemplazar por imagen real: fondo-industrial.jpg -->
-      <img
-        src="imagenes/fondo-industrial.jpg"
-        alt="Obra industrial con equipos de elevación"
-        onerror="this.style.display='none'; this.parentElement.style.background='#0a0a0a'"
-      >
-    </div>
+    <div class="statement-bg" style="background:#0a0a0a"></div>
     <div class="statement-content reveal">
       <h2>
         Tecnología, seguridad<br>
@@ -1251,7 +1244,7 @@
     document.body.style.overflow = 'hidden';
 
     function tick(){
-      pct += Math.random() * 20 + 8;
+      pct += Math.random() * 34 + 16;
       if(pct > 100) pct = 100;
       bar.style.width = pct + '%';
 
@@ -1260,20 +1253,27 @@
       if(pct >= 85 && mi===2){ mi=3; status.textContent=msgs[3]; }
 
       if(pct < 100){
-        setTimeout(tick, 100 + Math.random()*200);
+        setTimeout(tick, 55 + Math.random()*90);
       } else {
         setTimeout(function(){
           loader.style.opacity    = '0';
           loader.style.visibility = 'hidden';
           document.body.style.overflow = '';
-          setTimeout(function(){ loader.remove(); }, 800);
-        }, 500);
+          setTimeout(function(){ loader.remove(); }, 600);
+        }, 150);
       }
     }
 
-    window.addEventListener('load', function(){
-      setTimeout(tick, 300);
-    });
+    /* Arranca apenas el DOM está listo (no espera a que bajen todas las
+       imágenes), así el contenido real aparece antes y mejora el Speed Index.
+       Con respaldo en 'load' por si DOMContentLoaded ya pasó. */
+    function startLoader(){ if(!startLoader.done){ startLoader.done = true; setTimeout(tick, 120); } }
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', startLoader);
+    } else {
+      startLoader();
+    }
+    window.addEventListener('load', startLoader);
   })();
   </script>
 
