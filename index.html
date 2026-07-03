@@ -6,19 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://oguxdohmutqgacahcwop.supabase.co; frame-src https://maps.google.com https://www.google.com; frame-ancestors 'none';">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="preload" as="image" href="/IMAGENES%20POR%20INCORPORAR/logo%20up.webp">
-
-  <!-- CSS asíncrono: no bloquea el primer pintado (elimina ~2 s de espera).
-       styles.css es lo crítico y va primero. Las fuentes cargan después vía
-       fonts.css (tienen font-display:swap, así que el texto se ve al instante
-       con una fuente de respaldo y luego cambia). El loader negro (con estilos
-       en línea) cubre la pantalla hasta que styles.css se aplica, por lo que el
-       usuario nunca ve la página sin estilos. -->
-  <link rel="preload" href="css/styles.css" as="style" onload="this.onload=null;this.rel='stylesheet';window.__stylesReady=1">
-  <link rel="preload" href="css/fonts.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/fonts.css">
-  </noscript>
+  <link rel="stylesheet" href="css/fonts.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UP Equipos — Plataformas Elevadoras | Distribuidor GENIE Colombia</title>
   <meta name="description" content="Alquiler y venta de plataformas elevadoras certificadas. Distribuidor autorizado GENIE en Colombia. Medellín, Bogotá y Barranquilla.">
@@ -73,6 +61,7 @@
     "openingHours": "Mo-Fr 07:30-17:30"
   }
   </script>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
@@ -1266,19 +1255,12 @@
       if(pct < 100){
         setTimeout(tick, 55 + Math.random()*90);
       } else {
-        /* No revelar la página hasta que styles.css esté aplicado,
-           para que nunca se vea contenido sin estilo (CSS es asíncrono).
-           Tope de seguridad: revela igual tras ~4 s aunque falle el flag. */
-        var waited = 0;
-        (function finish(){
-          if(!window.__stylesReady && waited < 4000){ waited += 40; setTimeout(finish, 40); return; }
-          setTimeout(function(){
-            loader.style.opacity    = '0';
-            loader.style.visibility = 'hidden';
-            document.body.style.overflow = '';
-            setTimeout(function(){ loader.remove(); }, 600);
-          }, 120);
-        })();
+        setTimeout(function(){
+          loader.style.opacity    = '0';
+          loader.style.visibility = 'hidden';
+          document.body.style.overflow = '';
+          setTimeout(function(){ loader.remove(); }, 600);
+        }, 150);
       }
     }
 
@@ -1291,7 +1273,7 @@
     } else {
       startLoader();
     }
-    window.addEventListener('load', function(){ window.__stylesReady = 1; startLoader(); });
+    window.addEventListener('load', startLoader);
   })();
   </script>
 
