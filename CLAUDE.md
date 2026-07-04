@@ -88,6 +88,91 @@ Flujo (todo en el chat):
   operador, horas extra/nocturnas/festivos, viáticos) están **hardcodeadas en `up-cotizar`**
   como constante `OBSERVACIONES` y se guardan en cada cotización.
 
+## Liam por WhatsApp (Cloud API de Meta) — PRUEBA funcionando, falta pasar a número definitivo
+
+Objetivo: que Liam atienda por WhatsApp real (no solo el chat de la web), usando **Claude
+directo desde una Edge Function** (sin n8n, sin costo de plataforma extra — solo se paga
+Anthropic por uso y Meta por conversación, que es gratis cuando el cliente escribe primero).
+
+### Arquitectura
+- **Edge Function `up-whatsapp`** (verify_jwt=false, es un webhook público de Meta):
+  - `GET` → verificación del webhook (Meta manda `hub.mode`/`hub.verify_token`/`hub.challenge`).
+  - `POST` → mensaje entrante: llama a Anthropic (mismo patrón que `up-asesor`, modelo
+    `claude-sonnet-4-6`) y responde por la **Graph API de WhatsApp**
+    (`https://graph.facebook.com/v21.0/{PHONE_NUMBER_ID}/messages`).
+  - Guarda el hilo de conversación en la tabla **`whatsapp_sesiones_web`** (aislada del ERP,
+    igual que las demás `_web`): `telefono` (PK), `historial` jsonb, `lead_captured` bool,
+    `cliente_web_id`, `updated_at`. Sin esto Liam no tendría memoria entre mensajes.
+  - Al pedir **cotización** (detecta "cotiza"/"cotización"/"cotizar"), llama a la RPC
+    **`crear_cliente_web`** para capturar el lead automáticamente (mismo CRM `clientes_web`
+    que usa el cotizador web) — no genera la cotización completa todavía, solo captura el
+    contacto y pide los datos que falten (equipo, días, ciudad) para que el comercial cierre.
+  - Verificación de firma HMAC opcional vía secret `WHATSAPP_APP_SECRET` (si no está seteado,
+    se omite — no es obligatorio para que funcione).
+
+### Secrets configurados (Supabase Studio → Edge Functions → Secrets)
+- `WHATSAPP_TOKEN`: token de acceso de la API de WhatsApp. ⚠️ **El generado en modo prueba
+  dura 24h** — para producción hay que generar un **token permanente de sistema** (System User
+  token en Meta Business Suite, sin expiración) y actualizarlo aquí.
+- `WHATSAPP_PHONE_NUMBER_ID`: ID del número (el de prueba actual: `1284617354725165`).
+- `WHATSAPP_VERIFY_TOKEN`: palabra clave inventada (`up-liam-verify-2026`) que se repite
+  también en la config del webhook en Meta.
+- Reutiliza `ANTHROPIC_API_KEY_UP` (ya existente, misma key que `up-asesor`).
+
+### App de Meta usada para las pruebas
+- App **"vmaquinas"** (developers.facebook.com), bajo el portfolio comercial **Vehimaquinas**
+  (NO Up Equipos — ese portfolio quedó bloqueado por Meta para publicidad/apps; pendiente
+  apelar esa restricción si se quiere usar el nombre "Up Equipos" como negocio en Meta).
+- Número de prueba usado: `+1 (555) 624-1980`, WABA ID `880562888436811`.
+
+### Gotchas aprendidos (para no repetir la depuración el domingo)
+1. **Verificar el webhook (GET) no es suficiente.** Hay que además **suscribirse al campo
+   `messages`** en la lista de "Webhook fields" (a veces ya viene suscrito, a veces no).
+2. **El botón "Probar" en la lista de campos NO prueba el flujo real** — solo llama
+   directamente a nuestro endpoint con un payload de ejemplo. Que "Probar" funcione no
+   garantiza que los mensajes reales lleguen.
+3. **Paso que casi siempre falta y es el que de verdad conecta todo:** suscribir el WABA a la
+   app explícitamente con la API:
+   ```
+   POST https://graph.facebook.com/v21.0/{WABA_ID}/subscribed_apps
+   Authorization: Bearer {token}
+   ```
+   Se hace fácil desde **Graph API Explorer** (developers.facebook.com/tools/explorer):
+   elegir la app, pegar el token, método POST, ruta `{WABA_ID}/subscribed_apps`, Enviar.
+   Responde `{"success": true}`. Sin este paso, el webhook está bien configurado pero **Meta
+   nunca reenvía los mensajes reales** (aunque la verificación GET sí funcione).
+4. **El número de prueba solo envía/recibe con números autorizados.** Se agregan en
+   "Configuración de la API" → sección "Destinatario"/"Para" → verificación por código.
+   Error típico si falta este paso al enviar: `(#131030) Recipient phone number not in
+   allowed list`.
+5. **El token de prueba dura 24h.** Si deja de responder de un día para otro, regenerar el
+   token en "Configuración de la API" → "Generar token", y actualizar el secret
+   `WHATSAPP_TOKEN` en Supabase.
+6. Para depurar: `mcp__Supabase__get_logs` (service `edge-function`) muestra las líneas de
+   petición (`GET/POST | status | url`), pero **no** el `console.error` interno — para ver el
+   error real conviene mirar directo la tabla `whatsapp_sesiones_web` (¿se guardó el
+   `historial` con la respuesta de Claude?) o probar el envío de WhatsApp de forma aislada
+   con Graph API Explorer.
+
+### Pendiente para el domingo (pasar a número definitivo)
+- [ ] Generar **token permanente** (System User, sin expiración) — el de prueba expira en 24h.
+- [ ] Conseguir/activar el **número de WhatsApp definitivo** (no el de prueba `+1 555...`).
+- [ ] Repetir el paso de `subscribed_apps` con el WABA del número definitivo.
+- [ ] Verificar el negocio en Meta (Business Verification) — requisito para número real sin
+      límite de destinatarios.
+- [ ] Decidir si se usa el portfolio **Up Equipos** (hoy bloqueado, hay que apelar) o
+      **Vehimaquinas** (ya aprobado, usado en las pruebas).
+- [ ] Probar el flujo de **cotización** end-to-end por WhatsApp (hoy solo se probó saludo/charla).
+- [ ] Actualizar `WHATSAPP_PHONE_NUMBER_ID` y `WHATSAPP_TOKEN` en los secrets con los datos
+      del número definitivo.
+
+### Estilo comercial de Liam (ajustado, ver `SYSTEM_PROMPT` en `up-whatsapp`)
+Tono pedido por el cliente: **amable, profesional y seguro**, estilo comercial colombiano
+estándar (no informal de más). Reglas clave agregadas: usa frases naturales ("con gusto",
+"te cuento que...") sin abusar; si el cliente escribe algo corto/vago dos veces seguidas,
+Liam retoma la iniciativa en vez de seguir bromeando; cierra casi siempre con una pregunta
+que avanza la venta (altura, ciudad, cuándo lo necesita).
+
 ## Open Graph / miniatura WhatsApp
 - Las metaetiquetas OG/Twitter en `index.html` deben apuntar al **dominio donde está alojado
   el sitio** (`pagina-up.onrender.com`), si no WhatsApp no carga la miniatura. Imagen:
