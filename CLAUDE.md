@@ -154,6 +154,33 @@ Anthropic por uso y Meta por conversación, que es gratis cuando el cliente escr
    `historial` con la respuesta de Claude?) o probar el envío de WhatsApp de forma aislada
    con Graph API Explorer.
 
+### Panel de auditoría/intervención (`whatsapp.html`)
+- Página interna tipo "WhatsApp Web" para que el comercial audite lo que habla Liam por
+  WhatsApp y pueda intervenir en vivo. `noindex`, no enlazada, protegida por **clave**
+  (misma tabla `web_panel_config` que `panel.html`, vía RPC `web_panel_check_clave`).
+- **Edge Function `whatsapp-panel`** (verify_jwt=false): backend del panel, mismo patrón de
+  rate-limit por IP que `panel-web` (tabla `panel_web_login_attempts`). Acciones (`action` en el body):
+  - `list`: devuelve todas las sesiones de `whatsapp_sesiones_web` (teléfono, nombre, historial,
+    `lead_captured`, `bot_activo`, `cliente_web_id`, `updated_at`).
+  - `toggle_bot` (`telefono`, `activo`): interruptor manual para pausar/reanudar a Liam en esa
+    conversación puntual.
+  - `send` (`telefono`, `mensaje`): envía el mensaje por la Graph API de WhatsApp como si fuera
+    el comercial, lo guarda en el `historial` con `origen:"humano"`, y **pausa el bot
+    automáticamente** (`bot_activo=false`) para que Liam no siga respondiendo esa conversación.
+- **Columna `bot_activo`** (bool, default `true`) en `whatsapp_sesiones_web`: `up-whatsapp`
+  la revisa en cada mensaje entrante — si está en `false`, solo guarda el mensaje del cliente
+  en el historial (para que se vea en el panel) y **no** llama a Claude ni responde por
+  WhatsApp, hasta que el comercial reactive el interruptor desde `whatsapp.html`.
+- **Columna `nombre`** (text) en `whatsapp_sesiones_web`: se completa con el `profile.name`
+  que manda Meta en el primer mensaje, para mostrar nombre en vez de solo el teléfono.
+- Cada entrada del `historial` ahora trae `origen` (`"cliente"` / `"bot"` / `"humano"`) y `ts`,
+  usado solo para pintar el chat en el panel — al armar el payload para Anthropic (`up-whatsapp`)
+  se sigue enviando solo `{role, content}` (se filtran los campos extra).
+- Interfaz: lista de conversaciones a la izquierda (con badge "Bot activo"/"Pausado" y "Lead"),
+  chat a la derecha con burbujas (cliente a la izquierda; Liam y el humano a la derecha, con
+  etiqueta distinta), interruptor de bot arriba del chat, y caja de texto abajo para responder
+  como asesor. Auto-actualiza cada 8s (polling, sin Supabase Realtime).
+
 ### Pendiente para el domingo (pasar a número definitivo)
 - [ ] Generar **token permanente** (System User, sin expiración) — el de prueba expira en 24h.
 - [ ] Conseguir/activar el **número de WhatsApp definitivo** (no el de prueba `+1 555...`).

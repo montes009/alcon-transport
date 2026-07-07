@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>WhatsApp Liam — UP Equipos</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#0f1115;color:#e8eaed;font-size:14px;overflow:hidden}
+    button,input,textarea{font-family:inherit}
+    .btn{padding:7px 14px;border:none;border-radius:8px;background:#C0001F;color:#fff;
+      font-weight:700;cursor:pointer;font-size:.85rem}
+    .btn.ghost{background:#2a2e37;color:#cbd5e1}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .muted{color:#9aa3af}
+
+    #login{position:fixed;inset:0;background:#0f1115;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:14px;z-index:50;padding:20px;text-align:center}
+    #login h1{font-size:1.4rem;color:#fff}
+    #login input{padding:11px 14px;border:1px solid #2a2e37;border-radius:10px;background:#1a1d24;
+      color:#fff;font-size:1rem;width:min(320px,90vw)}
+    #login .err{color:#ff5a6e;font-size:.85rem;min-height:1em}
+
+    #app{display:none;height:100vh;flex-direction:column}
+    header{background:#1a1d24;border-bottom:3px solid #C0001F;padding:12px 18px;display:flex;
+      justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;flex:0 0 auto}
+    header .brand{font-size:1.1rem;font-weight:900;color:#fff}
+    header .brand span{color:#C0001F}
+    header .actions{display:flex;gap:8px;align-items:center}
+
+    .layout{flex:1 1 auto;display:flex;min-height:0}
+
+    .sidebar{width:320px;flex:0 0 320px;background:#15181e;border-right:1px solid #23272f;
+      display:flex;flex-direction:column;min-height:0}
+    .sidebar .search{padding:10px;border-bottom:1px solid #23272f}
+    .sidebar .search input{width:100%;padding:8px 10px;border-radius:8px;border:1px solid #2a2e37;
+      background:#1a1d24;color:#fff}
+    .convlist{flex:1;overflow-y:auto}
+    .conv{padding:12px 14px;border-bottom:1px solid #1e222a;cursor:pointer;display:flex;
+      flex-direction:column;gap:3px}
+    .conv:hover{background:#1c2028}
+    .conv.active{background:#22262f;border-left:3px solid #C0001F}
+    .conv .top{display:flex;justify-content:space-between;align-items:center;gap:6px}
+    .conv .nombre{font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .conv .fecha{font-size:.68rem;color:#7a828f;flex:0 0 auto}
+    .conv .preview{font-size:.78rem;color:#9aa3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .conv .badges{display:flex;gap:5px;margin-top:2px}
+    .tag{font-size:.62rem;padding:2px 6px;border-radius:6px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+    .tag.pausado{background:#3a2400;color:#ffb020}
+    .tag.activo{background:#123322;color:#25D366}
+    .tag.lead{background:#152a3a;color:#7cc0ff}
+
+    .chatpane{flex:1;display:flex;flex-direction:column;min-height:0;background:#0b0d11}
+    .chatpane .empty{margin:auto;color:#7a828f;text-align:center;padding:20px}
+    .chat-header{padding:12px 18px;background:#1a1d24;border-bottom:1px solid #23272f;
+      display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+    .chat-header .who{display:flex;flex-direction:column}
+    .chat-header .who .n{font-weight:800;color:#fff}
+    .chat-header .who .t{font-size:.75rem;color:#9aa3af}
+    .toggle-wrap{display:flex;align-items:center;gap:8px}
+    .switch{position:relative;display:inline-block;width:46px;height:24px}
+    .switch input{opacity:0;width:0;height:0}
+    .slider{position:absolute;cursor:pointer;inset:0;background:#3a3f4a;transition:.2s;border-radius:24px}
+    .slider::before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;
+      background:#fff;transition:.2s;border-radius:50%}
+    .switch input:checked + .slider{background:#25D366}
+    .switch input:checked + .slider::before{transform:translateX(22px)}
+    .toggle-label{font-size:.78rem;font-weight:700}
+    .toggle-label.on{color:#25D366}
+    .toggle-label.off{color:#ffb020}
+
+    .messages{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:8px}
+    .bubble{max-width:65%;padding:9px 12px;border-radius:12px;font-size:.88rem;line-height:1.35;
+      white-space:pre-wrap;word-wrap:break-word;position:relative}
+    .bubble .meta{display:block;font-size:.62rem;margin-top:4px;opacity:.65}
+    .cliente{align-self:flex-start;background:#232733;color:#e8eaed;border-bottom-left-radius:3px}
+    .bot{align-self:flex-end;background:#0a3d29;color:#dff7ea;border-bottom-right-radius:3px}
+    .humano{align-self:flex-end;background:#123a5c;color:#e2f1ff;border-bottom-right-radius:3px}
+    .bubble .who-tag{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;
+      display:block;margin-bottom:3px;opacity:.7}
+
+    .composer{border-top:1px solid #23272f;background:#1a1d24;padding:10px 14px;display:flex;gap:10px;
+      align-items:flex-end}
+    .composer textarea{flex:1;resize:none;min-height:42px;max-height:120px;padding:10px 12px;
+      border-radius:10px;border:1px solid #2a2e37;background:#0f1115;color:#fff;font-size:.9rem}
+    .composer .hint{font-size:.7rem;color:#9aa3af;padding:0 4px 4px}
+    .pausa-banner{background:#2a1c00;color:#ffb020;font-size:.76rem;padding:6px 14px;text-align:center}
+
+    @media(max-width:760px){
+      .sidebar{width:100%;flex-basis:100%;position:absolute;inset:0;z-index:5}
+      .sidebar.hide{display:none}
+      .chatpane.hide{display:none}
+      .layout{position:relative}
+      .back-btn{display:inline-block !important}
+    }
+    .back-btn{display:none}
+  </style>
+</head>
+<body>
+  <div id="login">
+    <h1>🔒 WhatsApp Liam — UP Equipos</h1>
+    <p class="muted">Ingresa la clave del equipo comercial</p>
+    <input id="clave" type="password" placeholder="Clave" autocomplete="off" />
+    <button class="btn" onclick="entrar()">Entrar</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+
+  <div id="app">
+    <header>
+      <div class="brand">UP <span>Equipos</span> · WhatsApp Liam</div>
+      <div class="actions">
+        <span class="muted" style="font-size:.74rem">🔄 Auto-actualiza cada 8s</span>
+        <button class="btn ghost" onclick="cargarLista()">↻ Actualizar</button>
+        <button class="btn ghost" onclick="salir()">Salir</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="sidebar" id="sidebar">
+        <div class="search">
+          <input id="buscar" placeholder="Buscar por nombre o teléfono..." oninput="renderLista()" />
+        </div>
+        <div class="convlist" id="convlist"></div>
+      </div>
+
+      <div class="chatpane" id="chatpane">
+        <div class="empty" id="chatEmpty">Selecciona una conversación para verla aquí.</div>
+
+        <div id="chatBody" style="display:none;flex:1;flex-direction:column;min-height:0">
+          <div class="chat-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="btn ghost back-btn" onclick="volverLista()">←</button>
+              <div class="who">
+                <span class="n" id="chNombre">—</span>
+                <span class="t" id="chTelefono">—</span>
+              </div>
+            </div>
+            <div class="toggle-wrap">
+              <span class="toggle-label" id="chToggleLabel">Bot activo</span>
+              <label class="switch">
+                <input type="checkbox" id="chToggle" onchange="toggleBot(this.checked)" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="pausa-banner" id="pausaBanner" style="display:none">
+            ⏸ Liam está pausado en esta conversación — tus mensajes salen como asesor humano y él no responderá hasta que reactives el interruptor.
+          </div>
+
+          <div class="messages" id="messages"></div>
+
+          <div class="composer">
+            <textarea id="mensaje" placeholder="Escribe como asesor humano... (Enter para enviar, Shift+Enter salto de línea)"
+              onkeydown="onComposerKey(event)"></textarea>
+            <button class="btn" id="btnEnviar" onclick="enviarMensaje()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const FN_URL = 'https://oguxdohmutqgacahcwop.supabase.co/functions/v1/whatsapp-panel';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndXhkb2htdXRxZ2FjYWhjd29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjc0NzcsImV4cCI6MjA4ODMwMzQ3N30.RRruTo8B7k4R97Igq7_KV1PV58FqrpIzEu0R_MXIwR8';
+
+let sesiones = [];
+let activoTel = null;
+let pollTimer = null;
+
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function getClave(){ return sessionStorage.getItem('wa_panel_clave') || ''; }
+
+async function call(action, extra){
+  const res = await fetch(FN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` },
+    body: JSON.stringify({ clave: getClave(), action, ...extra })
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data?.error || 'Error');
+  return data;
+}
+
+async function entrar(){
+  const clave = document.getElementById('clave').value.trim();
+  const err = document.getElementById('loginErr');
+  err.textContent = '';
+  if(!clave){ err.textContent = 'Ingresa la clave'; return; }
+  sessionStorage.setItem('wa_panel_clave', clave);
+  try { await cargarLista(); mostrarApp(); startPolling(); }
+  catch(e){ err.textContent = 'Clave incorrecta'; sessionStorage.removeItem('wa_panel_clave'); }
+}
+
+function mostrarApp(){
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+}
+
+function salir(){
+  if(pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+  sessionStorage.removeItem('wa_panel_clave');
+  location.reload();
+}
+
+function startPolling(){
+  if(pollTimer) return;
+  pollTimer = setInterval(async () => {
+    if(!getClave() || document.hidden) return;
+    try { await cargarLista(true); } catch(e) { /* silencioso */ }
+  }, 8000);
+}
+
+async function cargarLista(silencioso){
+  const data = await call('list');
+  sesiones = data.sesiones || [];
+  renderLista();
+  if(activoTel){
+    const s = sesiones.find(x => x.telefono === activoTel);
+    if(s) renderChat(s);
+  }
+}
+
+function fmtHora(d){
+  if(!d) return '';
+  const x = new Date(d);
+  if(isNaN(x)) return '';
+  const hoy = new Date();
+  const mismoDia = x.toDateString() === hoy.toDateString();
+  return mismoDia
+    ? x.toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit' })
+    : x.toLocaleDateString('es-CO', { day:'2-digit', month:'2-digit' });
+}
+
+function ultimoMensaje(s){
+  const h = s.historial || [];
+  return h.length ? h[h.length - 1] : null;
+}
+
+function renderLista(){
+  const filtro = (document.getElementById('buscar').value || '').toLowerCase().trim();
+  const list = sesiones.filter(s => {
+    if(!filtro) return true;
+    return (s.nombre||'').toLowerCase().includes(filtro) || (s.telefono||'').includes(filtro);
+  });
+
+  document.getElementById('convlist').innerHTML = list.map(s => {
+    const ult = ultimoMensaje(s);
+    const preview = ult ? esc(ult.content).slice(0,60) : 'Sin mensajes';
+    const activa = s.telefono === activoTel ? 'active' : '';
+    const badges = [
+      s.bot_activo ? '<span class="tag activo">Bot activo</span>' : '<span class="tag pausado">Pausado</span>',
+      s.lead_captured ? '<span class="tag lead">Lead</span>' : ''
+    ].join('');
+    return `<div class="conv ${activa}" onclick="abrirConversacion('${s.telefono}')">
+      <div class="top">
+        <span class="nombre">${esc(s.nombre || s.telefono)}</span>
+        <span class="fecha">${fmtHora(s.updated_at)}</span>
+      </div>
+      <div class="preview">${preview}</div>
+      <div class="badges">${badges}</div>
+    </div>`;
+  }).join('') || `<div class="muted" style="padding:16px;text-align:center">Sin conversaciones aún</div>`;
+}
+
+function abrirConversacion(telefono){
+  activoTel = telefono;
+  const s = sesiones.find(x => x.telefono === telefono);
+  if(s) renderChat(s);
+  renderLista();
+  document.getElementById('sidebar').classList.add('hide');
+  document.getElementById('chatpane').classList.remove('hide');
+}
+
+function volverLista(){
+  document.getElementById('sidebar').classList.remove('hide');
+  document.getElementById('chatpane').classList.add('hide');
+}
+
+function renderChat(s){
+  document.getElementById('chatEmpty').style.display = 'none';
+  document.getElementById('chatBody').style.display = 'flex';
+  document.getElementById('chNombre').textContent = s.nombre || 'Sin nombre';
+  document.getElementById('chTelefono').textContent = s.telefono;
+
+  const toggle = document.getElementById('chToggle');
+  toggle.checked = !!s.bot_activo;
+  document.getElementById('chToggleLabel').textContent = s.bot_activo ? 'Bot activo' : 'Pausado';
+  document.getElementById('chToggleLabel').className = 'toggle-label ' + (s.bot_activo ? 'on' : 'off');
+  document.getElementById('pausaBanner').style.display = s.bot_activo ? 'none' : 'block';
+
+  const msgsEl = document.getElementById('messages');
+  const wasAtBottom = msgsEl.scrollTop + msgsEl.clientHeight >= msgsEl.scrollHeight - 40;
+
+  const hist = s.historial || [];
+  msgsEl.innerHTML = hist.map(m => {
+    let cls = 'cliente', tag = '';
+    if(m.role === 'assistant'){
+      if(m.origen === 'humano'){ cls = 'humano'; tag = 'Tú (asesor)'; }
+      else { cls = 'bot'; tag = 'Liam'; }
+    }
+    const hora = m.ts ? fmtHora(m.ts) : '';
+    return `<div class="bubble ${cls}">
+      ${tag ? `<span class="who-tag">${tag}</span>` : ''}
+      ${esc(m.content)}
+      <span class="meta">${hora}</span>
+    </div>`;
+  }).join('') || `<div class="muted" style="margin:auto">Sin mensajes en esta conversación</div>`;
+
+  if(wasAtBottom) msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+async function toggleBot(activo){
+  if(!activoTel) return;
+  try {
+    await call('toggle_bot', { telefono: activoTel, activo });
+    await cargarLista();
+  } catch(e){
+    alert('No se pudo cambiar el estado del bot');
+    const s = sesiones.find(x => x.telefono === activoTel);
+    if(s) renderChat(s);
+  }
+}
+
+function onComposerKey(e){
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    enviarMensaje();
+  }
+}
+
+async function enviarMensaje(){
+  if(!activoTel) return;
+  const ta = document.getElementById('mensaje');
+  const mensaje = ta.value.trim();
+  if(!mensaje) return;
+  const btn = document.getElementById('btnEnviar');
+  btn.disabled = true;
+  try {
+    await call('send', { telefono: activoTel, mensaje });
+    ta.value = '';
+    await cargarLista();
+  } catch(e){
+    alert('No se pudo enviar el mensaje: ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.getElementById('clave').addEventListener('keydown', e => { if(e.key === 'Enter') entrar(); });
+if(getClave()){
+  cargarLista().then(() => { mostrarApp(); startPolling(); })
+    .catch(() => { sessionStorage.removeItem('wa_panel_clave'); });
+}
+</script>
+</body>
+</html>
