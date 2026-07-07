@@ -218,6 +218,12 @@ que avanza la venta (altura, ciudad, cuándo lo necesita).
   **`panel_web(p_clave)`** (devuelve clientes+cotizaciones) y
   **`panel_web_set_estado(p_clave,p_id,p_estado)`**. La clave vive en la tabla
   **`web_panel_config`** (editable desde Studio). Clave por defecto: `UP-leads-2026`.
+- ⚠️ **Bug corregido:** estas RPCs (y `web_panel_check_clave`, usada por `whatsapp.html`)
+  tenían `SET search_path TO 'public'`, lo que dejaba fuera el esquema `extensions` donde vive
+  `pgcrypto` — `crypt()` no resolvía y el login del panel fallaba siempre. Se corrigió a
+  `SET search_path TO public, extensions` (sin comillas: sino Postgres lo toma como un solo
+  nombre literal "public, extensions" en vez de dos esquemas). Si se crea una RPC nueva que
+  compare `clave_hash` con `crypt()`, usar ese mismo `search_path`.
 
 ## Chat: dos modos (selector al iniciar)
 - **Directo** (cliente con experiencia): NO usa IA (0 tokens). Responde con el motor local
