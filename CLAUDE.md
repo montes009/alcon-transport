@@ -5,7 +5,7 @@ plataformas elevadoras GENIE en Colombia: Medellín, Bogotá, Barranquilla).
 
 ## Despliegue / Git
 - **Hosting:** Render. **Despliega desde la rama `main`** (no desde otras ramas).
-- Rama de desarrollo de esta sesión: `claude/peaceful-wright-3frdsq`. Para que algo
+- Rama de desarrollo de esta sesión: `claude/liam-edg-update-vtfiw8` (PR #1 abierta). Para que algo
   salga en vivo hay que **fusionar a `main` y pushear**.
 - Sitio en vivo: `https://pagina-up.onrender.com/`. Dominio definitivo previsto: `equiposup.com`.
 - Es un sitio estático (HTML/CSS/JS en la raíz): `index.html`, `css/`, `js/`, `imagenes/`,
@@ -95,6 +95,9 @@ directo desde una Edge Function** (sin n8n, sin costo de plataforma extra — so
 Anthropic por uso y Meta por conversación, que es gratis cuando el cliente escribe primero).
 
 ### Arquitectura
+- **Código versionado en el repo**: `supabase/functions/up-whatsapp/index.ts` (antes solo
+  vivía desplegada en Supabase, sin versionar). Ahora todo cambio de prompt/lógica se hace
+  primero en el archivo y se despliega con `mcp__Supabase__deploy_edge_function`.
 - **Edge Function `up-whatsapp`** (verify_jwt=false, es un webhook público de Meta):
   - `GET` → verificación del webhook (Meta manda `hub.mode`/`hub.verify_token`/`hub.challenge`).
   - `POST` → mensaje entrante: llama a Anthropic (mismo patrón que `up-asesor`, modelo
@@ -209,12 +212,28 @@ Anthropic por uso y Meta por conversación, que es gratis cuando el cliente escr
 - [ ] Actualizar `WHATSAPP_PHONE_NUMBER_ID` y `WHATSAPP_TOKEN` en los secrets con los datos
       del número definitivo.
 
-### Estilo comercial de Liam (ajustado, ver `SYSTEM_PROMPT` en `up-whatsapp`)
-Tono pedido por el cliente: **amable, profesional y seguro**, estilo comercial colombiano
-estándar (no informal de más). Reglas clave agregadas: usa frases naturales ("con gusto",
-"te cuento que...") sin abusar; si el cliente escribe algo corto/vago dos veces seguidas,
-Liam retoma la iniciativa en vez de seguir bromeando; cierra casi siempre con una pregunta
-que avanza la venta (altura, ciudad, cuándo lo necesita).
+### Estilo comercial de Liam (`SYSTEM_PROMPT` en `up-whatsapp`, reescrito por completo)
+El prompt se llevó a una versión "comercial senior" estructurada en bloques (identidad,
+matriz técnica por tipo de equipo, política de precios, filtros antimáquina):
+- **Calificación de lead**: si la solicitud es genérica, indaga altura de trabajo, tipo de
+  terreno (interior plano / exterior irregular) y ciudad del proyecto antes de recomendar.
+- **Profundidad técnica**: distingue tijera eléctrica (interiores/piso terminado) vs. brazo
+  diésel 4x4 (terreno difícil/fachada) vs. telehandler (movimiento de materiales); habla
+  siempre de *altura de trabajo* (la útil para el cliente, no la de plataforma).
+- **Formato WhatsApp real**: párrafos cortos, negritas `*así*` para modelos/datos clave,
+  máximo 1-2 emojis por mensaje.
+- **Saludo obligatorio**: Liam **siempre saluda y se presenta por nombre** al inicio o
+  cuando el cliente saluda — usando el saludo real del momento del día (*Buenos días* /
+  *Buenas tardes* / *Buenas noches*, calculado en la función `saludoActual()` con hora de
+  Bogotá e inyectado en el prompt vía placeholder `{{SALUDO_HORA}}`). Antes se sentía "muy
+  directo" porque saltaba la conversación de negocio sin saludar; ahora aunque el cliente
+  repita un saludo corto, Liam lo reconoce con calidez antes de retomar el hilo.
+- **Filtros antimáquina**: nunca dice "soy una IA"; evita "¡Hola! Claro que sí..." repetitivo
+  y disculpas robóticas; si preguntan algo fuera de tema, desvía con seguridad hacia un
+  asesor humano.
+- Nota: el prompt describe la GS-3246 (tijera) con capacidad de 454 kg y los brazos con
+  227 kg — son cifras reales distintas por tipo de equipo, no un error (a diferencia del
+  bug histórico de `up-asesor` que daba 454 kg para todo).
 
 ## Open Graph / miniatura WhatsApp
 - Las metaetiquetas OG/Twitter en `index.html` deben apuntar al **dominio donde está alojado
