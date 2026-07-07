@@ -88,7 +88,7 @@ Flujo (todo en el chat):
   operador, horas extra/nocturnas/festivos, viáticos) están **hardcodeadas en `up-cotizar`**
   como constante `OBSERVACIONES` y se guardan en cada cotización.
 
-## Liam por WhatsApp (Cloud API de Meta) — PRUEBA funcionando, falta pasar a número definitivo
+## Liam por WhatsApp (Cloud API de Meta) — NÚMERO DEFINITIVO EN PRODUCCIÓN (desde 2026-07-07)
 
 Objetivo: que Liam atienda por WhatsApp real (no solo el chat de la web), usando **Claude
 directo desde una Edge Function** (sin n8n, sin costo de plataforma extra — solo se paga
@@ -111,19 +111,29 @@ Anthropic por uso y Meta por conversación, que es gratis cuando el cliente escr
     se omite — no es obligatorio para que funcione).
 
 ### Secrets configurados (Supabase Studio → Edge Functions → Secrets)
-- `WHATSAPP_TOKEN`: token de acceso de la API de WhatsApp. ⚠️ **El generado en modo prueba
-  dura 24h** — para producción hay que generar un **token permanente de sistema** (System User
-  token en Meta Business Suite, sin expiración) y actualizarlo aquí.
-- `WHATSAPP_PHONE_NUMBER_ID`: ID del número (el de prueba actual: `1284617354725165`).
+- `WHATSAPP_TOKEN`: token **permanente** de sistema (System User `liam-whatsapp` en Meta
+  Business Suite, sin expiración, con acceso total a la app `vmaquinas` y al WABA
+  `asistente up`). Actualizado el 2026-07-07. Si hay que regenerarlo: Meta Business Suite →
+  Configuración del negocio → Usuarios del sistema → `liam-whatsapp` → "Generar token"
+  (permisos `whatsapp_business_management` + `whatsapp_business_messaging`) → pegar aquí.
+- `WHATSAPP_PHONE_NUMBER_ID`: `1286362257883339` (número definitivo `+57 310 5196997`).
 - `WHATSAPP_VERIFY_TOKEN`: palabra clave inventada (`up-liam-verify-2026`) que se repite
   también en la config del webhook en Meta.
 - Reutiliza `ANTHROPIC_API_KEY_UP` (ya existente, misma key que `up-asesor`).
 
-### App de Meta usada para las pruebas
+### App de Meta y número definitivo
 - App **"vmaquinas"** (developers.facebook.com), bajo el portfolio comercial **Vehimaquinas**
   (NO Up Equipos — ese portfolio quedó bloqueado por Meta para publicidad/apps; pendiente
   apelar esa restricción si se quiere usar el nombre "Up Equipos" como negocio en Meta).
-- Número de prueba usado: `+1 (555) 624-1980`, WABA ID `880562888436811`.
+- **Número definitivo en producción**: `+57 310 5196997` ("asistente up"), Phone Number ID
+  `1286362257883339`, WABA ID `37231582703122337` (WABA nuevo, distinto al de prueba).
+  Estado: Conectado/Verificado. El WABA de prueba anterior (`880562888436811`,
+  `+1 555 624-1980`) queda en desuso.
+- El WABA se suscribió a la app con `POST /{WABA_ID}/subscribed_apps` (Graph API Explorer) →
+  `{"success": true}`. El webhook heredó la config a nivel de app
+  (`up-whatsapp` en Supabase), no hubo que reconfigurarlo.
+- Probado end-to-end el 2026-07-07: mensaje real recibido y respondido (sesión creada en
+  `whatsapp_sesiones_web` para el número que escribió).
 
 ### Gotchas aprendidos (para no repetir la depuración el domingo)
 1. **Verificar el webhook (GET) no es suficiente.** Hay que además **suscribirse al campo
@@ -154,17 +164,17 @@ Anthropic por uso y Meta por conversación, que es gratis cuando el cliente escr
    `historial` con la respuesta de Claude?) o probar el envío de WhatsApp de forma aislada
    con Graph API Explorer.
 
-### Pendiente para el domingo (pasar a número definitivo)
-- [ ] Generar **token permanente** (System User, sin expiración) — el de prueba expira en 24h.
-- [ ] Conseguir/activar el **número de WhatsApp definitivo** (no el de prueba `+1 555...`).
-- [ ] Repetir el paso de `subscribed_apps` con el WABA del número definitivo.
-- [ ] Verificar el negocio en Meta (Business Verification) — requisito para número real sin
-      límite de destinatarios.
-- [ ] Decidir si se usa el portfolio **Up Equipos** (hoy bloqueado, hay que apelar) o
-      **Vehimaquinas** (ya aprobado, usado en las pruebas).
-- [ ] Probar el flujo de **cotización** end-to-end por WhatsApp (hoy solo se probó saludo/charla).
-- [ ] Actualizar `WHATSAPP_PHONE_NUMBER_ID` y `WHATSAPP_TOKEN` en los secrets con los datos
-      del número definitivo.
+### Pendiente (ya con número definitivo funcionando)
+- [x] Generar **token permanente** (System User `liam-whatsapp`, sin expiración).
+- [x] Activar el **número de WhatsApp definitivo** `+57 310 5196997`.
+- [x] `subscribed_apps` hecho para el WABA definitivo (`37231582703122337`).
+- [x] Actualizar `WHATSAPP_PHONE_NUMBER_ID` y `WHATSAPP_TOKEN` en los secrets.
+- [x] Probar saludo/charla real por WhatsApp con el número definitivo.
+- [ ] Probar el flujo de **cotización completa** end-to-end por este número (solo se probó saludo).
+- [ ] Verificar el negocio en Meta (Business Verification) — requisito para escalar destinatarios
+      sin restricciones (hoy corre sobre "Vehimaquinas", ya aprobado para uso normal).
+- [ ] Decidir a futuro si se separa del portfolio **Vehimaquinas** hacia uno propio de
+      **Up Equipos** (hoy bloqueado en Meta para publicidad/apps, pendiente apelar).
 
 ### Estilo comercial de Liam (ajustado, ver `SYSTEM_PROMPT` en `up-whatsapp`)
 Tono pedido por el cliente: **amable, profesional y seguro**, estilo comercial colombiano
