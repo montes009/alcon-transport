@@ -176,10 +176,26 @@ Anthropic por uso y Meta por conversación, que es gratis cuando el cliente escr
 - Cada entrada del `historial` ahora trae `origen` (`"cliente"` / `"bot"` / `"humano"`) y `ts`,
   usado solo para pintar el chat en el panel — al armar el payload para Anthropic (`up-whatsapp`)
   se sigue enviando solo `{role, content}` (se filtran los campos extra).
-- Interfaz: lista de conversaciones a la izquierda (con badge "Bot activo"/"Pausado" y "Lead"),
-  chat a la derecha con burbujas (cliente a la izquierda; Liam y el humano a la derecha, con
-  etiqueta distinta), interruptor de bot arriba del chat, y caja de texto abajo para responder
-  como asesor. Auto-actualiza cada 8s (polling, sin Supabase Realtime).
+- Interfaz (estética tipo WhatsApp Web): lista de conversaciones a la izquierda con **avatar de
+  iniciales** (color por teléfono), preview, punto de estado (verde=bot activo / naranja=pausado)
+  y pill "Lead"; chat a la derecha con **burbujas con cola** (cliente gris a la izquierda; Liam
+  verde y el humano azul a la derecha, con etiqueta distinta), **separadores de día**
+  (Hoy/Ayer/fecha) y hora dentro de la burbuja; interruptor de bot arriba del chat y caja de
+  texto abajo para responder como asesor. Fondo con patrón sutil.
+  - ⚠️ **Bug de render corregido:** el `white-space:pre-wrap` estaba en toda la `.bubble` y
+    renderizaba los saltos de línea del template literal → burbujas gigantes y vacías. Se movió
+    a un `<span class="txt">` que envuelve solo el texto del mensaje.
+- **Refresco "en vivo" por polling adaptativo (NO Supabase Realtime, por seguridad):** se
+  descartó Realtime a propósito — expondría `whatsapp_sesiones_web` vía la anon key pública
+  (rompería la privacidad que hoy garantiza la Edge Function con clave). En su lugar:
+  `startPolling` usa `setTimeout` recursivo con `pollDelay()` → **3s** en el chat abierto, **6s**
+  navegando la lista, **8s** en segundo plano (pestaña oculta, para poder avisar igual).
+  - **Aviso de mensaje nuevo:** `detectarNuevos()` compara el ts del último mensaje ENTRANTE
+    (`role:'user'`) de cada sesión (`ultimoInboundTs`, robusto ante el recorte de historial);
+    si aparece uno nuevo y no es el chat que estás mirando/enfocado, suena un **beep**
+    (WebAudio, sin assets) y **parpadea el título** de la pestaña ("💬 (N) mensajes nuevos").
+    Se limpia al enfocar la ventana/pestaña o abrir una conversación. `baselineHecho` evita
+    avisar por todo lo que ya existía al abrir el panel.
 
 ### Pendiente para el domingo (pasar a número definitivo)
 - [ ] Generar **token permanente** (System User, sin expiración) — el de prueba expira en 24h.

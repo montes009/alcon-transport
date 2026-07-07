@@ -163,7 +163,7 @@
     <header>
       <div class="brand">UP <span>Equipos</span> · WhatsApp Liam</div>
       <div class="actions">
-        <span class="muted" style="font-size:.74rem">🔄 Auto-actualiza cada 8s</span>
+        <span class="muted" style="font-size:.74rem">🟢 En vivo · avisa mensajes nuevos</span>
         <button class="btn ghost" onclick="cargarLista()">↻ Actualizar</button>
         <button class="btn ghost" onclick="salir()">Salir</button>
       </div>
@@ -221,7 +221,15 @@ const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 
 let sesiones = [];
 let activoTel = null;
-let pollTimer = null;
+let pollTimeout = null;
+
+// --- Detección de mensajes nuevos (para avisar en "tiempo real") ---
+let lastInboundTs = {};   // telefono -> ts del último mensaje entrante ya visto
+let baselineHecho = false; // evita avisar por todo lo que ya existía al abrir
+let nuevosSinVer = 0;
+let flashTimer = null;
+let audioCtx = null;
+const tituloOriginal = document.title;
 
 const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 function getClave(){ return sessionStorage.getItem('wa_panel_clave') || ''; }
@@ -268,22 +276,33 @@ function mostrarApp(){
 }
 
 function salir(){
-  if(pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+  if(pollTimeout){ clearTimeout(pollTimeout); pollTimeout = null; }
+  pararFlash();
   sessionStorage.removeItem('wa_panel_clave');
   location.reload();
 }
 
+// Refresco adaptativo: rápido en el chat abierto, más lento navegando la
+// lista, y en segundo plano (otra pestaña) sigue vigilando para poder avisar.
+function pollDelay(){
+  if(document.hidden) return 8000;
+  return activoTel ? 3000 : 6000;
+}
 function startPolling(){
-  if(pollTimer) return;
-  pollTimer = setInterval(async () => {
-    if(!getClave() || document.hidden) return;
-    try { await cargarLista(true); } catch(e) { /* silencioso */ }
-  }, 8000);
+  if(pollTimeout) return;
+  const tick = async () => {
+    if(getClave()){
+      try { await cargarLista(); } catch(e) { /* silencioso */ }
+    }
+    pollTimeout = setTimeout(tick, pollDelay());
+  };
+  pollTimeout = setTimeout(tick, pollDelay());
 }
 
 async function cargarLista(){
   const data = await call('list');
   sesiones = data.sesiones || [];
+  detectarNuevos(sesiones);
   renderLista();
   if(activoTel){
     const s = sesiones.find(x => x.telefono === activoTel);
@@ -349,7 +368,67 @@ function renderLista(){
   }).join('') || `<div class="muted" style="padding:24px;text-align:center">Sin conversaciones aún</div>`;
 }
 
+// ts del último mensaje ENTRANTE (del cliente) en una sesión. Sobrevive al
+// recorte de historial porque el más reciente nunca se recorta.
+function ultimoInboundTs(s){
+  let mx = 0;
+  (s.historial || []).forEach(m => {
+    if(m.role === 'user' && m.ts){
+      const t = new Date(m.ts).getTime();
+      if(!isNaN(t) && t > mx) mx = t;
+    }
+  });
+  if(mx === 0){ const u = new Date(s.updated_at).getTime(); if(!isNaN(u)) mx = u; }
+  return mx;
+}
+
+function detectarNuevos(list){
+  let cuenta = 0;
+  list.forEach(s => {
+    const t = ultimoInboundTs(s);
+    const prev = lastInboundTs[s.telefono];
+    if(baselineHecho && prev !== undefined && t > prev){
+      // No avises por el chat que ya estás mirando y enfocado.
+      const viendoEste = (s.telefono === activoTel) && !document.hidden && document.hasFocus();
+      if(!viendoEste) cuenta++;
+    }
+    lastInboundTs[s.telefono] = t;
+  });
+  baselineHecho = true;
+  if(cuenta > 0){ nuevosSinVer += cuenta; beep(); flashTitulo(); }
+}
+
+function beep(){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = 'sine'; o.frequency.value = 880;
+    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.22, audioCtx.currentTime + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.32);
+    o.start(); o.stop(audioCtx.currentTime + 0.33);
+  }catch(e){ /* algunos navegadores exigen interacción previa; no pasa nada */ }
+}
+
+function flashTitulo(){
+  if(flashTimer) return;
+  let on = false;
+  flashTimer = setInterval(() => {
+    const plural = nuevosSinVer === 1 ? '' : 's';
+    document.title = on ? tituloOriginal : `💬 (${nuevosSinVer}) mensaje${plural} nuevo${plural}`;
+    on = !on;
+  }, 1000);
+}
+function pararFlash(){
+  if(flashTimer){ clearInterval(flashTimer); flashTimer = null; }
+  document.title = tituloOriginal;
+  nuevosSinVer = 0;
+}
+
 function abrirConversacion(telefono){
+  pararFlash();
   activoTel = telefono;
   const s = sesiones.find(x => x.telefono === telefono);
   if(s) renderChat(s);
@@ -448,6 +527,10 @@ async function enviarMensaje(){
     btn.disabled = false;
   }
 }
+
+// Al volver a la pestaña / ventana, se dan por vistos los avisos.
+window.addEventListener('focus', pararFlash);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) pararFlash(); });
 
 document.getElementById('clave').addEventListener('keydown', e => { if(e.key === 'Enter') entrar(); });
 if(getClave()){
