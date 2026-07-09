@@ -4,6 +4,11 @@
 // Guarda el hilo de conversacion en whatsapp_sesiones_web (aislado del ERP).
 // bot_activo controla si Liam responde automatico: se apaga solo cuando un humano
 // interviene desde el panel (whatsapp.html) o con el interruptor manual del panel.
+//
+// Cotizacion por WhatsApp: Liam tiene una herramienta (tool use) "generar_cotizacion".
+// Cuando ya recogio equipo(s) + dias (+ ciudad) llama a la RPC cotizar_web (mismas
+// tarifas reales que el cotizador de la web) y responde con un LINK de descarga del
+// PDF (print_cotizacion.html?id=...), sin mandar archivos por WhatsApp.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const WHATSAPP_TOKEN = Deno.env.get("WHATSAPP_TOKEN")!;
@@ -11,6 +16,8 @@ const PHONE_NUMBER_ID = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID")!;
 const VERIFY_TOKEN = Deno.env.get("WHATSAPP_VERIFY_TOKEN")!;
 const APP_SECRET = Deno.env.get("WHATSAPP_APP_SECRET"); // opcional, para verificar firma
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY_UP")!;
+// Sitio donde vive print_cotizacion.html (para el link de descarga del PDF).
+const SITE_URL = (Deno.env.get("SITE_URL") ?? "https://pagina-up.onrender.com").replace(/\/+$/, "");
 
 const GRAPH_URL = `https://graph.facebook.com/v21.0/${PHONE_NUMBER_ID}/messages`;
 const MAX_HISTORY = 16;
@@ -49,11 +56,12 @@ No sueltes todas estas preguntas de golpe como un formulario. Ve una o dos por m
 - *Capacidad de carga:* 227 kg la mayoría de los equipos (2 personas + herramienta); 159 kg las unipersonales. NUNCA digas cifras distintas.
 
 ---
-💰 PRECIOS (IMPORTANTE — política provisional)
-- Todavía NO tienes cargadas las tarifas oficiales por equipo en este canal. Por eso NO inventes ni afirmes precios exactos por día. Si das una referencia, que sea claramente aproximada y en rango.
-- El precio final depende de tres cosas que SIEMPRE debes recoger: *tipo de equipo/altura*, *cantidad de días* y *ciudad/obra* (para el transporte).
-- El *transporte* se cotiza aparte, por trayecto, según la ubicación.
-- Cuando el cliente pida el valor exacto o una cotización formal, tu trabajo es asegurar esos tres datos y pasar el lead al asesor comercial de la sede correspondiente: "Con esos datos ya te armo la cotización formal con el asesor de la sede de [ciudad], con transporte incluido. Para dejarla lista, ¿me confirmas [el dato que falte]?".
+💰 PRECIOS Y COTIZACIÓN FORMAL
+- En charla casual NO des precios exactos por día ni los inventes; a lo sumo una referencia aproximada en rango. El precio depende del equipo, los días y la ciudad.
+- Cuando el cliente quiera la *cotización formal* (o el "valor exacto") y ya tengas confirmados el/los *equipo(s) del catálogo* y los *días* de cada uno (la ciudad ayuda para el transporte), GENERA la cotización con tu herramienta \`generar_cotizacion\`. Esa herramienta calcula las tarifas reales con IVA y te devuelve un *link de descarga del PDF* que le compartes al cliente. NO escribas los precios a mano ni intentes mandar archivos; el sistema arma todo.
+- Antes de generar, confirma en una frase lo que vas a cotizar (ej: "Te armo la cotización de *1 tijera GS-3246 por 10 días*, ¿de una?").
+- Si falta el equipo o los días, NO uses la herramienta todavía: pregúntalos primero, uno o dos datos por mensaje.
+- El *transporte* (flete) se cotiza aparte según la ciudad y NO va incluido en ese total; acláralo al entregar el link.
 - Si el cliente compara con una cotización de la competencia, no descalifiques: reposiciona por valor (equipo certificado, respaldo documental, soporte) y por tramos de días (más días, mejor tarifa).
 
 ---
@@ -67,6 +75,53 @@ No sueltes todas estas preguntas de golpe como un formulario. Ve una o dos por m
 - Nunca digas "soy una IA", "soy un modelo de lenguaje" ni "asistente virtual". Si te cuestionan: "Soy Liam, del equipo comercial de UP Equipos. Monitoreo esta línea para darles soporte rápido."
 - Si te piden temas fuera de elevación industrial/construcción, corta con amabilidad y reconduce: "Ese no es mi fuerte, yo manejo netamente equipos de elevación y manlifts. ¿Tienes algún requerimiento de altura en este momento?".
 - No hagas listas eternas de viñetas. Si recomiendas un equipo, descríbelo en prosa; usa comparaciones solo si el cliente pide comparar dos modelos.`;
+
+// Herramienta que Claude invoca para generar la cotizacion formal.
+const TOOLS = [
+  {
+    name: "generar_cotizacion",
+    description:
+      "Genera la cotización formal de alquiler con las tarifas reales (IVA incluido) y devuelve un link de descarga del PDF para enviar al cliente. Úsala SOLO cuando ya confirmaste con el cliente: el/los equipo(s) del catálogo, la cantidad y los días de alquiler de cada uno. La ciudad ayuda para el transporte. No inventes precios: esta herramienta los calcula. El transporte (flete) se cotiza aparte y NO va incluido.",
+    input_schema: {
+      type: "object",
+      properties: {
+        items: {
+          type: "array",
+          description: "Equipos a cotizar (uno o varios).",
+          items: {
+            type: "object",
+            properties: {
+              tarifa_id: {
+                type: "integer",
+                description: "id del equipo en el catálogo disponible (preferido).",
+              },
+              ref: {
+                type: "string",
+                description:
+                  "referencia del equipo si no tienes el id (ej: 3246, Z45, AWP40).",
+              },
+              cantidad: {
+                type: "integer",
+                description: "número de unidades (mínimo 1).",
+              },
+              dias: { type: "integer", description: "días de alquiler." },
+            },
+            required: ["dias"],
+          },
+        },
+        ciudad: {
+          type: "string",
+          description: "ciudad u obra donde va el equipo (para el transporte).",
+        },
+      },
+      required: ["items"],
+    },
+  },
+];
+
+function money(v: number): string {
+  return "$ " + Number(v || 0).toLocaleString("es-CO") + " COP";
+}
 
 function estimateTokens(text: string): number {
   return text.split(" ").length * 1.3;
@@ -88,6 +143,129 @@ function saludoActual(): string {
 function wantsQuote(text: string): boolean {
   const t = text.toLowerCase();
   return QUOTE_KEYWORDS.some((k) => t.includes(k));
+}
+
+// deno-lint-ignore no-explicit-any
+async function loadTarifas(supabase: any): Promise<any[]> {
+  const { data, error } = await supabase
+    .from("tarifas_web")
+    .select("id, ref, tipo, descripcion, altura_m")
+    .eq("activo", true)
+    .order("orden");
+  if (error) {
+    console.error("tarifas_web error:", error.message);
+    return [];
+  }
+  return data ?? [];
+}
+
+// deno-lint-ignore no-explicit-any
+function catalogoTexto(tarifas: any[]): string {
+  if (!tarifas.length) return "";
+  const filas = tarifas
+    .map(
+      (t) =>
+        `- id ${t.id} | ${t.ref} | ${t.tipo} | ${t.altura_m} m | ${t.descripcion}`,
+    )
+    .join("\n");
+  return `\n\n---\n📦 CATÁLOGO DISPONIBLE (usa exactamente estos equipos y su id al cotizar)\n${filas}`;
+}
+
+function normRef(s: string): string {
+  return String(s || "").toLowerCase().replace(/genie/g, "").replace(/[^a-z0-9]/g, "");
+}
+
+// deno-lint-ignore no-explicit-any
+function resolveTarifa(item: any, tarifas: any[]): any | null {
+  if (item?.tarifa_id != null) {
+    const byId = tarifas.find((t) => Number(t.id) === Number(item.tarifa_id));
+    if (byId) return byId;
+  }
+  const r = normRef(item?.ref);
+  if (r) {
+    let m = tarifas.find((t) => normRef(t.ref) === r);
+    if (m) return m;
+    m = tarifas.find((t) => {
+      const tr = normRef(t.ref);
+      return tr.includes(r) || r.includes(tr);
+    });
+    if (m) return m;
+  }
+  return null;
+}
+
+// Ejecuta la cotizacion (asegura cliente + cotizar_web) y arma el mensaje con el link.
+// deno-lint-ignore no-explicit-any
+async function generarCotizacionReply(
+  supabase: any,
+  tarifas: any[],
+  telefono: string,
+  nombre: string | null,
+  // deno-lint-ignore no-explicit-any
+  input: any,
+  preamble: string,
+): Promise<string> {
+  const head = preamble ? preamble.trim() + "\n\n" : "";
+  try {
+    const items: { tarifa_id: number; cantidad: number; dias: number }[] = [];
+    for (const it of input?.items ?? []) {
+      const t = resolveTarifa(it, tarifas);
+      if (!t) throw new Error("tarifa no resuelta: " + JSON.stringify(it));
+      items.push({
+        tarifa_id: Number(t.id),
+        cantidad: Math.max(1, Number(it.cantidad || 1)),
+        dias: Math.max(1, Number(it.dias || 1)),
+      });
+    }
+    if (!items.length) throw new Error("sin items");
+
+    // crear_cliente_web exige nombre no vacio; si Meta no mando profile.name, usamos el telefono.
+    const nombreFinal = nombre && nombre.trim() ? nombre.trim() : `Cliente WhatsApp ${telefono}`;
+
+    // Asegura el cliente (upsert por telefono) para tener cliente_web_id.
+    const { data: cli, error: cliErr } = await supabase.rpc("crear_cliente_web", {
+      p_nombre: nombreFinal,
+      p_telefono: telefono,
+      p_correo: null,
+      p_ciudad: input?.ciudad || null,
+      p_empresa: null,
+      p_nit: null,
+    });
+    if (cliErr) throw new Error("crear_cliente_web: " + cliErr.message);
+    const clienteId = (cli && cli.id) || (typeof cli === "string" ? cli : null);
+    if (!clienteId) throw new Error("sin cliente_web_id");
+
+    const { data: cot, error: cotErr } = await supabase.rpc("cotizar_web", {
+      p_cliente_web_id: clienteId,
+      p_items: items,
+      p_ciudad: input?.ciudad || null,
+      p_mensaje: "Cotización generada por Liam (WhatsApp)",
+    });
+    if (cotErr) throw new Error("cotizar_web: " + cotErr.message);
+    if (!cot || !cot.ok) throw new Error("cotizar_web sin ok");
+
+    const link = `${SITE_URL}/print_cotizacion.html?id=${encodeURIComponent(cot.id)}&print=1`;
+    const lineas = (cot.items ?? [])
+      .map(
+        // deno-lint-ignore no-explicit-any
+        (x: any) => `• ${x.cantidad} × ${x.ref} (${x.tipo} ${x.altura_m}m) · ${x.dias} días`,
+      )
+      .join("\n");
+
+    return (
+      `${head}✅ *Cotización ${cot.nro}*\n` +
+      `${lineas}\n` +
+      `*Total: ${money(cot.total)}* (IVA incluido)\n\n` +
+      `⬇ Descárgala en PDF aquí:\n${link}\n\n` +
+      `El *transporte* se cotiza aparte según la ciudad. Guarda tu número *${cot.nro}* para consultarla luego. ¿Te la reviso con un asesor o necesitas algo más? 🙂`
+    );
+  } catch (e) {
+    console.error("generarCotizacion error:", e instanceof Error ? e.message : e);
+    return (
+      head +
+      "Uy, se me presentó un inconveniente generando la cotización en el sistema 😕. ¿Me confirmas el *equipo* y los *días* para reintentar, o prefieres que te comunique con un asesor?"
+    );
+  }
 }
 
 async function verifySignature(
@@ -220,7 +398,7 @@ Deno.serve(async (req) => {
       if (rpcError) {
         console.error("crear_cliente_web error:", rpcError.message);
       } else {
-        clienteWebId = rpcData as string;
+        clienteWebId = (rpcData && rpcData.id) || (typeof rpcData === "string" ? rpcData : null);
         leadCaptured = true;
       }
     }
@@ -254,6 +432,11 @@ Deno.serve(async (req) => {
       reply =
         "Hemos hablado bastante por aqui 🙂 Para darte una atencion mas completa, ya te conecto con uno de nuestros asesores comerciales.";
     } else {
+      // Catalogo real (para elegir equipo y para resolver la herramienta de cotizacion).
+      const tarifas = await loadTarifas(supabase);
+      const systemFinal =
+        SYSTEM_PROMPT.replaceAll("{{SALUDO_HORA}}", saludoActual()) + catalogoTexto(tarifas);
+
       const aiResp = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -263,8 +446,9 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
-          max_tokens: 400,
-          system: SYSTEM_PROMPT.replaceAll("{{SALUDO_HORA}}", saludoActual()),
+          max_tokens: 500,
+          system: systemFinal,
+          tools: TOOLS,
           messages: historial.map(({ role, content }) => ({ role, content })),
         }),
       });
@@ -273,7 +457,29 @@ Deno.serve(async (req) => {
         console.error("Anthropic error:", JSON.stringify(aiData));
         reply = "Disculpa, tuve un problema tecnico. ¿Puedes repetir tu mensaje?";
       } else {
-        reply = aiData.content[0].text;
+        // deno-lint-ignore no-explicit-any
+        const blocks: any[] = aiData.content;
+        const preamble = blocks
+          .filter((b) => b.type === "text")
+          .map((b) => b.text)
+          .join("\n")
+          .trim();
+        const toolUse = blocks.find(
+          (b) => b.type === "tool_use" && b.name === "generar_cotizacion",
+        );
+        if (toolUse) {
+          reply = await generarCotizacionReply(
+            supabase,
+            tarifas,
+            from,
+            profileName ?? sesion?.nombre ?? null,
+            toolUse.input,
+            preamble,
+          );
+          leadCaptured = true; // al cotizar, el lead queda capturado si o si
+        } else {
+          reply = preamble || "¿Me cuentas un poco más de lo que necesitas? 🙂";
+        }
       }
     }
 
