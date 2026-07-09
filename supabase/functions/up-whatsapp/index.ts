@@ -56,9 +56,16 @@ No sueltes todas estas preguntas de golpe como un formulario. Ve una o dos por m
 - *Capacidad de carga:* 227 kg la mayoría de los equipos (2 personas + herramienta); 159 kg las unipersonales. NUNCA digas cifras distintas.
 
 ---
+🧾 TIPO DE CLIENTE Y DATOS FISCALES (OBLIGATORIO ANTES DE COTIZAR)
+Una cotización formal en Colombia SIEMPRE sale identificada con el cliente y su número de identificación. NUNCA generes una cotización con el NIT en blanco. Antes de generar, define si es empresa o persona natural y captura sus datos:
+- *Empresa (persona jurídica):* necesitas la *razón social* (nombre legal de la empresa) y el *NIT*. Pídelo natural: "¿A nombre de qué empresa la hago? Regálame la *razón social* y el *NIT* para dejarla a nombre de ustedes."
+- *Persona natural:* necesitas el *nombre completo* y la *cédula*. "¿La cotización va a tu nombre? Pásame tu *nombre completo* y tu *número de cédula*."
+NO confundas el nombre del perfil de WhatsApp con la razón social: confírmalo siempre. Estos datos (NIT/razón social o cédula/nombre) los necesitas YA para cotizar. El RUT, la cámara de comercio y la cédula del representante legal se piden después, para formalizar el alquiler.
+
+---
 💰 PRECIOS Y COTIZACIÓN FORMAL
 - En charla casual NO des precios exactos por día ni los inventes; a lo sumo una referencia aproximada en rango. El precio depende del equipo, los días y la ciudad.
-- Cuando el cliente quiera la *cotización formal* (o el "valor exacto") y ya tengas confirmados el/los *equipo(s) del catálogo* y los *días* de cada uno (la ciudad ayuda para el transporte), GENERA la cotización con tu herramienta \`generar_cotizacion\`. Esa herramienta calcula las tarifas reales con IVA y te devuelve un *link de descarga del PDF* que le compartes al cliente. NO escribas los precios a mano ni intentes mandar archivos; el sistema arma todo.
+- Cuando el cliente quiera la *cotización formal* (o el "valor exacto") y ya tengas confirmados el/los *equipo(s) del catálogo*, los *días* de cada uno Y los *datos fiscales del cliente* (empresa: razón social + NIT · persona natural: nombre completo + cédula), GENERA la cotización con tu herramienta \`generar_cotizacion\`. Esa herramienta calcula las tarifas reales con IVA y te devuelve un *link de descarga del PDF* que le compartes al cliente. NO escribas los precios a mano ni intentes mandar archivos; el sistema arma todo.
 - Antes de generar, confirma en una frase lo que vas a cotizar (ej: "Te armo la cotización de *1 tijera GS-3246 por 10 días*, ¿de una?").
 - Si falta el equipo o los días, NO uses la herramienta todavía: pregúntalos primero, uno o dos datos por mensaje.
 - El *transporte* (flete) se cotiza aparte según la ciudad y NO va incluido en ese total; acláralo al entregar el link.
@@ -81,10 +88,41 @@ const TOOLS = [
   {
     name: "generar_cotizacion",
     description:
-      "Genera la cotización formal de alquiler con las tarifas reales (IVA incluido) y devuelve un link de descarga del PDF para enviar al cliente. Úsala SOLO cuando ya confirmaste con el cliente: el/los equipo(s) del catálogo, la cantidad y los días de alquiler de cada uno. La ciudad ayuda para el transporte. No inventes precios: esta herramienta los calcula. El transporte (flete) se cotiza aparte y NO va incluido.",
+      "Genera la cotización formal de alquiler con las tarifas reales (IVA incluido) y devuelve un link de descarga del PDF para enviar al cliente. Úsala SOLO cuando ya confirmaste con el cliente: el/los equipo(s) del catálogo, la cantidad y los días de alquiler de cada uno, Y los datos fiscales del cliente (empresa: razón social + NIT · persona natural: nombre completo + cédula). NUNCA la generes sin identificación (NIT o cédula). La ciudad ayuda para el transporte. No inventes precios: esta herramienta los calcula. El transporte (flete) se cotiza aparte y NO va incluido.",
     input_schema: {
       type: "object",
       properties: {
+        cliente: {
+          type: "object",
+          description:
+            "Datos fiscales del cliente para identificar la cotización (obligatorio).",
+          properties: {
+            tipo: {
+              type: "string",
+              enum: ["empresa", "natural"],
+              description: "empresa (persona jurídica) o natural (persona natural).",
+            },
+            razon_social: {
+              type: "string",
+              description: "razón social / nombre legal de la empresa (si tipo=empresa).",
+            },
+            nombre: {
+              type: "string",
+              description:
+                "nombre de la persona de contacto (empresa) o nombre completo (persona natural).",
+            },
+            nit: {
+              type: "string",
+              description: "NIT de la empresa (si tipo=empresa).",
+            },
+            cedula: {
+              type: "string",
+              description: "número de cédula (si tipo=natural).",
+            },
+            correo: { type: "string", description: "correo del cliente (opcional)." },
+          },
+          required: ["tipo"],
+        },
         items: {
           type: "array",
           description: "Equipos a cotizar (uno o varios).",
@@ -114,7 +152,7 @@ const TOOLS = [
           description: "ciudad u obra donde va el equipo (para el transporte).",
         },
       },
-      required: ["items"],
+      required: ["items", "cliente"],
     },
   },
 ];
@@ -194,13 +232,32 @@ function resolveTarifa(item: any, tarifas: any[]): any | null {
   return null;
 }
 
+// Mensaje cuando faltan los datos fiscales: pide identificacion en vez de cotizar en blanco.
+function pedirDatosFiscales(head: string, tipo: string): string {
+  if (tipo === "empresa") {
+    return (
+      head +
+      "Para dejarte la cotización a nombre de la empresa necesito la *razón social* y el *NIT* 🙂. ¿Me los regalas?"
+    );
+  }
+  if (tipo === "natural") {
+    return (
+      head +
+      "Para armarte la cotización necesito tu *nombre completo* y tu *número de cédula* 🙂. ¿Me los pasas?"
+    );
+  }
+  return (
+    head +
+    "Para dejarte la cotización formal necesito los datos de facturación 🙂. Si es *empresa*, la *razón social* y el *NIT*; si va a tu nombre, tu *nombre completo* y *cédula*."
+  );
+}
+
 // Ejecuta la cotizacion (asegura cliente + cotizar_web) y arma el mensaje con el link.
 // deno-lint-ignore no-explicit-any
 async function generarCotizacionReply(
   supabase: any,
   tarifas: any[],
   telefono: string,
-  nombre: string | null,
   // deno-lint-ignore no-explicit-any
   input: any,
   preamble: string,
@@ -219,17 +276,35 @@ async function generarCotizacionReply(
     }
     if (!items.length) throw new Error("sin items");
 
-    // crear_cliente_web exige nombre no vacio; si Meta no mando profile.name, usamos el telefono.
-    const nombreFinal = nombre && nombre.trim() ? nombre.trim() : `Cliente WhatsApp ${telefono}`;
+    // Datos fiscales: una cotizacion formal NUNCA sale con el NIT/cedula en blanco.
+    const c = input?.cliente ?? {};
+    const tipo = String(c.tipo || "").toLowerCase();
+    const razon = String(c.razon_social || "").trim();
+    const nombrePersona = String(c.nombre || "").trim();
+    const ident = String(c.nit || c.cedula || "").trim(); // NIT (empresa) o cedula (natural)
 
-    // Asegura el cliente (upsert por telefono) para tener cliente_web_id.
+    let pNombre: string;
+    let pEmpresa: string | null;
+    if (tipo === "empresa") {
+      if (!razon || !ident) return pedirDatosFiscales(head, "empresa");
+      pEmpresa = razon;
+      pNombre = nombrePersona || razon;
+    } else if (tipo === "natural") {
+      if (!nombrePersona || !ident) return pedirDatosFiscales(head, "natural");
+      pEmpresa = null;
+      pNombre = nombrePersona;
+    } else {
+      return pedirDatosFiscales(head, "");
+    }
+
+    // Asegura el cliente (upsert por telefono/NIT) con sus datos fiscales.
     const { data: cli, error: cliErr } = await supabase.rpc("crear_cliente_web", {
-      p_nombre: nombreFinal,
+      p_nombre: pNombre,
       p_telefono: telefono,
-      p_correo: null,
+      p_correo: c.correo || null,
       p_ciudad: input?.ciudad || null,
-      p_empresa: null,
-      p_nit: null,
+      p_empresa: pEmpresa,
+      p_nit: ident,
     });
     if (cliErr) throw new Error("crear_cliente_web: " + cliErr.message);
     const clienteId = (cli && cli.id) || (typeof cli === "string" ? cli : null);
@@ -472,7 +547,6 @@ Deno.serve(async (req) => {
             supabase,
             tarifas,
             from,
-            profileName ?? sesion?.nombre ?? null,
             toolUse.input,
             preamble,
           );
