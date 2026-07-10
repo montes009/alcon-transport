@@ -345,6 +345,7 @@ async function generarCotizacionReply(
       `${lineas}\n` +
       `*Total: ${money(cot.total)}* (IVA incluido)\n\n` +
       `⬇ Descárgala en PDF aquí:\n${link}\n\n` +
+      (cot.sede ? `📍 Te atiende nuestra *sede ${cot.sede}*.\n` : "") +
       `El *transporte* se cotiza aparte según la ciudad. Guarda tu número *${cot.nro}* para consultarla luego. ¿Te la reviso con un asesor o necesitas algo más? 🙂`
     );
   } catch (e) {

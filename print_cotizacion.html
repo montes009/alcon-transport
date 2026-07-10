@@ -83,6 +83,7 @@
       <div class="data-field"><label>Teléfono</label><div class="val" id="cliTelefono">—</div></div>
       <div class="data-field"><label>Correo</label><div class="val" id="cliCorreo">—</div></div>
       <div class="data-field"><label>Ciudad</label><div class="val" id="cliCiudad">—</div></div>
+      <div class="data-field"><label>Sede que atiende</label><div class="val" id="cliSede">—</div></div>
     </div>
   </div>
 
@@ -190,6 +191,7 @@ async function load() {
     set('cliTelefono', c.telefono);
     set('cliCorreo', c.correo);
     set('cliCiudad', c.ciudad);
+    set('cliSede', c.sede);
     set('firmaCliente', c.cliente);
 
     // Detalle: tabla de varios equipos (items_json) o ficha simple
