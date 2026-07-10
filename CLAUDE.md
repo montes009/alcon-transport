@@ -55,7 +55,7 @@ Flujo (todo en el chat):
 
 ### Tablas web (aisladas del ERP)
 - **`cotizaciones_web`**: cotizaciones generadas en el sitio. `id` (text, generado en la fn),
-  `nro` (`COT-Wxxxx`), cliente/contacto/telefono/correo/ciudad/**nit**, `cliente_web_id`,
+  `nro` (`COT-Wxxxx`), cliente/contacto/telefono/correo/ciudad/**sede**/**nit**, `cliente_web_id`,
   tipo/subtipo/altura/dias/precio, `iva_pct`/subtotal/total_iva/total_con_iva,
   `observaciones`, `obs`, `estado`('nueva'), `origen`('web'), `cliente_web_id`.
   - RLS: **lectura anon permitida solo en esta tabla** (para el PDF). Escritura solo service_role.
@@ -154,6 +154,40 @@ Anthropic por uso y Meta por conversación, que es gratis cuando el cliente escr
    `historial` con la respuesta de Claude?) o probar el envío de WhatsApp de forma aislada
    con Graph API Explorer.
 
+### Liam cotiza por WhatsApp (integración del cotizador) — jul/2026
+La función `up-whatsapp` **ya está versionada en el repo** (antes solo vivía desplegada):
+`supabase/functions/up-whatsapp/index.ts`. Deploy vía `mcp__Supabase__deploy_edge_function`
+(verify_jwt=false). Versión desplegada al cierre de esta ronda: **v18**.
+- **Prompt reescrito** con el flujo comercial real de Orlando (calcado de dos chats reales:
+  Yaruz/ECC y Marjorie/SMC): saludo + nombre/empresa → altura → ofrecer lo disponible →
+  días → perfilar ciudad/obra → transporte aparte. Tono cálido colombiano. Capacidad
+  corregida a **227 kg / 159 kg** (antes decía 454).
+- **Cotización por WhatsApp con tool use de Claude:** herramienta **`generar_cotizacion`**
+  (`items[{tarifa_id|ref, cantidad, dias}]`, `cliente{...}`, `ciudad`). Cuando Liam ya
+  tiene todo, la Edge Function: asegura el cliente (`crear_cliente_web`) → llama a la RPC
+  **`cotizar_web`** (mismas tarifas reales que la web) → responde con un **LINK de descarga
+  del PDF** `print_cotizacion.html?id=...&print=1` (NO manda archivos). En cada turno se
+  inyecta el **catálogo real de `tarifas_web`** (sin precios) para que elija el equipo.
+  `SITE_URL` es configurable por env (default `pagina-up.onrender.com`).
+- **En charla casual Liam NO da precios** (las tarifas reales solo salen dentro del PDF).
+- **Reglas duras antes de cotizar (guard en 3 capas: prompt + schema + servidor):**
+  - **Datos fiscales obligatorios** (nunca cotizar con NIT en blanco). Empresa →
+    *razón social + NIT*; persona natural → *nombre completo + cédula*. Si faltan,
+    Liam los pide (`pedirDatosFiscales`) en vez de generar. Mapea a `crear_cliente_web`
+    (`empresa`→p_empresa+p_nit / `natural`→p_nit=cédula).
+  - **Ciudad obligatoria** (define sede y transporte). Si falta, `pedirCiudad`.
+- **Sede automática por ciudad:** función SQL **`sede_por_ciudad(ciudad)`** (Medellín/
+  Bogotá/Barranquilla; default Barranquilla; normaliza acentos; **editable en un solo
+  lugar**). `cotizar_web` la calcula y guarda en la **columna nueva `cotizaciones_web.sede`**
+  y la devuelve. El PDF muestra "Sede que atiende" y Liam la menciona en el mensaje.
+  ⚠️ El campo del PDF solo se ve en vivo cuando llegue a **`main`** (Render sirve estático
+  desde main); la función SQL y el mensaje de WhatsApp ya están en vivo.
+- **🐛 Bug corregido en `cotizar_web` (afectaba web Y WhatsApp):** el `nro` se generaba con
+  `count(*)+1`, que **colisiona con la clave única al borrar una fila** (queda hueco) →
+  `duplicate key ...cotizaciones_web_nro_key` → el usuario veía "error al generar". Ahora
+  usa `max(número)+1` con **loop de reintento** ante `unique_violation`. Migraciones en
+  `supabase/migrations/` (`..._fix_cotizar_web_nro_secuencial.sql`, `..._sede_automatica_por_ciudad.sql`).
+
 ### Panel de auditoría/intervención (`whatsapp.html`)
 - Página interna tipo "WhatsApp Web" para que el comercial audite lo que habla Liam por
   WhatsApp y pueda intervenir en vivo. `noindex`, no enlazada, protegida por **clave**
@@ -205,9 +239,22 @@ Anthropic por uso y Meta por conversación, que es gratis cuando el cliente escr
       límite de destinatarios.
 - [ ] Decidir si se usa el portfolio **Up Equipos** (hoy bloqueado, hay que apelar) o
       **Vehimaquinas** (ya aprobado, usado en las pruebas).
-- [ ] Probar el flujo de **cotización** end-to-end por WhatsApp (hoy solo se probó saludo/charla).
+- [x] ~~Probar el flujo de **cotización** end-to-end por WhatsApp~~ → **probado y funcionando**
+      (jul/2026): genera la cotización real y manda el link del PDF. Ver subsección "Liam cotiza
+      por WhatsApp".
 - [ ] Actualizar `WHATSAPP_PHONE_NUMBER_ID` y `WHATSAPP_TOKEN` en los secrets con los datos
       del número definitivo.
+
+### Pendiente de esta ronda (cotización por WhatsApp + sede) — jul/2026
+- [ ] **Merge a `main`** para que el campo **"Sede que atiende" del PDF** (`print_cotizacion.html`)
+      salga en vivo (Render sirve estático desde main). La función SQL y el mensaje de Liam ya
+      están en vivo; solo falta el PDF. Rama de trabajo de esta sesión:
+      `claude/up-whatsapp-assistant-update-rumc0m`.
+- [ ] **2ª ronda de precios** (el cliente los organiza aparte): revisar/actualizar `tarifas_web`
+      y decidir si en **charla casual** Liam da precios reales por tramo (como hace Orlando) —
+      hoy en charla casual NO da precios; solo salen dentro del PDF de la cotización formal.
+- [ ] (Opcional) Revisar el **mapeo de sede** por si alguna región debe enrutarse distinto
+      (ej. Cali/Valle hoy → Bogotá). Se edita en la función `sede_por_ciudad`.
 
 ### Estilo comercial de Liam (ajustado, ver `SYSTEM_PROMPT` en `up-whatsapp`)
 Tono pedido por el cliente: **amable, profesional y seguro**, estilo comercial colombiano
