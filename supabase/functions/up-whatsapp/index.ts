@@ -65,9 +65,9 @@ NO confundas el nombre del perfil de WhatsApp con la razón social: confírmalo 
 ---
 💰 PRECIOS Y COTIZACIÓN FORMAL
 - En charla casual NO des precios exactos por día ni los inventes; a lo sumo una referencia aproximada en rango. El precio depende del equipo, los días y la ciudad.
-- Cuando el cliente quiera la *cotización formal* (o el "valor exacto") y ya tengas confirmados el/los *equipo(s) del catálogo*, los *días* de cada uno Y los *datos fiscales del cliente* (empresa: razón social + NIT · persona natural: nombre completo + cédula), GENERA la cotización con tu herramienta \`generar_cotizacion\`. Esa herramienta calcula las tarifas reales con IVA y te devuelve un *link de descarga del PDF* que le compartes al cliente. NO escribas los precios a mano ni intentes mandar archivos; el sistema arma todo.
+- Cuando el cliente quiera la *cotización formal* (o el "valor exacto") y ya tengas confirmados el/los *equipo(s) del catálogo*, los *días* de cada uno, los *datos fiscales del cliente* (empresa: razón social + NIT · persona natural: nombre completo + cédula) Y la *ciudad de la obra* (obligatoria: define la sede que atiende —Medellín, Bogotá o Barranquilla— y el transporte), GENERA la cotización con tu herramienta \`generar_cotizacion\`. Esa herramienta calcula las tarifas reales con IVA y te devuelve un *link de descarga del PDF* que le compartes al cliente. NO escribas los precios a mano ni intentes mandar archivos; el sistema arma todo.
 - Antes de generar, confirma en una frase lo que vas a cotizar (ej: "Te armo la cotización de *1 tijera GS-3246 por 10 días*, ¿de una?").
-- Si falta el equipo o los días, NO uses la herramienta todavía: pregúntalos primero, uno o dos datos por mensaje.
+- Si falta el equipo, los días o la ciudad, NO uses la herramienta todavía: pregúntalos primero, uno o dos datos por mensaje. La *ciudad* es imprescindible para asignar la sede.
 - El *transporte* (flete) se cotiza aparte según la ciudad y NO va incluido en ese total; acláralo al entregar el link.
 - Si el cliente compara con una cotización de la competencia, no descalifiques: reposiciona por valor (equipo certificado, respaldo documental, soporte) y por tramos de días (más días, mejor tarifa).
 
@@ -149,10 +149,11 @@ const TOOLS = [
         },
         ciudad: {
           type: "string",
-          description: "ciudad u obra donde va el equipo (para el transporte).",
+          description:
+            "ciudad donde va la obra (OBLIGATORIA): define la sede que atiende (Medellín, Bogotá, Barranquilla) y el transporte.",
         },
       },
-      required: ["items", "cliente"],
+      required: ["items", "cliente", "ciudad"],
     },
   },
 ];
@@ -252,6 +253,14 @@ function pedirDatosFiscales(head: string, tipo: string): string {
   );
 }
 
+// Mensaje cuando falta la ciudad: la necesitamos para la sede y el transporte.
+function pedirCiudad(head: string): string {
+  return (
+    head +
+    "¿En qué *ciudad* es la obra? 🙂 La necesito para asignarte la sede que te atiende (Medellín, Bogotá o Barranquilla) y calcular el transporte."
+  );
+}
+
 // Ejecuta la cotizacion (asegura cliente + cotizar_web) y arma el mensaje con el link.
 // deno-lint-ignore no-explicit-any
 async function generarCotizacionReply(
@@ -297,12 +306,16 @@ async function generarCotizacionReply(
       return pedirDatosFiscales(head, "");
     }
 
+    // Ciudad obligatoria: define la sede que atiende y el transporte. No cotizar sin ella.
+    const ciudad = String(input?.ciudad || "").trim();
+    if (!ciudad) return pedirCiudad(head);
+
     // Asegura el cliente (upsert por telefono/NIT) con sus datos fiscales.
     const { data: cli, error: cliErr } = await supabase.rpc("crear_cliente_web", {
       p_nombre: pNombre,
       p_telefono: telefono,
       p_correo: c.correo || null,
-      p_ciudad: input?.ciudad || null,
+      p_ciudad: ciudad,
       p_empresa: pEmpresa,
       p_nit: ident,
     });
@@ -313,7 +326,7 @@ async function generarCotizacionReply(
     const { data: cot, error: cotErr } = await supabase.rpc("cotizar_web", {
       p_cliente_web_id: clienteId,
       p_items: items,
-      p_ciudad: input?.ciudad || null,
+      p_ciudad: ciudad,
       p_mensaje: "Cotización generada por Liam (WhatsApp)",
     });
     if (cotErr) throw new Error("cotizar_web: " + cotErr.message);
