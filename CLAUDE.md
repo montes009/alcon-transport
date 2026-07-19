@@ -231,6 +231,37 @@ La función `up-whatsapp` **ya está versionada en el repo** (antes solo vivía 
     Se limpia al enfocar la ventana/pestaña o abrir una conversación. `baselineHecho` evita
     avisar por todo lo que ya existía al abrir el panel.
 
+### Configurar a Liam sin tocar código (tabla `liam_config_web`) — jul/2026
+Botón **"⚙️ Configurar Liam"** en el header de `whatsapp.html` abre un modal para editar el
+estilo/contenido comercial de Liam (WhatsApp) desde el navegador, sin redeploy. Inspirado en
+paneles tipo Bolten (chatbots white-label) que exponen "Tom da Conversa"/base de conocimiento
+como campos editables en vez de código.
+- **Tabla `liam_config_web`** (fila única `id=1`, aislada del ERP): `tono`, `contexto_negocio`,
+  `politica_precios`, `restricciones` (los 4 campos editables), `activo` (bool, **kill switch**:
+  si es `false` o la fila no existe o falla la consulta, `up-whatsapp` usa los valores por
+  defecto hardcodeados — nunca se rompe por una fila vacía o una edición a medias), `updated_by`,
+  `updated_at`. RLS sin policies para anon (igual que `clientes_web`): solo `service_role` lee/escribe.
+  Migración: `supabase/migrations/20260719120000_liam_config_web.sql`.
+- **División deliberada editable vs. fijo** (decisión de diseño, no cambiar sin pensar en el
+  flujo de cotización): SOLO tono/contexto de negocio/precios en charla casual/restricciones
+  salen a `liam_config_web`. Queda **FIJO en código** (`buildSystemPrompt` en
+  `up-whatsapp/index.ts`) todo lo estructural: el flujo de primer contacto, la exigencia de
+  NIT/cédula antes de cotizar, el uso obligatorio de la herramienta `generar_cotizacion`, los
+  requisitos de cierre y la **capacidad de carga (227/159 kg)** — así una edición descuidada
+  desde el panel no puede romper la cotización ni repetir el bug histórico de la capacidad mal
+  dicha (454 kg).
+- `up-whatsapp/index.ts`: `loadLiamConfig()` consulta la fila en cada mensaje entrante (fallback
+  seguro a `DEFAULT_CONFIG` si algo falla) y `buildSystemPrompt(cfg)` arma el prompt completo
+  interpolando esos 4 bloques dentro de la plantilla fija.
+- **Edge Function `whatsapp-panel`** (ahora versionada en el repo,
+  `supabase/functions/whatsapp-panel/index.ts`, antes solo vivía desplegada): se agregaron las
+  acciones `get_config` (lee la fila) y `save_config` (`tono`, `contexto_negocio`,
+  `politica_precios`, `restricciones`, `activo`, `updated_by` → upsert `id=1`). Mismo esquema de
+  autenticación por clave que las demás acciones del panel.
+- Alcance: **solo Liam por WhatsApp** por ahora. El chat de la web (`up-asesor`) sigue con su
+  prompt hardcodeado aparte (duplicación conocida, pendiente de unificar si se quiere evitar que
+  los dos canales se desincronicen de nuevo).
+
 ### Pendiente para el domingo (pasar a número definitivo)
 - [ ] Generar **token permanente** (System User, sin expiración) — el de prueba expira en 24h.
 - [ ] Conseguir/activar el **número de WhatsApp definitivo** (no el de prueba `+1 555...`).

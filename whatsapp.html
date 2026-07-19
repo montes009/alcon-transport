@@ -148,6 +148,32 @@
       .bubble{max-width:82%}
     }
     .back-btn{display:none}
+
+    /* ---------- Modal Configurar Liam ---------- */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;display:none;
+      align-items:center;justify-content:center;padding:20px}
+    .modal-overlay.show{display:flex}
+    .modal{background:var(--panel);border-radius:14px;width:min(640px,100%);max-height:88vh;
+      display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+    .modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;
+      justify-content:space-between;align-items:center;flex:0 0 auto}
+    .modal-head h2{font-size:1.05rem;color:#fff}
+    .modal-close{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;
+      line-height:1;padding:2px 6px}
+    .modal-body{padding:16px 20px;overflow-y:auto;flex:1 1 auto;display:flex;flex-direction:column;gap:14px}
+    .cfg-field label{display:block;font-size:.82rem;font-weight:700;color:#cfd6db;margin-bottom:5px}
+    .cfg-field .hint{font-size:.72rem;color:var(--muted);margin-bottom:6px}
+    .cfg-field textarea{width:100%;min-height:90px;resize:vertical;padding:10px 12px;
+      border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:#fff;
+      font-size:.85rem;line-height:1.45;outline:none;font-family:inherit}
+    .cfg-field textarea:focus{border-color:var(--brand)}
+    .cfg-toggle{display:flex;align-items:center;gap:10px;padding-top:2px}
+    .cfg-toggle .toggle-label{font-size:.82rem;font-weight:700}
+    .modal-foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;
+      justify-content:space-between;align-items:center;gap:10px;flex:0 0 auto;flex-wrap:wrap}
+    .cfg-status{font-size:.76rem;color:var(--muted);min-height:1.1em}
+    .cfg-status.ok{color:var(--wa)}
+    .cfg-status.err{color:#ff5a6e}
   </style>
 </head>
 <body>
@@ -164,6 +190,7 @@
       <div class="brand">UP <span>Equipos</span> · WhatsApp Liam</div>
       <div class="actions">
         <span class="muted" style="font-size:.74rem">🟢 En vivo · avisa mensajes nuevos</span>
+        <button class="btn ghost" onclick="abrirConfig()">⚙️ Configurar Liam</button>
         <button class="btn ghost" onclick="cargarLista()">↻ Actualizar</button>
         <button class="btn ghost" onclick="salir()">Salir</button>
       </div>
@@ -210,6 +237,56 @@
               onkeydown="onComposerKey(event)"></textarea>
             <button class="btn" id="btnEnviar" onclick="enviarMensaje()" title="Enviar">➤</button>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="cfgOverlay">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>⚙️ Configurar a Liam (WhatsApp)</h2>
+        <button class="modal-close" onclick="cerrarConfig()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="muted" style="font-size:.78rem">
+          Edita cómo habla Liam sin tocar código. Lo que NO se edita aquí (por seguridad de la
+          cotización): pedir siempre NIT/cédula antes de cotizar, el uso de la herramienta de
+          cotizar y la capacidad de carga (227/159 kg) — eso queda fijo en el sistema.
+        </p>
+        <div class="cfg-field">
+          <label>🎯 Tono</label>
+          <div class="hint">Cómo habla: registro, calidez, uso de negritas/emojis, cómo saluda y cierra.</div>
+          <textarea id="cfgTono"></textarea>
+        </div>
+        <div class="cfg-field">
+          <label>🏗️ Contexto de negocio</label>
+          <div class="hint">Descripción de los equipos y para qué sirve cada tipo (catálogo en prosa).</div>
+          <textarea id="cfgContexto"></textarea>
+        </div>
+        <div class="cfg-field">
+          <label>💰 Política de precios (charla casual)</label>
+          <div class="hint">Qué tan aproximado puede ser al hablar de precio antes de la cotización formal.</div>
+          <textarea id="cfgPrecios"></textarea>
+        </div>
+        <div class="cfg-field">
+          <label>🚫 Restricciones</label>
+          <div class="hint">Qué NO debe decir o hacer (temas fuera de tema, revelar que es IA, etc.).</div>
+          <textarea id="cfgRestricciones"></textarea>
+        </div>
+        <div class="cfg-toggle">
+          <label class="switch">
+            <input type="checkbox" id="cfgActivo" checked />
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label" id="cfgActivoLabel">Configuración activa</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <span class="cfg-status" id="cfgStatus"></span>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" onclick="cerrarConfig()">Cancelar</button>
+          <button class="btn" id="cfgGuardarBtn" onclick="guardarConfig()">Guardar</button>
         </div>
       </div>
     </div>
@@ -527,6 +604,68 @@ async function enviarMensaje(){
     btn.disabled = false;
   }
 }
+
+// --- Configurar a Liam (tono, contexto de negocio, precios, restricciones) ---
+async function abrirConfig(){
+  const overlay = document.getElementById('cfgOverlay');
+  const status = document.getElementById('cfgStatus');
+  status.textContent = 'Cargando...';
+  status.className = 'cfg-status';
+  overlay.classList.add('show');
+  try {
+    const data = await call('get_config');
+    const c = data.config || {};
+    document.getElementById('cfgTono').value = c.tono || '';
+    document.getElementById('cfgContexto').value = c.contexto_negocio || '';
+    document.getElementById('cfgPrecios').value = c.politica_precios || '';
+    document.getElementById('cfgRestricciones').value = c.restricciones || '';
+    const activo = c.activo !== false;
+    document.getElementById('cfgActivo').checked = activo;
+    document.getElementById('cfgActivoLabel').textContent = activo
+      ? 'Configuración activa' : 'Desactivada (Liam usa los valores por defecto del sistema)';
+    status.textContent = '';
+  } catch(e){
+    status.textContent = 'No se pudo cargar la configuración: ' + e.message;
+    status.className = 'cfg-status err';
+  }
+}
+
+function cerrarConfig(){
+  document.getElementById('cfgOverlay').classList.remove('show');
+}
+
+document.getElementById('cfgActivo').addEventListener('change', function(){
+  document.getElementById('cfgActivoLabel').textContent = this.checked
+    ? 'Configuración activa' : 'Desactivada (Liam usa los valores por defecto del sistema)';
+});
+
+async function guardarConfig(){
+  const btn = document.getElementById('cfgGuardarBtn');
+  const status = document.getElementById('cfgStatus');
+  btn.disabled = true;
+  status.textContent = 'Guardando...';
+  status.className = 'cfg-status';
+  try {
+    await call('save_config', {
+      tono: document.getElementById('cfgTono').value,
+      contexto_negocio: document.getElementById('cfgContexto').value,
+      politica_precios: document.getElementById('cfgPrecios').value,
+      restricciones: document.getElementById('cfgRestricciones').value,
+      activo: document.getElementById('cfgActivo').checked,
+    });
+    status.textContent = '✓ Guardado. Liam ya usa esta configuración desde el próximo mensaje.';
+    status.className = 'cfg-status ok';
+  } catch(e){
+    status.textContent = 'No se pudo guardar: ' + e.message;
+    status.className = 'cfg-status err';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.getElementById('cfgOverlay').addEventListener('click', function(e){
+  if(e.target === this) cerrarConfig();
+});
 
 // Al volver a la pestaña / ventana, se dan por vistos los avisos.
 window.addEventListener('focus', pararFlash);
