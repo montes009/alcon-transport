@@ -369,3 +369,37 @@ que avanza la venta (altura, ciudad, cuándo lo necesita).
   Borrarla si se quiere dejar limpio.
 - Las funciones `up-cliente`/`up-cotizar` del repo pueden estar más nuevas que las desplegadas
   si el deploy quedó bloqueado; el NIT ya funciona vía RPC + trigger sin necesidad de redeploy.
+
+## Ideas a futuro (solo anotadas, NO implementadas) — jul/2026
+Lluvia de ideas de "qué más se le puede agregar" a Liam/WhatsApp. Ninguna de estas se construyó
+todavía; quedan aquí para retomar cuando se decida cuál priorizar.
+- **Unificar el prompt del chat web (`up-asesor`) con `liam_config_web`**: hoy cada canal tiene
+  su propio prompt hardcodeado y ya se desincronizaron una vez (bug histórico de 454kg vs
+  227/159kg). Con `liam_config_web` ya construida para WhatsApp, sería relativamente rápido
+  hacer que `up-asesor` lea la misma tabla en vez de tener su propio `BASE` hardcodeado.
+- **Aviso proactivo al comercial de leads/cotizaciones nuevas**: hoy `whatsapp.html` solo avisa
+  (beep + parpadeo de pestaña) si el panel está abierto. Si nadie lo tiene abierto, se puede
+  perder un lead caliente. Idea: que `up-whatsapp` mande un WhatsApp automático al número
+  comercial (`whatsappComercial` en `js/config.js`) cuando Liam captura un lead o genera una
+  cotización.
+- **Seguimiento automático a leads fríos**: si un cliente pidió info y no volvió a escribir en
+  ~2 días, que Liam reenganche ("¿sigues necesitando el equipo?"). Requiere un cron +
+  **plantilla de WhatsApp aprobada por Meta**, porque los mensajes iniciados por el negocio
+  fuera de la ventana de 24h desde el último mensaje del cliente no se pueden mandar como texto
+  libre (solo con template).
+- **Que Liam mande fotos del equipo por WhatsApp**: hoy `up-whatsapp` solo lee/responde texto
+  ("Por ahora puedo leer solo mensajes de texto"). Se podría mandar la foto del modelo
+  recomendado junto con la respuesta usando la Graph API (`type: "image", image: {link: "..."}`
+  — Meta descarga la imagen desde una URL pública, no hace falta subirla a servidores de Meta).
+  - **Dónde alojar las fotos**: usar la misma carpeta pública `imagenes/` del repo (servida por
+    Render, mismo mecanismo que ya usa `og-image.png` para el preview de WhatsApp/Facebook) en
+    vez de crear un bucket nuevo de Supabase Storage — ya es infraestructura existente y
+    probada; la única baja es que cambiar una foto requiere commit + push (no es editable desde
+    un panel). Alternativa descartada por ahora: bucket de Supabase Storage (más flexible desde
+    Studio, pero es infraestructura nueva para algo ya resuelto de forma más simple).
+  - **Ya existe material listo para esto**: la carpeta `IMAGENES POR INCORPORAR/` en la raíz del
+    repo tiene fotos reales por tipo de equipo que nunca se movieron a `imagenes/` — *BRAZO
+    ARTICULADO Z45 25J*, *BRAZO ARTICULADO Z62 40*, *TIJERA*, *Telehandler*, *UNI PERSONAL NO
+    AUTOPROPULSADA*, *UNIPERSONAL AUTOPROPULSADA*, *Z80 60*. El siguiente paso (cuando se
+    priorice) sería moverlas a `imagenes/equipos/`, mapear cada referencia de `tarifas_web` a su
+    foto, y que `up-whatsapp` la envíe junto con la recomendación.
