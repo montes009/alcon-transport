@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Propuesta de diseno definitivo del sitio de UP Equipos basada en las metricas reales de GA4 de julio 2026.">
-<title>Manual de diseño — Liam, consultor técnico · UP Equipos</title>
+<meta name="description" content="Manual de configuracion y operacion del sitio web y de Liam - UP Equipos.">
+<title>Manual de configuración y operación — Sitio web y Liam · UP Equipos</title>
 
 <style>
 /* ============================================================
-   MANUAL DE DISEÑO — UP EQUIPOS
+   MANUAL DE CONFIGURACIÓN Y OPERACIÓN — UP EQUIPOS
    Paleta base del proyecto: #C0001F / negro / blanco (styles.css)
    Tipografía: Open Sans (self-hosted del repo) + mono de sistema
    ============================================================ */
@@ -44,87 +44,52 @@
   --verde-suave:#e2efea;
   --ambar:#9c5c06;
   --ambar-suave:#f6ecdd;
-  --sombra:0 1px 0 rgba(20,22,26,.06);
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
   --texto:'Open Sans Doc','Open Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
 }
 
 @media (prefers-color-scheme:dark){
   :root{
-    --papel:#0d0f11;
-    --papel-2:#14181b;
-    --papel-3:#1b2025;
-    --tinta:#e9e9e4;
-    --tinta-2:#a2a8ae;
-    --tinta-3:#858b92;
-    --linea:#272c31;
-    --linea-fuerte:#3a4148;
-    --rojo:#ff4257;
-    --rojo-suave:#2a1418;
-    --verde:#35c08a;
-    --verde-suave:#0f2019;
-    --ambar:#dda03c;
-    --ambar-suave:#241a0d;
-    --sombra:0 1px 0 rgba(0,0,0,.4);
+    --papel:#0d0f11;--papel-2:#14181b;--papel-3:#1b2025;
+    --tinta:#e9e9e4;--tinta-2:#a2a8ae;--tinta-3:#858b92;
+    --linea:#272c31;--linea-fuerte:#3a4148;
+    --rojo:#ff4257;--rojo-suave:#2a1418;
+    --verde:#35c08a;--verde-suave:#0f2019;
+    --ambar:#dda03c;--ambar-suave:#241a0d;
   }
 }
 :root[data-theme="dark"]{
-  --papel:#0d0f11;
-  --papel-2:#14181b;
-  --papel-3:#1b2025;
-  --tinta:#e9e9e4;
-  --tinta-2:#a2a8ae;
-  --tinta-3:#858b92;
-  --linea:#272c31;
-  --linea-fuerte:#3a4148;
-  --rojo:#ff4257;
-  --rojo-suave:#2a1418;
-  --verde:#35c08a;
-  --verde-suave:#0f2019;
-  --ambar:#dda03c;
-  --ambar-suave:#241a0d;
-  --sombra:0 1px 0 rgba(0,0,0,.4);
+  --papel:#0d0f11;--papel-2:#14181b;--papel-3:#1b2025;
+  --tinta:#e9e9e4;--tinta-2:#a2a8ae;--tinta-3:#858b92;
+  --linea:#272c31;--linea-fuerte:#3a4148;
+  --rojo:#ff4257;--rojo-suave:#2a1418;
+  --verde:#35c08a;--verde-suave:#0f2019;
+  --ambar:#dda03c;--ambar-suave:#241a0d;
 }
 :root[data-theme="light"]{
-  --papel:#ffffff;
-  --papel-2:#f2f2ee;
-  --papel-3:#e9e9e4;
-  --tinta:#14161a;
-  --tinta-2:#565b62;
-  --tinta-3:#7d838a;
-  --linea:#dcdcd6;
-  --linea-fuerte:#b9b9b2;
-  --rojo:#c0001f;
-  --rojo-suave:#f6e2e5;
-  --verde:#0a6b4c;
-  --verde-suave:#e2efea;
-  --ambar:#9c5c06;
-  --ambar-suave:#f6ecdd;
-  --sombra:0 1px 0 rgba(20,22,26,.06);
+  --papel:#ffffff;--papel-2:#f2f2ee;--papel-3:#e9e9e4;
+  --tinta:#14161a;--tinta-2:#565b62;--tinta-3:#7d838a;
+  --linea:#dcdcd6;--linea-fuerte:#b9b9b2;
+  --rojo:#c0001f;--rojo-suave:#f6e2e5;
+  --verde:#0a6b4c;--verde-suave:#e2efea;
+  --ambar:#9c5c06;--ambar-suave:#f6ecdd;
 }
 
 *,*::before,*::after{box-sizing:border-box;}
 body{
-  margin:0;
-  background:var(--papel);
-  color:var(--tinta);
-  font-family:var(--texto);
-  font-size:16px;
-  line-height:1.62;
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
+  margin:0;background:var(--papel);color:var(--tinta);
+  font-family:var(--texto);font-size:16px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
 }
 p,ul,ol,table,figure,h1,h2,h3,h4{margin:0;}
 img{display:block;max-width:100%;}
+code{font-family:var(--mono);font-size:.92em;}
 
-/* ---------- rejilla del documento: riel de medición + columna ---------- */
+/* ---------- rejilla del documento ---------- */
 .doc{max-width:1080px;margin:0 auto;padding:0 20px 96px;}
 .bloque{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:0;
-  padding:56px 0 8px;
-  border-top:1px solid var(--linea);
+  display:grid;grid-template-columns:1fr;gap:0;
+  padding:56px 0 8px;border-top:1px solid var(--linea);
 }
 .bloque:first-of-type{border-top:0;}
 .riel{display:none;}
@@ -132,41 +97,18 @@ img{display:block;max-width:100%;}
 
 @media (min-width:920px){
   .bloque{grid-template-columns:104px minmax(0,1fr);gap:32px;}
-  .riel{
-    display:block;
-    position:relative;
-    border-right:1px solid var(--linea);
-    padding-right:14px;
-  }
-  /* marcas de cinta métrica */
+  .riel{display:block;position:relative;border-right:1px solid var(--linea);padding-right:14px;}
   .riel::after{
-    content:"";
-    position:absolute;
-    top:6px;right:-1px;bottom:0;
-    width:9px;
-    background-image:repeating-linear-gradient(
-      to bottom,
-      var(--linea) 0 1px,
-      transparent 1px 24px
-    );
+    content:"";position:absolute;top:6px;right:-1px;bottom:0;width:9px;
+    background-image:repeating-linear-gradient(to bottom,var(--linea) 0 1px,transparent 1px 24px);
   }
   .riel-num{
-    position:sticky;top:64px;
-    display:block;
-    text-align:right;
-    font-family:var(--mono);
-    font-size:12px;
-    letter-spacing:.06em;
-    color:var(--tinta-3);
+    position:sticky;top:64px;display:block;text-align:right;
+    font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--tinta-3);
   }
   .riel-num b{
-    display:block;
-    font-family:var(--texto);
-    font-weight:700;
-    font-size:26px;
-    line-height:1.1;
-    color:var(--rojo);
-    letter-spacing:-.02em;
+    display:block;font-family:var(--texto);font-weight:700;font-size:26px;
+    line-height:1.1;color:var(--rojo);letter-spacing:-.02em;
   }
 }
 
@@ -177,14 +119,9 @@ img{display:block;max-width:100%;}
   backdrop-filter:saturate(1.4) blur(8px);
   border-bottom:1px solid var(--linea);
 }
-.barra-in{
-  max-width:1080px;margin:0 auto;padding:10px 20px;
-  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
-}
+.barra-in{max-width:1080px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
 .marca{display:flex;align-items:center;gap:9px;font-weight:700;font-size:14px;letter-spacing:-.01em;}
-.marca span{
-  display:inline-block;width:10px;height:18px;background:var(--rojo);
-}
+.marca span{display:inline-block;width:10px;height:18px;background:var(--rojo);}
 .barra nav{margin-left:auto;display:flex;gap:2px;flex-wrap:wrap;}
 .barra nav a{
   font-family:var(--mono);font-size:11px;letter-spacing:.04em;
@@ -195,120 +132,67 @@ img{display:block;max-width:100%;}
 
 /* ---------- portada ---------- */
 .portada{padding:76px 0 44px;max-width:80ch;}
-.eyebrow{
-  font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--rojo);
-}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--rojo);}
 .portada h1{
-  font-size:clamp(2.1rem,5.4vw,3.5rem);
-  font-weight:700;line-height:1.04;letter-spacing:-.035em;
-  text-wrap:balance;margin:18px 0 0;
+  font-size:clamp(2rem,5vw,3.2rem);font-weight:700;line-height:1.06;
+  letter-spacing:-.035em;text-wrap:balance;margin:18px 0 0;
 }
 .portada h1 em{font-style:normal;color:var(--rojo);}
-.bajada{
-  font-size:1.09rem;color:var(--tinta-2);margin-top:20px;max-width:62ch;
-}
-.ficha-doc{
-  margin-top:30px;display:flex;flex-wrap:wrap;gap:0;
-  border:1px solid var(--linea);
-}
-.ficha-doc div{
-  flex:1 1 180px;padding:11px 14px;border-right:1px solid var(--linea);
-}
+.bajada{font-size:1.09rem;color:var(--tinta-2);margin-top:20px;max-width:62ch;}
+.ficha-doc{margin-top:30px;display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--linea);}
+.ficha-doc div{flex:1 1 170px;padding:11px 14px;border-right:1px solid var(--linea);}
 .ficha-doc div:last-child{border-right:0;}
-.ficha-doc dt{
-  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--tinta-3);
-}
+.ficha-doc dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-3);}
 .ficha-doc dd{margin:3px 0 0;font-size:13.5px;font-weight:700;}
 
-/* ---------- tipografía de sección ---------- */
-h2{
-  font-size:clamp(1.5rem,3vw,2rem);font-weight:700;
-  letter-spacing:-.028em;line-height:1.14;text-wrap:balance;
-}
-h3{
-  font-size:1.06rem;font-weight:700;letter-spacing:-.012em;
-  margin-top:34px;text-wrap:balance;
-}
+/* ---------- tipografía ---------- */
+h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:700;letter-spacing:-.028em;line-height:1.14;text-wrap:balance;}
+h3{font-size:1.06rem;font-weight:700;letter-spacing:-.012em;margin-top:34px;text-wrap:balance;}
 h4{font-size:.95rem;font-weight:700;}
 .col > p{margin-top:16px;}
 .col > p + p{margin-top:12px;}
 .lede{font-size:1.06rem;color:var(--tinta-2);margin-top:14px;}
-.pie-nota{
-  font-family:var(--mono);font-size:11.5px;line-height:1.55;
-  color:var(--tinta-3);margin-top:14px;
-}
+.pie-nota{font-family:var(--mono);font-size:11.5px;line-height:1.55;color:var(--tinta-3);margin-top:14px;}
 strong{font-weight:700;}
 .dato{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;color:var(--rojo);}
 
 ul.lista{margin-top:14px;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:9px;}
 ul.lista li{position:relative;padding-left:20px;}
-ul.lista li::before{
-  content:"";position:absolute;left:2px;top:.62em;
-  width:7px;height:1px;background:var(--linea-fuerte);
-}
+ul.lista li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:1px;background:var(--linea-fuerte);}
 
-/* ---------- tiles de cifras ---------- */
+/* ---------- cifras ---------- */
 .kpis{
   margin-top:26px;display:grid;gap:1px;background:var(--linea);
-  border:1px solid var(--linea);
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  border:1px solid var(--linea);grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
 }
 .kpi{background:var(--papel);padding:16px 15px;}
-.kpi .n{
-  font-size:clamp(1.5rem,3.4vw,2rem);font-weight:700;letter-spacing:-.03em;
-  font-variant-numeric:tabular-nums;line-height:1.05;
-}
+.kpi .n{font-size:clamp(1.5rem,3.4vw,2rem);font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.05;}
 .kpi .d{font-family:var(--mono);font-size:11px;color:var(--tinta-3);margin-top:7px;line-height:1.45;}
-.kpi .v{
-  font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--verde);
-  margin-top:5px;letter-spacing:.02em;
-}
+.kpi .v{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--verde);margin-top:5px;letter-spacing:.02em;}
 
-/* ---------- barras de magnitud (serie única, etiquetada) ---------- */
+/* ---------- barras ---------- */
 .barras{margin-top:22px;display:flex;flex-direction:column;gap:11px;}
 .barra-fila{display:grid;grid-template-columns:minmax(96px,150px) 1fr auto;gap:12px;align-items:center;}
 .barra-fila .et{font-size:13px;color:var(--tinta-2);line-height:1.3;}
 .barra-pista{background:var(--papel-3);height:16px;position:relative;}
-.barra-val{
-  height:16px;background:var(--rojo);
-  border-top-right-radius:4px;border-bottom-right-radius:4px;
-}
-.barra-fila .num{
-  font-family:var(--mono);font-variant-numeric:tabular-nums;
-  font-size:12.5px;font-weight:700;min-width:52px;text-align:right;
-}
+.barra-val{height:16px;background:var(--rojo);border-top-right-radius:4px;border-bottom-right-radius:4px;}
+.barra-fila .num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:12.5px;font-weight:700;min-width:52px;text-align:right;}
 .barra-fila.apagada .barra-val{background:var(--linea-fuerte);}
 .barra-fila.alerta .barra-val{background:var(--ambar);}
 
 /* ---------- ritmo semanal ---------- */
-.ritmo{
-  margin-top:22px;border:1px solid var(--linea);padding:16px 14px 12px;
-  background:var(--papel-2);
-}
+.ritmo{margin-top:22px;border:1px solid var(--linea);padding:16px 14px 12px;background:var(--papel-2);}
 .ritmo-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;align-items:end;}
 .ritmo-col{display:grid;grid-template-rows:96px auto;justify-items:center;gap:7px;}
-.ritmo-bar{
-  width:100%;align-self:end;background:var(--rojo);
-  border-top-left-radius:3px;border-top-right-radius:3px;
-}
+.ritmo-bar{width:100%;align-self:end;background:var(--rojo);border-top-left-radius:3px;border-top-right-radius:3px;}
 .ritmo-col.fin .ritmo-bar{background:var(--linea-fuerte);}
 .ritmo-dia{font-family:var(--mono);font-size:10.5px;color:var(--tinta-3);letter-spacing:.04em;}
 .ritmo-base{height:1px;background:var(--linea-fuerte);margin-top:-1px;}
 
-/* ---------- veredictos ---------- */
-.veredicto{
-  margin-top:20px;border:1px solid var(--linea);background:var(--papel);
-}
-.veredicto > header{
-  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
-  padding:13px 16px 11px;border-bottom:1px solid var(--linea);
-}
-.chip{
-  font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.1em;
-  text-transform:uppercase;padding:3px 7px;white-space:nowrap;
-}
+/* ---------- fichas de estado ---------- */
+.veredicto{margin-top:20px;border:1px solid var(--linea);background:var(--papel);}
+.veredicto > header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:13px 16px 11px;border-bottom:1px solid var(--linea);}
+.chip{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;white-space:nowrap;}
 .chip.si{color:var(--verde);background:var(--verde-suave);}
 .chip.no{color:var(--ambar);background:var(--ambar-suave);}
 .chip.neutro{color:var(--tinta-2);background:var(--papel-2);}
@@ -321,14 +205,20 @@ ul.lista li::before{
   font-family:var(--mono);font-size:11.5px;line-height:1.6;color:var(--tinta-2);
 }
 .prueba b{color:var(--tinta);}
+.accion{
+  margin-top:10px;padding:10px 12px;background:var(--papel);
+  border-left:2px solid var(--rojo);
+  font-size:13.5px;line-height:1.55;
+}
+.accion .et{
+  display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--rojo);margin-bottom:3px;
+}
 
 /* ---------- tablas ---------- */
 .tabla-wrap{margin-top:20px;overflow-x:auto;border:1px solid var(--linea);}
 table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px;}
-th,td{
-  text-align:left;padding:10px 13px;
-  border-bottom:1px solid var(--linea);vertical-align:top;
-}
+th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--linea);vertical-align:top;}
 thead th{
   font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
   color:var(--tinta-3);font-weight:700;background:var(--papel-2);
@@ -340,64 +230,43 @@ td.malo{color:var(--ambar);font-weight:700;}
 td.bueno{color:var(--verde);font-weight:700;}
 caption{
   caption-side:bottom;text-align:left;padding:9px 13px;
-  font-family:var(--mono);font-size:11px;color:var(--tinta-3);
-  border-top:1px solid var(--linea);
+  font-family:var(--mono);font-size:11px;color:var(--tinta-3);border-top:1px solid var(--linea);
 }
 
-/* ---------- maqueta de la página ---------- */
+/* ---------- maqueta ---------- */
 .maqueta{margin-top:24px;display:flex;flex-direction:column;gap:1px;background:var(--linea);border:1px solid var(--linea);}
 .mq{background:var(--papel);padding:14px 16px;display:grid;grid-template-columns:34px 1fr;gap:14px;}
-.mq-n{
-  font-family:var(--mono);font-size:12px;font-weight:700;color:var(--rojo);
-  padding-top:2px;font-variant-numeric:tabular-nums;
-}
+.mq-n{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--rojo);padding-top:2px;font-variant-numeric:tabular-nums;}
 .mq h4{margin:0;}
 .mq p{margin:5px 0 0;font-size:13.5px;color:var(--tinta-2);}
-.mq .tag{
-  display:inline-block;margin-top:9px;
-  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
-  color:var(--tinta-3);border:1px solid var(--linea);padding:2px 6px;
-}
+.mq .tag{display:inline-block;margin-top:9px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--tinta-3);border:1px solid var(--linea);padding:2px 6px;}
 .mq.destacado{background:var(--rojo-suave);}
 .mq.destacado h4{color:var(--rojo);}
 
 /* ---------- reglas ---------- */
 .reglas{margin-top:22px;display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);}
 .regla{background:var(--papel);padding:14px 16px;display:grid;grid-template-columns:46px 1fr;gap:14px;align-items:start;}
-.regla-id{
-  font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.06em;
-  color:var(--rojo);padding-top:2px;
-}
+.regla-id{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--rojo);padding-top:2px;}
 .regla h4{margin:0;font-size:.97rem;}
 .regla p{margin:5px 0 0;font-size:13.5px;color:var(--tinta-2);}
 
-/* ---------- ficha de equipo (ejemplo) ---------- */
-.ficha-eq{
-  margin-top:20px;border:1px solid var(--linea-fuerte);background:var(--papel);
-  max-width:420px;
-}
+/* ---------- ficha de equipo ---------- */
+.ficha-eq{margin-top:20px;border:1px solid var(--linea-fuerte);background:var(--papel);max-width:420px;}
 .ficha-eq header{padding:13px 15px 11px;border-bottom:1px solid var(--linea);}
 .ficha-eq .ref{font-family:var(--mono);font-size:11px;color:var(--tinta-3);letter-spacing:.08em;}
 .ficha-eq h4{margin:3px 0 0;font-size:1.15rem;letter-spacing:-.02em;}
 .ficha-eq dl{margin:0;display:grid;grid-template-columns:1fr auto;}
-.ficha-eq dt,.ficha-eq dd{
-  padding:8px 15px;margin:0;border-bottom:1px solid var(--linea);font-size:13px;
-}
+.ficha-eq dt,.ficha-eq dd{padding:8px 15px;margin:0;border-bottom:1px solid var(--linea);font-size:13px;}
 .ficha-eq dt{color:var(--tinta-2);}
-.ficha-eq dd{
-  font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;text-align:right;
-}
+.ficha-eq dd{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;text-align:right;}
 .ficha-eq .acciones{padding:13px 15px;display:flex;gap:8px;flex-wrap:wrap;}
-.btn-falso{
-  font-size:12.5px;font-weight:700;padding:8px 12px;border:1px solid var(--rojo);
-  color:var(--rojo);background:transparent;
-}
+.btn-falso{font-size:12.5px;font-weight:700;padding:8px 12px;border:1px solid var(--rojo);color:var(--rojo);background:transparent;}
 .btn-falso.lleno{background:var(--rojo);color:#fff;}
 @media (prefers-color-scheme:dark){.btn-falso.lleno{color:#0d0f11;}}
 :root[data-theme="dark"] .btn-falso.lleno{color:#0d0f11;}
 :root[data-theme="light"] .btn-falso.lleno{color:#fff;}
 
-/* ---------- fases ---------- */
+/* ---------- fases y checklist ---------- */
 .fases{margin-top:22px;display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);}
 .fase{background:var(--papel);padding:15px 16px;}
 .fase-cab{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
@@ -408,40 +277,115 @@ caption{
 .fase li::before{content:"";position:absolute;left:1px;top:.62em;width:6px;height:6px;background:var(--rojo);}
 .fase li.hecho::before{background:var(--verde);}
 
-/* ---------- cierre ---------- */
-.cierre{
-  margin-top:40px;border:2px solid var(--tinta);padding:24px 22px;
+.checklist{margin-top:22px;border:2px solid var(--tinta);padding:22px 20px;}
+.checklist h3{margin-top:0;font-size:1.1rem;}
+.checklist ul{margin:14px 0 0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px;}
+.checklist li{position:relative;padding-left:28px;font-size:14px;}
+.checklist li::before{
+  content:"";position:absolute;left:0;top:.25em;width:13px;height:13px;
+  border:1.5px solid var(--linea-fuerte);
 }
-.cierre h3{margin-top:0;font-size:1.15rem;}
-.cierre ol{margin:16px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:10px;}
-.cierre li{font-size:14.5px;}
-.firma{
-  margin-top:22px;padding-top:16px;border-top:1px solid var(--linea);
-  font-family:var(--mono);font-size:11.5px;color:var(--tinta-3);line-height:1.7;
-}
+.firma{margin-top:22px;padding-top:16px;border-top:1px solid var(--linea);font-family:var(--mono);font-size:11.5px;color:var(--tinta-3);line-height:1.7;}
 
 @media (prefers-reduced-motion:reduce){
   *{animation:none !important;transition:none !important;scroll-behavior:auto !important;}
 }
+
+/* ============================================================
+   IMPRESIÓN / PDF — conserva la rejilla y los márgenes
+   ============================================================ */
+@page{ size:A4; margin:14mm 12mm 16mm; }
+
 @media print{
-  .barra{position:static;}
-  .bloque{break-inside:avoid;}
+  :root{
+    --papel:#ffffff;--papel-2:#f2f2ee;--papel-3:#e9e9e4;
+    --tinta:#14161a;--tinta-2:#4c5157;--tinta-3:#6e747b;
+    --linea:#d2d2cc;--linea-fuerte:#a9a9a2;
+    --rojo:#c0001f;--rojo-suave:#f6e2e5;
+    --verde:#0a6b4c;--verde-suave:#e2efea;
+    --ambar:#8a5205;--ambar-suave:#f6ecdd;
+  }
+  html,body{background:#fff !important;}
+  *{
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
+  }
+  body{font-size:9.6pt;line-height:1.5;}
+  .barra{display:none !important;}
+  .doc{max-width:none;padding:0;}
+
+  /* la rejilla del riel se conserva en papel */
+  .bloque{
+    grid-template-columns:62px minmax(0,1fr);
+    gap:16px;padding:0 0 6px;
+    break-inside:auto;break-before:page;border-top:0;
+  }
+  .bloque:first-of-type{border-top:0;}
+  .riel{display:block;position:relative;border-right:1px solid var(--linea);padding-right:10px;}
+  .riel::after{
+    content:"";position:absolute;top:4px;right:-1px;bottom:0;width:7px;
+    background-image:repeating-linear-gradient(to bottom,var(--linea) 0 1px,transparent 1px 20px);
+  }
+  .riel-num{
+    position:static;display:block;text-align:right;
+    font-family:var(--mono);font-size:7.6pt;letter-spacing:.06em;color:var(--tinta-3);
+  }
+  .riel-num b{
+    display:block;font-family:var(--texto);font-weight:700;font-size:15pt;
+    line-height:1.1;color:var(--rojo);letter-spacing:-.02em;
+  }
+  .col{max-width:none;}
+
+  .portada{padding:0 0 18px;break-after:page;}
+  .portada h1{font-size:25pt;}
+  .bajada{font-size:10.5pt;max-width:none;}
+
+  h2{font-size:15pt;break-after:avoid;}
+  h3{font-size:10.6pt;margin-top:16px;break-after:avoid;}
+  h4{font-size:9.8pt;break-after:avoid;}
+  .lede{font-size:10pt;break-after:avoid;}
+  .col > p{margin-top:9px;}
+  p,li{orphans:3;widows:3;}
+
+  /* nada se parte por la mitad */
+  .veredicto,.regla,.mq,.fase,.kpi,.ficha-eq,.ritmo,.checklist,
+  .ficha-doc,.barra-fila,.prueba,.accion,.tabla-wrap{break-inside:avoid;}
+  table{min-width:0;font-size:8.8pt;}
+  th,td{padding:6px 8px;}
+  thead{display:table-header-group;}
+  tr{break-inside:avoid;}
+  caption{font-size:7.8pt;padding:6px 8px;}
+  .tabla-wrap{overflow:visible;}
+
+  .kpis{grid-template-columns:repeat(4,1fr);}
+  .kpi{padding:10px 10px;}
+  .kpi .n{font-size:16pt;}
+  .kpi .d,.kpi .v{font-size:7.6pt;}
+  .pie-nota{font-size:7.8pt;}
+  .prueba{font-size:8pt;}
+  .accion{font-size:9.2pt;}
+  .chip{font-size:7.6pt;}
+  .mq p,.regla p,.fase li,.barra-fila .et{font-size:9.2pt;}
+  .maqueta,.reglas,.fases,.kpis{break-inside:auto;}
+  a{color:inherit;text-decoration:none;}
 }
 </style>
 </head>
 <body>
 <header class="barra">
   <div class="barra-in">
-    <div class="marca"><span></span> UP Equipos · Manual de diseño</div>
+    <div class="marca"><span></span> UP Equipos · Manual de configuración</div>
     <nav>
-      <a href="#evidencia">01 Evidencia</a>
-      <a href="#funciona">02 Sí funciona</a>
-      <a href="#nofunciona">03 No funciona</a>
-      <a href="#decision">05 La decisión</a>
-      <a href="#whatsapp">06 WhatsApp 24/7</a>
-      <a href="#pagina">07 La página</a>
+      <a href="#alcance">01 Alcance</a>
+      <a href="#estado">02 Estado</a>
+      <a href="#conserva">03 Se conserva</a>
+      <a href="#corrige">04 Se corrige</a>
+      <a href="#liam">05 Liam</a>
+      <a href="#whatsapp">06 WhatsApp</a>
+      <a href="#pagina">07 Página</a>
       <a href="#reglas">08 Reglas</a>
-      <a href="#metas">10 Metas</a>
+      <a href="#operacion">09 Operación</a>
+      <a href="#control">10 Control</a>
       <a href="#plan">11 Plan</a>
     </nav>
   </div>
@@ -450,32 +394,72 @@ caption{
 <div class="doc">
 
   <section class="portada">
-    <p class="eyebrow">Propuesta de diseño definitivo · Julio 2026</p>
-    <h1>La gente no entra a conocer la empresa. Entra con una <em>pregunta técnica</em> sin resolver.</h1>
+    <p class="eyebrow">Manual de configuración y operación · Julio 2026</p>
+    <h1>Cómo queda configurado el sitio y <em>cómo se opera</em> de aquí en adelante.</h1>
     <p class="bajada">
-      Este manual usa las métricas reales de <strong>equiposup.com</strong> (Google Analytics 4, cortes de
-      28 y 90 días) para separar lo que ya está funcionando de lo que no, y sobre esa evidencia define
-      cómo debe quedar el sitio nuevo: <strong>Liam deja de ser un chat de ventas y pasa a ser el
-      consultor técnico de equipos</strong>, con el mismo cerebro en el sitio y en WhatsApp — donde
-      ya está funcionando y atiende cuando no hay nadie en la oficina.
+      Este documento no discute si el proyecto se hace. Define, sobre las métricas reales de
+      julio de 2026, <strong>qué está funcionando y se conserva</strong>,
+      <strong>qué se corrige</strong>, <strong>cómo queda configurado Liam</strong> en el sitio y en
+      WhatsApp, y <strong>qué reglas se aplican cada vez que se publique algo</strong>. Es un manual
+      de ejecución y mantenimiento, no una propuesta.
     </p>
     <dl class="ficha-doc">
-      <div><dt>Fuente de datos</dt><dd>Google Analytics 4</dd></div>
-      <div><dt>Ventanas</dt><dd>2–29 jul · 3 may–29 jul 2026</dd></div>
-      <div><dt>Sitio medido</dt><dd>equiposup.com</dd></div>
-      <div><dt>Sitio nuevo</dt><dd>pagina-up.onrender.com</dd></div>
+      <div><dt>Fuente de métricas</dt><dd>Google Analytics 4</dd></div>
+      <div><dt>Ventanas medidas</dt><dd>2–29 jul · 3 may–29 jul 2026</dd></div>
+      <div><dt>Sitio en producción</dt><dd>pagina-up.onrender.com</dd></div>
+      <div><dt>Canales cubiertos</dt><dd>Web · WhatsApp · Panel</dd></div>
     </dl>
   </section>
 
   <!-- 01 ------------------------------------------------------------- -->
-  <section class="bloque" id="evidencia">
+  <section class="bloque" id="alcance">
     <div class="riel"><span class="riel-num">SECCIÓN<b>01</b></span></div>
     <div class="col">
-      <h2>Lo que dicen los números</h2>
+      <h2>Alcance y cómo leer este manual</h2>
+      <p class="lede">Qué cubre el documento y con qué convención está escrito.</p>
+
+      <h3>Qué queda cubierto</h3>
+      <ul class="lista">
+        <li><strong>Sitio web nuevo</strong> — estructura, contenido y reglas de publicación.</li>
+        <li><strong>Liam en el sitio</strong> — consultor técnico, base de conocimiento y política de precios.</li>
+        <li><strong>Liam por WhatsApp</strong> — atención fuera de horario, cotización y puesta en producción.</li>
+        <li><strong>Paneles internos</strong> — leads, cotizaciones y auditoría de conversaciones.</li>
+        <li><strong>Catálogo y tarifas</strong> — qué se edita sin programar y dónde.</li>
+      </ul>
+
+      <h3>Cómo está organizado</h3>
+      <div class="tabla-wrap">
+        <table>
+          <thead><tr><th class="num">Sección</th><th>Contenido</th><th>Para quién</th></tr></thead>
+          <tbody>
+            <tr><td class="num">02</td><td>Estado medido del sitio en julio 2026</td><td>Dirección</td></tr>
+            <tr><td class="num">03–04</td><td>Qué se conserva y qué se corrige, con la acción concreta</td><td>Dirección y ejecución</td></tr>
+            <tr><td class="num">05–07</td><td>Configuración de Liam, del canal de WhatsApp y de la página</td><td>Ejecución</td></tr>
+            <tr><td class="num">08</td><td>Reglas de publicación permanentes</td><td>Todo el que publique</td></tr>
+            <tr><td class="num">09</td><td>Operación y mantenimiento: quién edita qué y dónde</td><td>Comercial y administración</td></tr>
+            <tr><td class="num">10–12</td><td>Tablero de control, plan de aplicación y restricciones</td><td>Dirección</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Convención</h3>
+      <p>
+        Cada ficha de las secciones 03 y 04 trae el <strong>dato que la sustenta</strong> y la
+        <strong>acción concreta</strong> que se deriva. Las reglas de la sección 08 están numeradas
+        <span class="dato">R1</span> a <span class="dato">R10</span> y se citan por ese número en el
+        resto del manual.
+      </p>
+    </div>
+  </section>
+
+  <!-- 02 ------------------------------------------------------------- -->
+  <section class="bloque" id="estado">
+    <div class="riel"><span class="riel-num">SECCIÓN<b>02</b></span></div>
+    <div class="col">
+      <h2>Estado medido</h2>
       <p class="lede">
-        El sitio actual creció y el SEO está pagando. Ese es el punto de partida: no vamos a rehacer
-        una página que fracasó, vamos a corregir el <em>tipo</em> de contenido que la gente premia y el
-        que castiga.
+        Los números sobre los que se toma cada decisión de configuración de este manual.
+        Todo viene de Google Analytics 4, cortes de 28 y 90 días.
       </p>
 
       <div class="kpis">
@@ -501,7 +485,7 @@ caption{
         </div>
       </div>
 
-      <h3>De dónde llega la gente</h3>
+      <h3>Origen del tráfico</h3>
       <div class="barras">
         <div class="barra-fila">
           <div class="et">Búsqueda orgánica</div>
@@ -531,12 +515,12 @@ caption{
       </div>
       <p class="pie-nota">Participación por canal, últimos 28 días. Barra proporcional al canal líder.</p>
 
-      <h3>El público es B2B y compra entre semana</h3>
+      <h3>Ciclo semanal de la demanda</h3>
       <p>
         Los picos de julio cayeron los días <span class="dato">8</span>, <span class="dato">14</span> y
-        <span class="dato">20–21</span>, todos entre martes y miércoles. Los fines de semana
-        (10–11, 17–18 y 24) las sesiones bajan casi a cero. No es un público que navega por curiosidad
-        el domingo: es alguien resolviendo un problema de obra en horario de trabajo.
+        <span class="dato">20–21</span>, todos entre martes y miércoles; los fines de semana las
+        sesiones bajan casi a cero. Este ciclo define cuándo se publica, cuándo se pauta y en qué
+        franja el comercial está más saturado.
       </p>
       <div class="ritmo">
         <div class="ritmo-grid">
@@ -551,20 +535,17 @@ caption{
         <div class="ritmo-base"></div>
       </div>
       <p class="pie-nota">
-        Esquema del patrón semanal descrito en el informe (picos martes–miércoles, caída de fin de semana).
-        Ilustra la forma del ciclo, no valores diarios exactos.
+        Esquema del patrón semanal descrito en el informe. Ilustra la forma del ciclo, no valores
+        diarios exactos.
       </p>
 
-      <h3>Qué páginas se llevan el tráfico y cuáles retienen</h3>
+      <h3>Comportamiento por página</h3>
       <div class="tabla-wrap">
         <table>
           <thead>
             <tr>
-              <th>Página</th>
-              <th class="num">Vistas 28 d</th>
-              <th class="num">Vistas 90 d</th>
-              <th class="num">Participación</th>
-              <th class="num">Duración</th>
+              <th>Página</th><th class="num">Vistas 28 d</th><th class="num">Vistas 90 d</th>
+              <th class="num">Participación</th><th class="num">Duración</th>
             </tr>
           </thead>
           <tbody>
@@ -578,188 +559,90 @@ caption{
         </table>
       </div>
       <p>
-        Ahí está todo el argumento del rediseño en cinco filas: <strong>las páginas que explican retienen
-        entre 2 y 4 veces más que las páginas que venden</strong>, y la peor página real del top 10 es
-        justamente una ficha de producto.
+        Lectura operativa de esta tabla: <strong>el contenido que explica retiene entre 2 y 4 veces
+        más que el que solo muestra el equipo</strong>. Es el criterio que ordena las secciones 03 y 04.
       </p>
-    </div>
-  </section>
-
-  <!-- 02 ------------------------------------------------------------- -->
-  <section class="bloque" id="funciona">
-    <div class="riel"><span class="riel-num">SECCIÓN<b>02</b></span></div>
-    <div class="col">
-      <h2>Lo que SÍ funciona</h2>
-      <p class="lede">Cuatro hallazgos con evidencia. Todo lo que se diseñe de aquí en adelante debe respetarlos.</p>
-
-      <div class="veredicto">
-        <header>
-          <span class="chip si">Sí funciona</span>
-          <h3>E1 · Explicar retiene más que vender</h3>
-        </header>
-        <div class="veredicto-cuerpo">
-          <p>
-            Las páginas tipo guía (“¿Qué es Manlift?”, “Cómo elegir la plataforma correcta”, “Nosotros”)
-            son las que más tiempo sostienen al visitante, de forma consistente en las dos ventanas de
-            medición. No es casualidad ni un mes bueno: es el comportamiento estable del público.
-          </p>
-          <div class="prueba">
-            PRUEBA · Guías: hasta <b>4 min 10 s</b> de duración y participación de <b>58 %</b> a <b>79,75 %</b>.
-            Ficha de producto “Plataforma Unipersonal”: <b>37 s</b> y <b>47,92 %</b>.
-          </div>
-        </div>
-      </div>
-
-      <div class="veredicto">
-        <header>
-          <span class="chip si">Sí funciona</span>
-          <h3>E2 · La gente busca por problema y por la palabra que usa en obra</h3>
-        </header>
-        <div class="veredicto-cuerpo">
-          <p>
-            El término que trae tráfico es <strong>“Manlift”</strong>, no la marca ni la referencia del
-            equipo. La página de alquiler de Manlift es la más vista en 90 días. El sitio debe hablar el
-            idioma del cliente (manlift, tijera, brazo, “llegar a 12 metros”) y dejar la nomenclatura
-            técnica para la ficha.
-          </p>
-          <div class="prueba">
-            PRUEBA · /alquiler-manlift/: <b>460 vistas</b> en 90 días, por encima incluso de la página de inicio (449).
-          </div>
-        </div>
-      </div>
-
-      <div class="veredicto">
-        <header>
-          <span class="chip si">Sí funciona</span>
-          <h3>E3 · La velocidad y el SEO técnico ya se pagaron solos</h3>
-        </header>
-        <div class="veredicto-cuerpo">
-          <p>
-            La optimización subió PageSpeed de 67 a 87+ y el orgánico creció 37 % en un mes. Es la
-            inversión con mejor retorno hecha hasta ahora y marca el estándar del sitio nuevo: si algo
-            que queramos agregar cuesta velocidad, no entra.
-          </p>
-          <div class="prueba">
-            PRUEBA · <b>+37,07 %</b> en sesiones orgánicas (28 d) y <b>53,7 %</b> del tráfico total por búsqueda orgánica.
-          </div>
-        </div>
-      </div>
-
-      <div class="veredicto">
-        <header>
-          <span class="chip si">Sí funciona</span>
-          <h3>E4 · El cliente es B2B y decide entre semana</h3>
-        </header>
-        <div class="veredicto-cuerpo">
-          <p>
-            El ciclo semanal es tan marcado que sirve para planear pauta y publicaciones (martes y
-            miércoles), y confirma algo más importante: el visitante espera respuesta profesional
-            inmediata, como se la daría un asesor por teléfono. Cuando escribe, está trabajando.
-          </p>
-          <div class="prueba">
-            PRUEBA · Picos los días <b>8, 14 y 20–21</b> de julio (mar–mié); caídas a casi cero los días <b>10–11, 17–18 y 24</b>.
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
   <!-- 03 ------------------------------------------------------------- -->
-  <section class="bloque" id="nofunciona">
+  <section class="bloque" id="conserva">
     <div class="riel"><span class="riel-num">SECCIÓN<b>03</b></span></div>
     <div class="col">
-      <h2>Lo que NO funciona</h2>
+      <h2>Lo que funciona y se conserva</h2>
       <p class="lede">
-        Cinco problemas medidos. Esto es lo que <strong>no podemos seguir haciendo</strong> en la página nueva.
+        Cuatro comportamientos confirmados en las dos ventanas de medición. La configuración del
+        sitio nuevo se construye encima de ellos, no en contra.
       </p>
 
       <div class="veredicto">
-        <header>
-          <span class="chip no">No funciona</span>
-          <h3>P1 · La ficha de producto “foto + párrafo + contáctanos”</h3>
-        </header>
+        <header><span class="chip si">Se conserva</span><h3>E1 · El contenido que explica retiene</h3></header>
         <div class="veredicto-cuerpo">
           <p>
-            “Plataforma Unipersonal” es la página real con peor desempeño del top 10: la gente entra,
-            no encuentra lo que necesita saber (altura de trabajo, capacidad, si entra por una puerta,
-            si sirve en exteriores) y se va en 37 segundos. El problema no es el equipo: es que la
-            página no responde ninguna pregunta.
+            Las páginas tipo guía sostienen al visitante varias veces más que las páginas de producto,
+            de forma estable en los dos cortes.
           </p>
           <div class="prueba">
-            PRUEBA · <b>55 vistas</b>, <b>47,92 %</b> de participación, <b>0:37</b> de duración — la más baja del top 10 entre páginas reales.
+            DATO · Guías: hasta <b>4 min 10 s</b> y participación de <b>58 %</b> a <b>79,75 %</b>.
+            Ficha de producto: <b>37 s</b> y <b>47,92 %</b>.
+          </div>
+          <div class="accion">
+            <span class="et">Se aplica así</span>
+            Una guía o comparativa nueva al mes (sección 11), y ese mismo contenido cargado como base
+            de conocimiento de Liam (sección 05).
           </div>
         </div>
       </div>
 
       <div class="veredicto">
-        <header>
-          <span class="chip no">No funciona</span>
-          <h3>P2 · El texto largo que describe en vez de responder</h3>
-        </header>
+        <header><span class="chip si">Se conserva</span><h3>E2 · La búsqueda entra por “Manlift”, no por la referencia</h3></header>
         <div class="veredicto-cuerpo">
           <p>
-            Matiz importante, porque es fácil sacar la conclusión equivocada: el problema de la página
-            antigua <strong>no es que tenga mucho texto</strong> — las guías son largas y son las que mejor
-            funcionan. El problema es el texto que describe a la empresa en el medio del recorrido de
-            alguien que está intentando resolver un problema de obra.
+            El término que trae tráfico es el que usa el cliente en obra. La nomenclatura técnica va en
+            la ficha, no en los títulos.
           </p>
           <div class="prueba">
-            REGLA QUE SE DERIVA · Texto que responde una pregunta del cliente = se queda.
-            Texto que habla de nosotros sin que nadie lo haya preguntado = se corta o se baja al final.
+            DATO · /alquiler-manlift/: <b>460 vistas</b> en 90 días, por encima de la página de inicio (449).
+          </div>
+          <div class="accion">
+            <span class="et">Se aplica así</span>
+            Regla <b>R2</b>: el título de cada página es la pregunta del cliente, en su vocabulario
+            (manlift, tijera, brazo, “llegar a 12 metros”).
           </div>
         </div>
       </div>
 
       <div class="veredicto">
-        <header>
-          <span class="chip no">No funciona</span>
-          <h3>P3 · Un error 404 crónico ensuciando toda la analítica</h3>
-        </header>
+        <header><span class="chip si">Se conserva</span><h3>E3 · La velocidad y el SEO técnico</h3></header>
         <div class="veredicto-cuerpo">
           <p>
-            La ruta <code>/.well-known/sgcaptcha</code> aparece en el top 10 de las <em>dos</em> ventanas,
-            siempre con 0 % de participación y 0 segundos. Ese patrón corresponde al captcha anti-bots
-            del hosting, que se está registrando como si fuera una página del sitio. Cada visita falsa
-            baja el promedio de participación y duración de todo el sitio, así que hoy los indicadores
-            reales son <em>mejores</em> de lo que muestra el reporte.
+            La optimización subió PageSpeed de 67 a 87+ y el orgánico creció 37 % en un mes. Es el
+            estándar técnico del sitio nuevo.
           </p>
           <div class="prueba">
-            PRUEBA · <b>84 vistas</b> sumando las dos ventanas (40 + 44), <b>0 %</b> de participación, <b>0:00</b> de duración.
-            A confirmar en los logs del hosting antes de intervenir.
+            DATO · <b>+37,07 %</b> en sesiones orgánicas (28 d); <b>53,7 %</b> del tráfico total es orgánico.
+          </div>
+          <div class="accion">
+            <span class="et">Se aplica así</span>
+            Regla <b>R3</b>: presupuesto de velocidad fijo. Lo que cueste velocidad no entra, sin excepción.
           </div>
         </div>
       </div>
 
       <div class="veredicto">
-        <header>
-          <span class="chip no">No funciona</span>
-          <h3>P4 · Las redes no traen a nadie al sitio</h3>
-        </header>
+        <header><span class="chip si">Se conserva</span><h3>E4 · El ciclo B2B de martes y miércoles</h3></header>
         <div class="veredicto-cuerpo">
           <p>
-            5,5 % del tráfico, y en la ventana de 90 días GA4 ni siquiera lo etiqueta como social:
-            lo manda a “Unassigned”. Se está produciendo contenido cuyo efecto no se puede medir y que
-            no aterriza en ninguna página concreta.
+            La demanda se concentra en días hábiles y desaparece el fin de semana. Sirve para programar
+            publicaciones y pauta, y explica dónde se satura el comercial.
           </p>
           <div class="prueba">
-            PRUEBA · <b>5,5 %</b> en 28 días; en 90 días aparece como “Unassigned” (<b>~8,6 %</b> junto con otros).
+            DATO · Picos los días <b>8, 14 y 20–21</b> de julio (mar–mié); caídas los días <b>10–11, 17–18 y 24</b>.
           </div>
-        </div>
-      </div>
-
-      <div class="veredicto">
-        <header>
-          <span class="chip no">No funciona</span>
-          <h3>P5 · Depender de la pauta para sostener el flujo</h3>
-        </header>
-        <div class="veredicto-cuerpo">
-          <p>
-            La pauta arrancó el sitio y cumplió su función, pero es alquiler de tráfico: el mes que no se
-            paga, el flujo cae. El orgánico ya está consolidado y creciendo, así que hay margen para
-            mover parte del presupuesto hacia palabras de menor competencia y hacia contenido propio.
-          </p>
-          <div class="prueba">
-            PRUEBA · Paid Search: <b>27,7 %</b> a 90 días vs <b>20,4 %</b> a 28 días — su peso relativo ya está bajando solo.
+          <div class="accion">
+            <span class="et">Se aplica así</span>
+            Publicaciones y pauta concentradas martes y miércoles; sin gasto de pauta el fin de semana.
+            En el pico, Liam recibe el primer contacto y el comercial cierra (sección 06).
           </div>
         </div>
       </div>
@@ -767,84 +650,200 @@ caption{
   </section>
 
   <!-- 04 ------------------------------------------------------------- -->
-  <section class="bloque" id="lectura">
+  <section class="bloque" id="corrige">
     <div class="riel"><span class="riel-num">SECCIÓN<b>04</b></span></div>
     <div class="col">
-      <h2>La lectura: qué está pidiendo el visitante</h2>
+      <h2>Lo que no funciona y se corrige</h2>
       <p class="lede">
-        Si se juntan los cinco hallazgos, todos apuntan a lo mismo.
+        Cinco problemas medidos, cada uno con su corrección concreta. Esto es lo que deja de hacerse.
       </p>
-      <p>
-        El visitante de UP Equipos llega con una pregunta muy concreta y sin resolver:
-        <strong>“¿qué equipo necesito para llegar a X metros, en este piso, con este espacio y este peso?”</strong>
-      </p>
-      <p>
-        Las páginas que se acercan a responderla retienen cuatro minutos. Las que muestran el equipo y
-        piden que llame, treinta y siete segundos. Esa respuesta la da <strong>una persona</strong>:
-        el asesor comercial, por WhatsApp o por teléfono, en horario laboral. Todo lo demás del negocio
-        ya está montado alrededor de esa conversación — y fuera de ese horario, hasta hace poco, no la
-        daba nadie.
-      </p>
-      <p>
-        La decisión de diseño de esta propuesta es una sola:
-        <strong>que esa conversación la den el sitio y WhatsApp, siempre, con el mismo cerebro, y que
-        se llame Liam.</strong>
-      </p>
+
+      <div class="veredicto">
+        <header><span class="chip no">Se corrige</span><h3>P1 · Ficha de producto sin datos técnicos</h3></header>
+        <div class="veredicto-cuerpo">
+          <p>
+            La página “Plataforma Unipersonal” es la peor del top 10 entre páginas reales: el visitante
+            no encuentra altura, capacidad, ancho ni condiciones de uso, y se va.
+          </p>
+          <div class="prueba">
+            DATO · <b>55 vistas</b>, <b>47,92 %</b> de participación, <b>0:37</b> de duración.
+          </div>
+          <div class="accion">
+            <span class="et">Corrección</span>
+            Toda ficha se rehace con el formato del bloque 04 (sección 07): datos duros visibles,
+            tomados del catálogo, y dos acciones. Regla <b>R5</b>.
+          </div>
+        </div>
+      </div>
+
+      <div class="veredicto">
+        <header><span class="chip no">Se corrige</span><h3>P2 · Texto que describe en vez de responder</h3></header>
+        <div class="veredicto-cuerpo">
+          <p>
+            El problema no es la cantidad de texto —las guías son largas y funcionan— sino el texto que
+            habla de la empresa en medio del recorrido de alguien que está resolviendo un problema de obra.
+          </p>
+          <div class="prueba">
+            CRITERIO · Texto que responde una pregunta del cliente = se queda.
+            Texto que habla de nosotros sin que nadie lo pregunte = se corta o se baja al final.
+          </div>
+          <div class="accion">
+            <span class="et">Corrección</span>
+            Reglas <b>R1</b>, <b>R6</b> y <b>R10</b>, aplicadas a todo el copy, incluido el que llegue
+            redactado desde afuera.
+          </div>
+        </div>
+      </div>
+
+      <div class="veredicto">
+        <header><span class="chip no">Se corrige</span><h3>P3 · Error 404 crónico en la analítica</h3></header>
+        <div class="veredicto-cuerpo">
+          <p>
+            La ruta <code>/.well-known/sgcaptcha</code> aparece en el top 10 de las dos ventanas con
+            0 % de participación y 0 segundos. Corresponde al captcha anti-bots del hosting
+            registrándose como página. Baja el promedio de todo el sitio: los indicadores reales de hoy
+            son mejores que los que muestra el reporte.
+          </p>
+          <div class="prueba">
+            DATO · <b>84 vistas</b> entre las dos ventanas (40 + 44), <b>0 %</b> de participación, <b>0:00</b> de duración.
+          </div>
+          <div class="accion">
+            <span class="et">Corrección</span>
+            Revisar el origen en los logs del hosting, excluir la ruta en GA4 y bloquear el tráfico
+            automatizado. Tarea de la fase 1.
+          </div>
+        </div>
+      </div>
+
+      <div class="veredicto">
+        <header><span class="chip no">Se corrige</span><h3>P4 · Enlaces de redes sin etiquetar</h3></header>
+        <div class="veredicto-cuerpo">
+          <p>
+            El tráfico social es bajo y en la ventana de 90 días GA4 ni siquiera lo clasifica: aparece
+            como “Unassigned”. Hoy no se puede saber qué publicación funcionó.
+          </p>
+          <div class="prueba">
+            DATO · <b>5,5 %</b> a 28 días; a 90 días queda dentro de “Unassigned” (<b>~8,6 %</b> con otros).
+          </div>
+          <div class="accion">
+            <span class="et">Corrección</span>
+            Todo enlace que salga a redes lleva etiquetas UTM y apunta a una página concreta, nunca a
+            la portada. Regla <b>R7</b>.
+          </div>
+        </div>
+      </div>
+
+      <div class="veredicto">
+        <header><span class="chip no">Se corrige</span><h3>P5 · Peso alto de la pauta</h3></header>
+        <div class="veredicto-cuerpo">
+          <p>
+            La pauta cumplió su función de arranque, pero es tráfico alquilado. El orgánico ya está
+            consolidado y su peso relativo viene bajando solo.
+          </p>
+          <div class="prueba">
+            DATO · Paid Search: <b>27,7 %</b> a 90 días vs <b>20,4 %</b> a 28 días.
+          </div>
+          <div class="accion">
+            <span class="et">Corrección</span>
+            Redistribuir parte del presupuesto hacia palabras de menor competencia y contenido propio,
+            y no pautar fines de semana. Fase 4.
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- 05 ------------------------------------------------------------- -->
-  <section class="bloque" id="decision">
+  <section class="bloque" id="liam">
     <div class="riel"><span class="riel-num">SECCIÓN<b>05</b></span></div>
     <div class="col">
-      <h2>Liam: de chat de ventas a consultor técnico</h2>
+      <h2>Configuración de Liam</h2>
       <p class="lede">
-        La diferencia no es de tono ni de diseño del globo de chat. Es de <em>qué sabe</em> y
-        <em>qué entrega</em>.
+        Liam queda configurado como <strong>consultor técnico de equipos</strong>: diagnostica,
+        recomienda un modelo con razones y entrega una cotización real. Esta sección define qué debe
+        saber, qué debe exigir antes de cotizar y qué se puede editar sin programar.
       </p>
 
+      <h3>Base de conocimiento obligatoria: las 7 preguntas</h3>
+      <p>
+        Liam debe resolver siempre estas siete. Es el contenido educativo que ya demostró retener,
+        entregado como respuesta al caso del cliente en vez de como un artículo para leer entero.
+      </p>
+      <ul class="lista">
+        <li><strong>1. ¿Qué equipo llega a X metros?</strong> — diferencia entre altura de trabajo y altura de plataforma, el error más común al pedir.</li>
+        <li><strong>2. ¿Tijera o brazo articulado?</strong> — la tijera sube en vertical; el brazo sortea obstáculos y alcanza de lado, en fachadas.</li>
+        <li><strong>3. ¿Me entra al sitio?</strong> — ancho, peso del equipo, paso por puerta estándar y resistencia del piso.</li>
+        <li><strong>4. ¿Cuánto peso sube?</strong> — <strong>227 kg</strong> en general y <strong>159 kg</strong> en las unipersonales.</li>
+        <li><strong>5. ¿Eléctrico o diésel?</strong> — interior sin emisiones frente a exterior y terreno irregular.</li>
+        <li><strong>6. ¿Qué necesito para operarlo?</strong> — certificación del operador, arnés y responsabilidades.</li>
+        <li><strong>7. ¿Cuánto vale y cuándo llega?</strong> — cotización formal con tarifas reales, IVA, sede que atiende y observaciones.</li>
+      </ul>
+
+      <h3>Datos que nunca se aproximan</h3>
       <div class="tabla-wrap">
         <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Chatbot de ventas <span style="color:var(--ambar)">(lo que no haremos)</span></th>
-              <th>Consultor técnico <span style="color:var(--verde)">(lo que haremos)</span></th>
-            </tr>
-          </thead>
+          <thead><tr><th>Dato</th><th>Valor</th><th>De dónde sale</th></tr></thead>
           <tbody>
-            <tr><td><strong>Primera frase</strong></td><td>“¡Hola! ¿En qué te puedo ayudar?”</td><td>“¿Qué altura necesitas alcanzar y dónde vas a trabajar?”</td></tr>
-            <tr><td><strong>Qué hace</strong></td><td>Recoge el dato y pasa el lead</td><td>Diagnostica y recomienda un modelo, explicando por qué</td></tr>
-            <tr><td><strong>Qué sabe</strong></td><td>Horarios, ciudades, “tenemos de todo”</td><td>Altura de trabajo, capacidad, ancho, superficie, energía, certificación</td></tr>
-            <tr><td><strong>Qué entrega</strong></td><td>“Un asesor te contacta pronto”</td><td>Equipo recomendado + cotización real en PDF con N.º COT-W</td></tr>
-            <tr><td><strong>Cuándo atiende</strong></td><td>Cuando hay alguien en la oficina</td><td>24/7, en el sitio y en WhatsApp, con el mismo cerebro</td></tr>
-            <tr><td><strong>Cómo se mide</strong></td><td>Número de chats abiertos</td><td>% de consultas que terminan en recomendación y cotización</td></tr>
+            <tr><td>Capacidad de carga general</td><td class="num">227 kg</td><td>Fijo en la configuración de Liam</td></tr>
+            <tr><td>Capacidad de las unipersonales</td><td class="num">159 kg</td><td>Fijo en la configuración de Liam</td></tr>
+            <tr><td>Altura de trabajo por referencia</td><td class="num">10 – 43 m</td><td>Catálogo de tarifas (sección 09)</td></tr>
+            <tr><td>Tarifas por tramo de días</td><td class="num">variable</td><td>Catálogo de tarifas, editable sin código</td></tr>
+            <tr><td>Sede que atiende</td><td class="num">3 sedes</td><td>Se asigna sola según la ciudad del cliente</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h3>Las 7 preguntas que Liam debe resolver siempre</h3>
+      <h3>Requisitos antes de generar una cotización</h3>
       <p>
-        Este es el temario del consultor. Sale directamente del contenido educativo que ya demostró
-        funcionar: en vez de un artículo que el cliente tiene que leer entero, la misma información
-        entregada como respuesta a su caso.
+        Estos requisitos están puestos en tres capas para que no se puedan saltar: en las
+        instrucciones de Liam, en la herramienta de cotización y en el servidor.
       </p>
       <ul class="lista">
-        <li><strong>1. ¿Qué equipo llega a X metros?</strong> — diferencia entre altura de trabajo y altura de plataforma, que es el error más común al pedir.</li>
-        <li><strong>2. ¿Tijera o brazo articulado?</strong> — la tijera sube en vertical; el brazo sortea obstáculos y alcanza de lado, en fachadas.</li>
-        <li><strong>3. ¿Me entra al sitio?</strong> — ancho, peso del equipo, si pasa por una puerta estándar y si el piso lo soporta.</li>
-        <li><strong>4. ¿Cuánto peso sube?</strong> — <strong>227 kg</strong> en general y <strong>159 kg</strong> en las unipersonales. Dato duro, nunca aproximado.</li>
-        <li><strong>5. ¿Eléctrico o diésel?</strong> — interior sin emisiones vs. exterior y terreno irregular.</li>
-        <li><strong>6. ¿Qué necesito para operarlo?</strong> — certificación del operador, arnés, quién responde por el equipo.</li>
-        <li><strong>7. ¿Cuánto vale y cuándo llega?</strong> — cotización formal con tarifas reales, IVA, sede que atiende y observaciones.</li>
+        <li><strong>Datos fiscales completos.</strong> Empresa: razón social y NIT. Persona natural: nombre completo y cédula. Nunca se cotiza con este campo en blanco.</li>
+        <li><strong>Ciudad.</strong> Define la sede que atiende y el transporte.</li>
+        <li><strong>Equipo y días.</strong> Determinan el tramo de tarifa que se aplica.</li>
       </ul>
 
-      <h3>Regla de precios (se mantiene tal como está definida)</h3>
+      <h3>Política de precios</h3>
+      <div class="tabla-wrap">
+        <table>
+          <thead><tr><th>Situación</th><th>Qué entrega Liam</th></tr></thead>
+          <tbody>
+            <tr><td>Conversación, consulta casual</td><td>Rangos aproximados. Nunca tarifas reales.</td></tr>
+            <tr><td>Solicitud formal de cotización</td><td>Valores reales con IVA, observaciones, sede y número <b>COT-Wxxxx</b> en PDF.</td></tr>
+          </tbody>
+          <caption>Esta política protege la tarifa, obliga a capturar el contacto y le deja al comercial un documento con el cual cerrar.</caption>
+        </table>
+      </div>
+
+      <h3>Qué se edita sin programar y qué queda fijo</h3>
       <p>
-        En conversación, Liam da <strong>rangos aproximados</strong>. Los valores reales salen únicamente
-        dentro de la cotización formal, con su número <span class="dato">COT-Wxxxx</span> y su PDF. Eso
-        protege la tarifa, obliga a capturar el contacto y le da al comercial un documento con el cual
-        cerrar.
+        La división es deliberada: una edición descuidada desde el panel no puede romper el flujo de
+        cotización ni cambiar un dato técnico.
+      </p>
+      <div class="tabla-wrap">
+        <table>
+          <thead><tr><th>Elemento</th><th>Dónde se cambia</th><th>Quién</th></tr></thead>
+          <tbody>
+            <tr><td>Tono y estilo de Liam</td><td class="bueno">Panel · Configurar Liam</td><td>Comercial</td></tr>
+            <tr><td>Contexto del negocio</td><td class="bueno">Panel · Configurar Liam</td><td>Comercial</td></tr>
+            <tr><td>Política de precios en conversación</td><td class="bueno">Panel · Configurar Liam</td><td>Comercial</td></tr>
+            <tr><td>Restricciones de lo que no debe decir</td><td class="bueno">Panel · Configurar Liam</td><td>Comercial</td></tr>
+            <tr><td>Tarifas y catálogo de equipos</td><td class="bueno">Tabla de tarifas</td><td>Administración</td></tr>
+            <tr><td>Flujo de primer contacto</td><td class="malo">Fijo en código</td><td>Desarrollo</td></tr>
+            <tr><td>Exigencia de NIT o cédula y ciudad</td><td class="malo">Fijo en código</td><td>Desarrollo</td></tr>
+            <tr><td>Uso obligatorio de la herramienta de cotización</td><td class="malo">Fijo en código</td><td>Desarrollo</td></tr>
+            <tr><td>Capacidad de carga (227 / 159 kg)</td><td class="malo">Fijo en código</td><td>Desarrollo</td></tr>
+          </tbody>
+          <caption>Existe además un interruptor general: si la configuración editable falla o queda a medias, Liam vuelve solo a los valores por defecto.</caption>
+        </table>
+      </div>
+
+      <h3>Un solo cerebro para los dos canales</h3>
+      <p>
+        El sitio y WhatsApp deben responder con la misma configuración. Hoy están duplicados y ya se
+        desincronizaron una vez: un canal daba una capacidad de carga equivocada mientras el otro daba
+        la correcta. Unificarlos es tarea de la fase 2 y queda como regla permanente <span class="dato">R8</span>.
       </p>
     </div>
   </section>
@@ -853,43 +852,45 @@ caption{
   <section class="bloque" id="whatsapp">
     <div class="riel"><span class="riel-num">SECCIÓN<b>06</b></span></div>
     <div class="col">
-      <h2>Liam ya atiende cuando no hay nadie</h2>
+      <h2>Canal de WhatsApp: atención 24/7</h2>
       <p class="lede">
-        Esta es la pieza que convierte la propuesta en atención real de 24 horas, los 7 días:
-        <strong>Liam por WhatsApp ya está funcionando y probado de punta a punta</strong>. No hay que
-        construirlo, hay que ponerlo en el número definitivo.
-      </p>
-      <p>
-        El comercial atiende y cierra en horario laboral. Fuera de ese horario —de noche, en fin de
-        semana, en festivo— el cliente que escribe ya no queda sin respuesta hasta el otro día:
-        Liam lo atiende, lo perfila, le pide los datos que hacen falta y, si tiene todo, le genera la
-        cotización real con el PDF. Al otro día el comercial no encuentra un mensaje sin leer:
-        encuentra un lead perfilado y, muchas veces, una cotización ya emitida.
+        Liam por WhatsApp ya está funcionando y probado de punta a punta. Es la pieza que permite
+        atender fuera del horario de oficina. Lo que falta es de configuración con Meta, no de
+        desarrollo.
       </p>
 
-      <h3>Lo que Liam por WhatsApp ya hace hoy</h3>
+      <h3>Estado del canal</h3>
       <div class="tabla-wrap">
         <table>
           <thead><tr><th>Capacidad</th><th>Estado</th></tr></thead>
           <tbody>
             <tr><td>Conversa con el flujo comercial real: saludo, altura, equipo, días, ciudad</td><td class="bueno">Funcionando</td></tr>
-            <tr><td>Exige razón social + NIT (o nombre + cédula) y ciudad <em>antes</em> de cotizar</td><td class="bueno">Funcionando</td></tr>
-            <tr><td>Genera la cotización con las tarifas reales y envía el link del PDF</td><td class="bueno">Probado de punta a punta</td></tr>
+            <tr><td>Exige razón social + NIT (o nombre + cédula) y ciudad antes de cotizar</td><td class="bueno">Funcionando</td></tr>
+            <tr><td>Genera la cotización con tarifas reales y envía el link del PDF</td><td class="bueno">Probado de punta a punta</td></tr>
             <tr><td>Asigna la sede que atiende según la ciudad del cliente</td><td class="bueno">Funcionando</td></tr>
             <tr><td>Guarda el lead en el mismo CRM que usa el sitio</td><td class="bueno">Funcionando</td></tr>
-            <tr><td>El comercial ve todas las conversaciones y puede intervenir o pausar el bot</td><td class="bueno">Funcionando</td></tr>
-            <tr><td>Se ajusta el tono y la política comercial sin programar</td><td class="bueno">Funcionando</td></tr>
+            <tr><td>El comercial ve las conversaciones y puede intervenir o pausar el bot</td><td class="bueno">Funcionando</td></tr>
+            <tr><td>Tono y política comercial ajustables sin programar</td><td class="bueno">Funcionando</td></tr>
             <tr><td>En conversación no da tarifas reales, solo rangos</td><td class="bueno">Funcionando</td></tr>
           </tbody>
-          <caption>Estado del canal de WhatsApp al 31 de julio de 2026.</caption>
+          <caption>Estado del canal al 31 de julio de 2026.</caption>
         </table>
       </div>
 
-      <h3>Lo que ya se vio en el piloto</h3>
-      <p>
-        En las conversaciones registradas durante las pruebas de julio,
-        <strong>la mayoría de los mensajes entrantes llegó fuera del horario de oficina</strong>:
-      </p>
+      <h3>Reparto entre Liam y el comercial</h3>
+      <div class="tabla-wrap">
+        <table>
+          <thead><tr><th>Momento</th><th>Quién atiende</th><th>Qué entrega</th></tr></thead>
+          <tbody>
+            <tr><td>Lun–vie en horario laboral</td><td>El comercial, con Liam de apoyo</td><td>Cierre y negociación</td></tr>
+            <tr><td>Noches, fines de semana y festivos</td><td>Liam</td><td>Consulta resuelta, lead capturado y cotización con PDF</td></tr>
+            <tr><td>Pico de martes y miércoles</td><td>Liam recibe, el comercial cierra</td><td>Lead perfilado, sin cola de espera</td></tr>
+            <tr><td>Cuando el comercial toma la conversación</td><td>El comercial</td><td>Interruptor en el panel: Liam se pausa en ese chat</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Comprobación en el piloto</h3>
       <div class="barras">
         <div class="barra-fila">
           <div class="et">Fuera de horario<br><span style="color:var(--tinta-3);font-size:11.5px">noches, fin de semana</span></div>
@@ -904,64 +905,41 @@ caption{
       </div>
       <p class="pie-nota">
         43 mensajes entrantes en 10 conversaciones, del 7 al 23 de julio de 2026, hora de Colombia.
-        <strong>Muestra pequeña y de fase de pruebas</strong>: sirve para mostrar que el mecanismo
-        responde a cualquier hora, no para dimensionar la demanda nocturna. El dato que sí decide
-        aquí es el de abajo.
+        <strong>Muestra pequeña y de fase de pruebas</strong>: confirma que el mecanismo responde a
+        cualquier hora, no dimensiona la demanda nocturna.
+      </p>
+      <p>
+        El criterio operativo no depende de esa muestra: <strong>el costo de estar disponible ya está
+        pagado</strong>. El sistema está construido y probado, y en alquiler de equipos la solicitud
+        suele ser urgente —hay una obra parada—, así que el primero en responder es el que cotiza.
       </p>
 
-      <div class="veredicto">
-        <header>
-          <span class="chip si">Sí funciona</span>
-          <h3>E5 · Estar disponible fuera de horario ya no cuesta trabajo</h3>
-        </header>
-        <div class="veredicto-cuerpo">
-          <p>
-            El argumento para atender 24/7 no es que la mitad de la demanda sea de noche. Es que
-            <strong>el costo de estar disponible ya está pagado</strong>: el sistema está construido,
-            probado y no requiere que nadie se quede despierto. En alquiler de equipos la solicitud
-            casi siempre es urgente —hay una obra parada— y el que responde primero es el que cotiza.
-          </p>
-          <p>
-            Y hay un segundo efecto, menos obvio: el pico de búsqueda es martes y miércoles en horario
-            laboral, justo cuando el comercial está más saturado. Liam absorbe ese primer contacto y
-            se lo entrega ya perfilado, con altura, ciudad, días y datos fiscales.
-          </p>
-          <div class="prueba">
-            PRUEBA · Piloto de julio: <b>43 mensajes</b> atendidos sin intervención humana, con
-            cotización real generada y enviada. Picos de búsqueda del sitio: <b>martes y miércoles</b>.
-          </div>
+      <h3>Puesta en producción</h3>
+      <p>
+        Hoy el canal corre sobre un número de pruebas que solo habla con teléfonos autorizados y con un
+        token que vence cada 24 horas. Estos cinco pasos son los que faltan:
+      </p>
+      <div class="fases">
+        <div class="fase">
+          <div class="fase-cab"><h4>Checklist de activación</h4><span class="fase-plazo">CONFIGURACIÓN EN META</span></div>
+          <ul>
+            <li><strong>Número definitivo</strong> de WhatsApp en lugar del número de pruebas.</li>
+            <li><strong>Token permanente</strong> de usuario de sistema, sin expiración.</li>
+            <li><strong>Suscribir la cuenta de WhatsApp a la aplicación</strong> — es el paso que de verdad hace que lleguen los mensajes reales; sin él, el webhook queda bien configurado pero Meta nunca los reenvía.</li>
+            <li><strong>Verificación del negocio en Meta</strong>, requisito para atender sin límite de destinatarios.</li>
+            <li><strong>Definir el portafolio de Meta</strong> bajo el cual queda el número.</li>
+          </ul>
         </div>
       </div>
 
-      <h3>El reparto entre Liam y el comercial</h3>
-      <div class="tabla-wrap">
-        <table>
-          <thead><tr><th>Momento</th><th>Quién atiende</th><th>Qué entrega</th></tr></thead>
-          <tbody>
-            <tr><td>Lun–vie en horario laboral</td><td>El comercial, con Liam de apoyo</td><td>Cierre y negociación</td></tr>
-            <tr><td>Noches, fines de semana y festivos</td><td>Liam</td><td>Consulta técnica resuelta, lead capturado y cotización con PDF</td></tr>
-            <tr><td>Pico de martes y miércoles</td><td>Liam recibe, el comercial cierra</td><td>Lead perfilado, sin cola de espera</td></tr>
-            <tr><td>Cuando el comercial quiere tomar la conversación</td><td>El comercial</td><td>Interruptor en el panel: Liam se pausa en ese chat</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3>Lo que falta para encender el 24/7 de verdad</h3>
-      <p>
-        Todo lo pendiente es de configuración con Meta, no de desarrollo. Hoy el canal corre sobre un
-        número de pruebas que solo habla con teléfonos autorizados y con un token que vence cada día.
-      </p>
+      <h3>Si Liam deja de responder</h3>
+      <p>Orden de diagnóstico, de la causa más frecuente a la menos frecuente:</p>
       <ul class="lista">
-        <li><strong>Número definitivo de WhatsApp</strong> en vez del número de pruebas.</li>
-        <li><strong>Token permanente</strong> (usuario de sistema), para que no se caiga cada 24 horas.</li>
-        <li><strong>Suscribir la cuenta de WhatsApp a la aplicación</strong> — el paso que de verdad hace que lleguen los mensajes reales.</li>
-        <li><strong>Verificación del negocio en Meta</strong>, requisito para atender sin límite de destinatarios.</li>
-        <li><strong>Decidir bajo qué portafolio de Meta</strong> queda el número.</li>
+        <li><strong>1.</strong> ¿Venció el token? Es la causa más común mientras se use el número de pruebas.</li>
+        <li><strong>2.</strong> ¿El bot quedó pausado en esa conversación desde el panel? Se reactiva con el mismo interruptor.</li>
+        <li><strong>3.</strong> ¿El teléfono está en la lista de destinatarios autorizados? Aplica solo al número de pruebas.</li>
+        <li><strong>4.</strong> ¿Se perdió la suscripción de la cuenta a la aplicación? Se vuelve a ejecutar el paso 3 del checklist.</li>
       </ul>
-      <p class="pie-nota">
-        Mientras esto no se cierre, el 24/7 existe técnicamente pero no le llega al cliente.
-        Es la tarea de mayor impacto y menor esfuerzo de todo el plan.
-      </p>
     </div>
   </section>
 
@@ -969,9 +947,10 @@ caption{
   <section class="bloque" id="pagina">
     <div class="riel"><span class="riel-num">SECCIÓN<b>07</b></span></div>
     <div class="col">
-      <h2>Cómo queda la página</h2>
+      <h2>Estructura de la página</h2>
       <p class="lede">
-        Nueve bloques, en este orden. Cada uno responde a un hallazgo de las secciones 02 y 03.
+        Nueve bloques, en este orden. Cada uno indica el hallazgo de las secciones 03 y 04 que lo
+        justifica.
       </p>
 
       <div class="maqueta">
@@ -980,20 +959,19 @@ caption{
           <div>
             <h4>Encabezado corto</h4>
             <p>Logo, teléfono/WhatsApp y un solo botón: Cotizar. Sin mega-menú ni submenús desplegables.</p>
-            <span class="tag">Responde a P2</span>
+            <span class="tag">Corrige P2</span>
           </div>
         </div>
         <div class="mq destacado">
           <div class="mq-n">02</div>
           <div>
-            <h4>Portada = la pregunta, no el eslogan</h4>
+            <h4>Portada: la pregunta, no el eslogan</h4>
             <p>
               Un solo campo grande: <em>“¿Qué necesitas alcanzar?”</em>, con atajos de un toque
-              (6 m en interior · 12 m en fachada · 20 m en exterior · no sé cuál necesito).
-              Escribir ahí abre a Liam con el contexto ya cargado. El visitante empieza a resolver su
-              problema sin bajar ni un centímetro.
+              (6 m en interior · 12 m en fachada · 20 m en exterior · no sé cuál necesito). Escribir
+              ahí abre a Liam con el contexto ya cargado, sin que el visitante tenga que bajar.
             </p>
-            <span class="tag">Responde a E1 · E2 · P1</span>
+            <span class="tag">Conserva E1 · E2 · Corrige P1</span>
           </div>
         </div>
         <div class="mq">
@@ -1001,39 +979,39 @@ caption{
           <div>
             <h4>Selector técnico de tres preguntas</h4>
             <p>Altura → dónde (interior/exterior) → superficie. Al final, el equipo recomendado. Es la guía “Cómo elegir la plataforma” convertida en herramienta.</p>
-            <span class="tag">Responde a E1</span>
+            <span class="tag">Conserva E1</span>
           </div>
         </div>
         <div class="mq">
           <div class="mq-n">04</div>
           <div>
             <h4>Fichas de equipo con datos duros</h4>
-            <p>Las 10 referencias GENIE reales del catálogo, cada una con sus números visibles y dos acciones. Se acabó la ficha con foto y párrafo.</p>
-            <span class="tag">Responde a P1</span>
+            <p>Las 10 referencias del catálogo, cada una con sus números visibles y dos acciones.</p>
+            <span class="tag">Corrige P1</span>
           </div>
         </div>
         <div class="mq">
           <div class="mq-n">05</div>
           <div>
-            <h4>Comparativas en tabla, no en párrafos</h4>
-            <p>Tijera vs. brazo · eléctrico vs. diésel · unipersonal vs. tijera. Es el contenido que más retiene, en el formato que se lee en diez segundos.</p>
-            <span class="tag">Responde a E1 · P2</span>
+            <h4>Comparativas en tabla</h4>
+            <p>Tijera vs. brazo · eléctrico vs. diésel · unipersonal vs. tijera. El contenido que más retiene, en el formato que se lee en diez segundos.</p>
+            <span class="tag">Conserva E1 · Corrige P2</span>
           </div>
         </div>
         <div class="mq">
           <div class="mq-n">06</div>
           <div>
-            <h4>Por qué nosotros, en cifras</h4>
-            <p>Distribuidor autorizado GENIE, flota, sedes, certificación. Corto y con números. Va aquí, no en el medio del recorrido.</p>
-            <span class="tag">Responde a P2</span>
+            <h4>Respaldo, en cifras</h4>
+            <p>Distribuidor autorizado GENIE, flota, sedes, certificación. Corto y con números, y ubicado aquí, no en el medio del recorrido.</p>
+            <span class="tag">Corrige P2</span>
           </div>
         </div>
         <div class="mq">
           <div class="mq-n">07</div>
           <div>
             <h4>Cobertura y sede que atiende</h4>
-            <p>Medellín · Bogotá · Barranquilla. La sede se asigna sola según la ciudad del cliente y ya sale impresa en la cotización.</p>
-            <span class="tag">Ya construido</span>
+            <p>Medellín · Bogotá · Barranquilla. La sede se asigna sola según la ciudad y ya sale impresa en la cotización.</p>
+            <span class="tag">Ya configurado</span>
           </div>
         </div>
         <div class="mq">
@@ -1041,7 +1019,7 @@ caption{
           <div>
             <h4>Cierre: cotiza en 3 pasos</h4>
             <p>Equipo → días → datos. Sale el PDF con número COT-W. Un solo camino, sin formularios paralelos.</p>
-            <span class="tag">Ya construido</span>
+            <span class="tag">Ya configurado</span>
           </div>
         </div>
         <div class="mq">
@@ -1049,15 +1027,15 @@ caption{
           <div>
             <h4>Pie corto</h4>
             <p>Contacto, sedes, legal. Nada más.</p>
-            <span class="tag">Responde a P2</span>
+            <span class="tag">Corrige P2</span>
           </div>
         </div>
       </div>
 
-      <h3>La ficha de equipo, en concreto</h3>
+      <h3>Formato de la ficha de equipo</h3>
       <p>
-        Así se ve el bloque 04. Los datos de altura y referencia ya existen en el catálogo del sistema
-        (<code>tarifas_web</code>) y hoy simplemente no se le muestran al cliente:
+        Así queda el bloque 04. La altura y la referencia ya existen en el catálogo del sistema y hoy
+        simplemente no se le muestran al cliente:
       </p>
 
       <div class="ficha-eq">
@@ -1082,12 +1060,10 @@ caption{
         contra la ficha técnica GENIE antes de publicar.
       </p>
 
-      <h3>Catálogo real disponible para las fichas</h3>
+      <h3>Catálogo vigente</h3>
       <div class="tabla-wrap">
         <table>
-          <thead>
-            <tr><th>Referencia</th><th>Tipo</th><th class="num">Altura de trabajo</th><th>Energía</th></tr>
-          </thead>
+          <thead><tr><th>Referencia</th><th>Tipo</th><th class="num">Altura de trabajo</th><th>Energía</th></tr></thead>
           <tbody>
             <tr><td>AWP40</td><td>Unipersonal</td><td class="num">14 m</td><td>Eléctrico</td></tr>
             <tr><td>GENIE 2632</td><td>Tijera</td><td class="num">10 m</td><td>Eléctrico</td></tr>
@@ -1100,7 +1076,7 @@ caption{
             <tr><td>GENIE Z80</td><td>Brazo articulado</td><td class="num">26 m</td><td>Diésel</td></tr>
             <tr><td>GENIE ZX135</td><td>Brazo articulado</td><td class="num">43 m</td><td>Diésel</td></tr>
           </tbody>
-          <caption>Catálogo vigente en el sistema de tarifas. Editable sin tocar código.</caption>
+          <caption>Catálogo vigente en el sistema de tarifas. Editable sin tocar código (sección 09).</caption>
         </table>
       </div>
 
@@ -1119,16 +1095,17 @@ caption{
   <section class="bloque" id="reglas">
     <div class="riel"><span class="riel-num">SECCIÓN<b>08</b></span></div>
     <div class="col">
-      <h2>Reglas duras del sitio</h2>
+      <h2>Reglas de publicación</h2>
       <p class="lede">
-        Diez reglas medibles. Si algo no las cumple, no se publica — da igual quién lo pida.
+        Diez reglas medibles. Se aplican a todo lo que se publique en el sitio de aquí en adelante,
+        venga de donde venga el contenido.
       </p>
 
       <div class="reglas">
         <div class="regla">
           <div class="regla-id">R1</div>
           <div><h4>Un bloque de texto no pasa de 45 palabras sin un dato o una acción al lado</h4>
-          <p>El texto largo se permite solo dentro de una guía o comparativa, donde el visitante entró precisamente a leer.</p></div>
+          <p>El texto largo se permite dentro de una guía o comparativa, donde el visitante entró precisamente a leer.</p></div>
         </div>
         <div class="regla">
           <div class="regla-id">R2</div>
@@ -1137,13 +1114,13 @@ caption{
         </div>
         <div class="regla">
           <div class="regla-id">R3</div>
-          <div><h4>Presupuesto de velocidad: LCP bajo 2,5 s en 4G y menos de 500 KB de carga inicial</h4>
-          <p>Imágenes en WebP, sin librerías externas. La velocidad es la mejora que más rindió; no se negocia por un efecto visual.</p></div>
+          <div><h4>Presupuesto de velocidad: carga principal bajo 2,5 s en 4G y menos de 500 KB iniciales</h4>
+          <p>Imágenes en WebP, sin librerías externas. Lo que cueste velocidad no entra.</p></div>
         </div>
         <div class="regla">
           <div class="regla-id">R4</div>
           <div><h4>Máximo tres acciones por pantalla, una sola principal</h4>
-          <p>Si compiten dos botones del mismo peso, ninguno se usa.</p></div>
+          <p>Si compiten dos botones del mismo peso, no se usa ninguno.</p></div>
         </div>
         <div class="regla">
           <div class="regla-id">R5</div>
@@ -1158,12 +1135,12 @@ caption{
         <div class="regla">
           <div class="regla-id">R7</div>
           <div><h4>Nada se publica sin medición</h4>
-          <p>Cada bloque nuevo entra con su evento en GA4 y con enlaces etiquetados (UTM) cuando se comparte en redes. Sin esto no se puede saber si funcionó.</p></div>
+          <p>Cada bloque nuevo entra con su evento de analítica, y los enlaces que salen a redes van etiquetados con UTM.</p></div>
         </div>
         <div class="regla">
           <div class="regla-id">R8</div>
           <div><h4>Un solo cerebro para Liam</h4>
-          <p>Web y WhatsApp deben leer la misma configuración. Hoy están duplicados y ya se desincronizaron una vez: un canal decía una capacidad de carga equivocada mientras el otro decía la correcta.</p></div>
+          <p>El sitio y WhatsApp leen la misma configuración. Nunca se edita un canal sin el otro.</p></div>
         </div>
         <div class="regla">
           <div class="regla-id">R9</div>
@@ -1180,64 +1157,97 @@ caption{
   </section>
 
   <!-- 09 ------------------------------------------------------------- -->
-  <section class="bloque" id="construido">
+  <section class="bloque" id="operacion">
     <div class="riel"><span class="riel-num">SECCIÓN<b>09</b></span></div>
     <div class="col">
-      <h2>Lo que ya está construido</h2>
+      <h2>Operación y mantenimiento</h2>
       <p class="lede">
-        Esto no es una propuesta desde cero. La maquinaria ya existe y está funcionando; lo que falta
-        es ponerla al frente de la página en vez de esconderla.
+        Qué se cambia, dónde se cambia y quién lo hace. La mayoría de los ajustes del día a día
+        <strong>no requieren programar</strong>.
       </p>
 
       <div class="tabla-wrap">
         <table>
-          <thead><tr><th>Pieza</th><th>Estado</th><th>Qué falta</th></tr></thead>
+          <thead><tr><th>Qué</th><th>Dónde se cambia</th><th>Quién</th><th>Frecuencia</th></tr></thead>
           <tbody>
-            <tr><td>Liam en el sitio (dos modos: directo e asistido)</td><td class="bueno">Funcionando</td><td>Volverlo consultor técnico y subirlo a la portada</td></tr>
-            <tr><td>Cotizador con varios equipos y tarifas por tramo de días</td><td class="bueno">Funcionando</td><td>—</td></tr>
-            <tr><td>Cotización en PDF con número COT-W</td><td class="bueno">Funcionando</td><td>—</td></tr>
-            <tr><td>Base de clientes y leads del sitio</td><td class="bueno">Funcionando</td><td>—</td></tr>
-            <tr><td>Panel de leads para el comercial</td><td class="bueno">Funcionando</td><td>—</td></tr>
-            <tr><td>Liam por WhatsApp con cotización real, atendiendo fuera de horario</td><td class="bueno">Probado</td><td>Pasar al número definitivo (sección 06)</td></tr>
-            <tr><td>Panel para auditar e intervenir los chats de WhatsApp</td><td class="bueno">Funcionando</td><td>—</td></tr>
-            <tr><td>Asignación automática de sede por ciudad</td><td class="bueno">Funcionando</td><td>Publicar el campo en el PDF</td></tr>
-            <tr><td>Configuración de Liam editable sin programar</td><td class="bueno">Funcionando</td><td>Extenderla también al chat del sitio</td></tr>
-            <tr><td>Fichas de equipo con datos técnicos visibles</td><td class="malo">No existe</td><td>Construir (bloque 04)</td></tr>
-            <tr><td>Selector técnico de tres preguntas</td><td class="malo">No existe</td><td>Construir (bloque 03)</td></tr>
+            <tr><td>Tarifas por tramo de días</td><td>Tabla de tarifas del sistema</td><td>Administración</td><td>Cuando cambien</td></tr>
+            <tr><td>Catálogo de equipos y alturas</td><td>Tabla de tarifas del sistema</td><td>Administración</td><td>Cuando cambie la flota</td></tr>
+            <tr><td>Tono y política comercial de Liam</td><td>Panel · Configurar Liam</td><td>Comercial</td><td>Cuando se requiera</td></tr>
+            <tr><td>Estado de las cotizaciones</td><td>Panel de leads</td><td>Comercial</td><td>Diaria</td></tr>
+            <tr><td>Revisión de conversaciones de WhatsApp</td><td>Panel de WhatsApp</td><td>Comercial</td><td>Diaria</td></tr>
+            <tr><td>Intervenir un chat / pausar a Liam</td><td>Panel de WhatsApp · interruptor</td><td>Comercial</td><td>Cuando se requiera</td></tr>
+            <tr><td>Contenido y guías nuevas</td><td>Sitio, con las reglas de la sección 08</td><td>Desarrollo</td><td>Mensual</td></tr>
+            <tr><td>Token de WhatsApp</td><td>Configuración del sistema</td><td>Desarrollo</td><td>Al pasar a producción</td></tr>
           </tbody>
         </table>
       </div>
+
+      <h3>Rutina</h3>
+      <div class="fases">
+        <div class="fase">
+          <div class="fase-cab"><h4>Diaria</h4><span class="fase-plazo">COMERCIAL</span></div>
+          <ul>
+            <li>Revisar leads y cotizaciones nuevas en el panel.</li>
+            <li>Revisar las conversaciones que Liam atendió fuera de horario y retomar las que estén calientes.</li>
+          </ul>
+        </div>
+        <div class="fase">
+          <div class="fase-cab"><h4>Semanal</h4><span class="fase-plazo">COMERCIAL Y CONTENIDO</span></div>
+          <ul>
+            <li>Publicar martes y miércoles, que es cuando la demanda está arriba.</li>
+            <li>Verificar que los enlaces compartidos lleven etiquetas UTM.</li>
+            <li>Revisar si alguna conversación quedó con el bot pausado por error.</li>
+          </ul>
+        </div>
+        <div class="fase">
+          <div class="fase-cab"><h4>Mensual</h4><span class="fase-plazo">DIRECCIÓN</span></div>
+          <ul>
+            <li>Publicar una guía o comparativa nueva.</li>
+            <li>Revisar el tablero de control de la sección 10 contra la línea base.</li>
+            <li>Revisar tarifas y catálogo.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Advertencias operativas</h3>
+      <ul class="lista">
+        <li><strong>Nada sale en vivo hasta que llegue a la rama de producción.</strong> Los cambios de contenido y de estructura solo se ven en el sitio público después de ese paso.</li>
+        <li><strong>Los paneles internos no se enlazan desde el sitio</strong> y siguen protegidos por clave. No se publican ni se comparten sus enlaces.</li>
+        <li><strong>Las tarifas nunca se editan en el código.</strong> Siempre en la tabla de tarifas, para que web y WhatsApp queden iguales al instante.</li>
+        <li><strong>Si se cambia un dato técnico, se cambia en la configuración de Liam</strong>, no en un texto suelto de una página.</li>
+      </ul>
     </div>
   </section>
 
   <!-- 10 ------------------------------------------------------------- -->
-  <section class="bloque" id="metas">
+  <section class="bloque" id="control">
     <div class="riel"><span class="riel-num">SECCIÓN<b>10</b></span></div>
     <div class="col">
-      <h2>Cómo sabremos si funcionó</h2>
+      <h2>Tablero de control</h2>
       <p class="lede">
-        Línea base real de julio 2026 y meta a 90 días. Sin esta tabla, el rediseño es cuestión de gusto.
+        Línea base real de julio de 2026 y meta a 90 días. Es el instrumento con el que se revisa el
+        avance cada mes.
       </p>
 
       <div class="tabla-wrap">
         <table>
-          <thead><tr><th>Indicador</th><th class="num">Hoy</th><th class="num">Meta 90 días</th><th>Por qué</th></tr></thead>
+          <thead><tr><th>Indicador</th><th class="num">Hoy</th><th class="num">Meta 90 días</th><th>Origen</th></tr></thead>
           <tbody>
-            <tr><td>Participación en página de producto</td><td class="num malo">47,92 %</td><td class="num">≥ 65 %</td><td>P1 — hoy es la peor página real</td></tr>
+            <tr><td>Participación en página de producto</td><td class="num malo">47,92 %</td><td class="num">≥ 65 %</td><td>P1</td></tr>
             <tr><td>Duración en página de producto</td><td class="num malo">0:37</td><td class="num">≥ 2:00</td><td>P1</td></tr>
-            <tr><td>Duración en guías</td><td class="num bueno">hasta 4:10</td><td class="num">mantener</td><td>E1 — es el techo a replicar</td></tr>
+            <tr><td>Duración en guías</td><td class="num bueno">hasta 4:10</td><td class="num">mantener</td><td>E1</td></tr>
             <tr><td>Sesiones orgánicas / mes</td><td class="num">440</td><td class="num">600</td><td>E3</td></tr>
-            <tr><td>Tráfico desde redes</td><td class="num malo">5,5 %</td><td class="num">12 %</td><td>P4 — con enlaces etiquetados</td></tr>
+            <tr><td>Tráfico desde redes</td><td class="num malo">5,5 %</td><td class="num">12 %</td><td>P4</td></tr>
             <tr><td>Vistas al error 404</td><td class="num malo">84</td><td class="num">0</td><td>P3</td></tr>
             <tr><td>Peso de la pauta</td><td class="num">27,7 %</td><td class="num">≤ 20 %</td><td>P5</td></tr>
-            <tr><td>Visitantes que abren a Liam</td><td class="num">nuevo</td><td class="num">15 %</td><td>Mide si la portada invita</td></tr>
-            <tr><td>Consultas que terminan en recomendación</td><td class="num">nuevo</td><td class="num">60 %</td><td>Mide si Liam es consultor de verdad</td></tr>
-            <tr><td>Cotizaciones generadas / mes</td><td class="num">nuevo</td><td class="num">30</td><td>El resultado que importa</td></tr>
-            <tr><td>Primera respuesta fuera de horario</td><td class="num malo">al día siguiente</td><td class="num">&lt; 1 min</td><td>E5 — es lo que gana o pierde el lead</td></tr>
-            <tr><td>Mensajes fuera de horario sin responder</td><td class="num">sin medir</td><td class="num">0</td><td>E5</td></tr>
-            <tr><td>Leads capturados fuera de horario / mes</td><td class="num">nuevo</td><td class="num">10</td><td>Mide lo que hoy se está perdiendo</td></tr>
+            <tr><td>Visitantes que abren a Liam</td><td class="num">nuevo</td><td class="num">15 %</td><td>Bloque 02</td></tr>
+            <tr><td>Consultas que terminan en recomendación</td><td class="num">nuevo</td><td class="num">60 %</td><td>Sección 05</td></tr>
+            <tr><td>Cotizaciones generadas / mes</td><td class="num">nuevo</td><td class="num">30</td><td>Resultado</td></tr>
+            <tr><td>Primera respuesta fuera de horario</td><td class="num malo">al día siguiente</td><td class="num">&lt; 1 min</td><td>Sección 06</td></tr>
+            <tr><td>Mensajes fuera de horario sin responder</td><td class="num">sin medir</td><td class="num">0</td><td>Sección 06</td></tr>
+            <tr><td>Leads capturados fuera de horario / mes</td><td class="num">nuevo</td><td class="num">10</td><td>Sección 06</td></tr>
           </tbody>
-          <caption>Las tres últimas filas son indicadores nuevos: hoy no se miden y deben quedar instrumentados antes de empezar.</caption>
+          <caption>“Nuevo” = indicador que hoy no se mide y debe quedar instrumentado en la fase 1.</caption>
         </table>
       </div>
     </div>
@@ -1247,17 +1257,17 @@ caption{
   <section class="bloque" id="plan">
     <div class="riel"><span class="riel-num">SECCIÓN<b>11</b></span></div>
     <div class="col">
-      <h2>Plan por fases</h2>
-      <p class="lede">Ocho semanas, en orden de impacto sobre las métricas.</p>
+      <h2>Plan de aplicación</h2>
+      <p class="lede">Ocho semanas, en orden de impacto sobre los indicadores de la sección 10.</p>
 
       <div class="fases">
         <div class="fase">
-          <div class="fase-cab"><h4>Fase 1 · Encender el 24/7 e higiene</h4><span class="fase-plazo">SEMANAS 1–2</span></div>
+          <div class="fase-cab"><h4>Fase 1 · Encender el 24/7 e higiene de datos</h4><span class="fase-plazo">SEMANAS 1–2</span></div>
           <ul>
-            <li><strong>Pasar Liam WhatsApp al número definitivo</strong>: token permanente, suscripción de la cuenta y verificación del negocio. Mayor impacto, menor esfuerzo.</li>
+            <li><strong>Pasar Liam WhatsApp al número definitivo</strong> con el checklist de la sección 06. Mayor impacto, menor esfuerzo.</li>
             <li>Cerrar el error 404 del captcha y limpiar la analítica.</li>
             <li>Etiquetar con UTM todos los enlaces de redes y apuntarlos a páginas concretas.</li>
-            <li>Instrumentar los eventos de GA4 de los tres indicadores nuevos.</li>
+            <li>Instrumentar los indicadores marcados como “nuevo” en el tablero de control.</li>
             <li>Publicar el campo de sede en el PDF de cotización.</li>
           </ul>
         </div>
@@ -1265,8 +1275,8 @@ caption{
           <div class="fase-cab"><h4>Fase 2 · Liam consultor técnico</h4><span class="fase-plazo">SEMANAS 3–5</span></div>
           <ul>
             <li>Cargar el temario de las siete preguntas como base de conocimiento.</li>
-            <li>Unificar el cerebro de Liam entre el sitio y WhatsApp (regla R8).</li>
-            <li>Portada nueva: la pregunta en vez del eslogan.</li>
+            <li>Unificar la configuración de Liam entre el sitio y WhatsApp (regla R8).</li>
+            <li>Portada nueva: la pregunta en lugar del eslogan.</li>
             <li>Selector técnico de tres preguntas.</li>
           </ul>
         </div>
@@ -1282,7 +1292,7 @@ caption{
         <div class="fase">
           <div class="fase-cab"><h4>Fase 4 · Medir y redistribuir</h4><span class="fase-plazo">DESDE LA SEMANA 9</span></div>
           <ul>
-            <li>Revisar la tabla de metas contra la línea base de julio.</li>
+            <li>Revisar el tablero de control contra la línea base de julio.</li>
             <li>Mover parte del presupuesto de pauta a palabras de menor competencia.</li>
             <li>Concentrar publicaciones y pauta en martes y miércoles.</li>
           </ul>
@@ -1292,29 +1302,34 @@ caption{
   </section>
 
   <!-- 12 ------------------------------------------------------------- -->
-  <section class="bloque" id="cierre">
+  <section class="bloque" id="restricciones">
     <div class="riel"><span class="riel-num">SECCIÓN<b>12</b></span></div>
     <div class="col">
-      <h2>Lo que decidimos no hacer</h2>
+      <h2>Restricciones permanentes</h2>
+      <p class="lede">Decisiones ya tomadas que no se revisan con cada cambio.</p>
+
       <ul class="lista">
-        <li><strong>No repetir la estructura de la página antigua.</strong> Creció por SEO y velocidad, no por su recorrido comercial.</li>
-        <li><strong>No publicar artículos sueltos sin herramienta.</strong> Cada guía debe terminar en el selector o en Liam.</li>
-        <li><strong>No pedir datos antes de dar valor.</strong> La consulta técnica es abierta; los datos se piden cuando el cliente ya quiere la cotización — ahí sí son obligatorios, incluidos NIT o cédula y ciudad.</li>
-        <li><strong>No mostrar tarifas reales en conversación.</strong> Solo dentro del PDF formal.</li>
-        <li><strong>No abrir los datos de conversaciones al navegador.</strong> El panel sigue detrás de clave, por seguridad.</li>
+        <li><strong>No se replica la estructura de la página antigua.</strong> Su crecimiento vino del SEO y de la velocidad, no de su recorrido comercial.</li>
+        <li><strong>No se publican artículos sueltos sin herramienta.</strong> Cada guía termina en el selector técnico o en Liam.</li>
+        <li><strong>No se piden datos antes de dar valor.</strong> La consulta técnica es abierta; los datos se exigen cuando el cliente pide la cotización, y ahí son obligatorios: NIT o cédula y ciudad.</li>
+        <li><strong>No se muestran tarifas reales en conversación.</strong> Solo dentro del PDF formal.</li>
+        <li><strong>No se abren al navegador los datos de conversaciones ni de clientes.</strong> Los paneles siguen detrás de clave.</li>
+        <li><strong>No se edita un canal de Liam sin el otro.</strong> Regla R8.</li>
       </ul>
 
-      <div class="cierre">
-        <h3>Cuatro decisiones que necesitamos aprobadas para arrancar</h3>
-        <ol>
-          <li><strong>Encender el WhatsApp definitivo esta quincena.</strong> Es lo único que separa a UP Equipos de atender 24/7 desde ya, y no depende de desarrollo.</li>
-          <li><strong>La portada abre con la pregunta técnica</strong>, no con el eslogan ni con el carrusel de equipos.</li>
-          <li><strong>Liam se vuelve consultor técnico</strong> con el temario de siete preguntas, y responde en los dos canales con el mismo cerebro.</li>
-          <li><strong>Las diez reglas duras de la sección 08 aplican a todo lo que se publique</strong>, incluidos textos que lleguen desde afuera.</li>
-        </ol>
+      <div class="checklist">
+        <h3>Antes de publicar cualquier cambio</h3>
+        <ul>
+          <li>¿Responde una pregunta concreta del cliente? (R2, R10)</li>
+          <li>¿Los datos técnicos están como dato y no dentro de un párrafo? (R5)</li>
+          <li>¿La sección termina con un paso siguiente? (R6)</li>
+          <li>¿Se mantiene el presupuesto de velocidad? (R3)</li>
+          <li>¿Quedó su evento de medición y, si va a redes, sus UTM? (R7)</li>
+          <li>¿Si tocó a Liam, se aplicó en los dos canales? (R8)</li>
+        </ul>
         <p class="firma">
           UP EQUIPOS S.A.S. · MEDELLÍN · BOGOTÁ · BARRANQUILLA<br>
-          FUENTE DE MÉTRICAS: GOOGLE ANALYTICS 4 · INFORME DEL 31/07/2026<br>
+          MÉTRICAS: GOOGLE ANALYTICS 4 · INFORME DEL 31/07/2026<br>
           CATÁLOGO Y ESTADO DE PLATAFORMA: SISTEMA UP EQUIPOS, CONSULTADO EL 31/07/2026
         </p>
       </div>
