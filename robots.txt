@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /seo/
+Disallow: /docs/
 
 Sitemap: https://pagina-up.onrender.com/sitemap.xml
